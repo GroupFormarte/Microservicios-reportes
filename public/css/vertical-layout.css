@@ -1,0 +1,83 @@
+/* Vertical layout specific styles */
+.vertical-layout {
+    /* Any specific styles for vertical pages */
+}
+
+.vertical-layout .header {
+    /* Vertical header adjustments */
+}
+
+.vertical-layout .chart-title.vertical {
+    /* Vertical chart title adjustments */
+    width: 80%; /* Different width for vertical layout */
+    padding: 10px 50px; /* Different padding for vertical layout */
+}
+
+/* Grid layout for vertical components */
+.vertical-layout .paddingMargen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+    align-items: start;
+}
+
+/* Full width components in vertical layout */
+.vertical-layout .component-tabla-dificultad-analisis,
+.vertical-layout .component-comparativo-puntaje,
+.vertical-layout .component-score-distribution {
+    grid-column: 1 / -1; /* Span all columns */
+}
+
+/* Compact components that can share space */
+.vertical-layout .component-bar-chart-with-title,
+.vertical-layout .component-bar-chart-simple {
+    /* These will automatically fit in grid cells */
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/* Ensure bar chart components are responsive within grid */
+.vertical-layout .component-bar-chart-with-title .chart-container,
+.vertical-layout .component-bar-chart-simple .chart-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Score distribution components - allow full width */
+.vertical-layout .component-score-distribution {
+    /* Remove grid-column span - let it fit in grid cells like other compact components */
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Score distribution internal layout - single chart per component */
+.vertical-layout .component-score-distribution .circular-charts-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.vertical-layout .component-score-distribution .chart-item {
+    width: 336px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Responsive adjustments for vertical layout */
+@media (max-width: 1200px) {
+    .vertical-layout .paddingMargen {
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .vertical-layout .paddingMargen {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}

@@ -1,0 +1,35 @@
+:root {
+    /* Color palette - Principal */
+    --color-primary-1: #27a1db;
+    --color-primary-2: #bd5785;
+    --color-primary-3: #d88008;
+
+    /* Color palette - Acentos */
+    --color-accent-1: #4b3e7a;
+    --color-accent-2: #0075af;
+    --color-accent-3: #4c8631;
+    --color-accent-4: #fcf1ef;
+    --color-accent-5: #2557a4;
+
+    /* Typography */
+    --font-family-primary: 'Nunito', Arial, sans-serif;
+    --font-weight-light: 300;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+
+    /* Spacing */
+    --padding-horizontal: 60px;
+    --border-radius-small: 3px;
+    --border-radius-medium: 4px;
+    --border-radius-large: 8px;
+
+    /* Layout dimensions */
+    --header-logo-height: 40px;
+    --info-icon-size: 30px;
+    --legend-bar-width: 15px;
+    --legend-bar-height: 35px;
+    --legend-bar-year-width: 100px;
+}

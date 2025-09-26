@@ -1,0 +1,102 @@
+/* Bar Chart with Title specific styles */
+
+.chart-item {
+    margin-bottom: 40px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: var(--border-radius-large);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chart-label {
+    text-align: center;
+    font-size: 20px;
+    font-weight: var(--font-weight-semibold);
+    color: #666;
+    margin-bottom: 20px;
+    font-family: var(--font-family-primary);
+}
+
+.chart-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+canvas {
+    display: block;
+    box-sizing: border-box;
+    height: 200px;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Legend row */
+.legend-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+    gap: 2px;
+}
+
+.legend-color-box {
+    width: 40px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-semibold);
+    font-size: 14px;
+    color: white;
+}
+
+.legend-color-1 { background-color: #c55c5c; }
+.legend-color-2 { background-color: #d88008; }
+.legend-color-3 { background-color: #f4d03f; color: #333; }
+.legend-color-4 { background-color: #58a55c; }
+
+.border-radius-left {
+    border-top-left-radius: var(--border-radius-medium);
+    border-bottom-left-radius: var(--border-radius-medium);
+}
+
+.border-radius-right {
+    border-top-right-radius: var(--border-radius-medium);
+    border-bottom-right-radius: var(--border-radius-medium);
+}
+
+/* Ranges table */
+.ranges-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 2px;
+    font-family: var(--font-family-primary);
+}
+
+.ranges-table td {
+    background-color: var(--color-accent-4);
+    padding: 8px 12px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: var(--font-weight-medium);
+}
+
+.ranges-table td:first-child {
+    background-color: #e8e8e8;
+    font-weight: var(--font-weight-semibold);
+    text-align: left;
+    padding-left: 16px;
+}
+
+/* Vertical layout adjustments */
+.vertical-layout .chart-item {
+    margin-bottom: 30px;
+}
+
+.vertical-layout .chart-label {
+    font-size: 18px;
+}
+
+.vertical-layout canvas {
+    height: 180px;
+}

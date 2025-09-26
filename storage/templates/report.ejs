@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diseño estilo tarjeta</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fff;
+            /* padding: 40px; */
+            padding: 0px 40px 0px 40px;
+
+            margin: 0px;
+        }
+
+
+        .info-user {
+            max-width: 900px;
+            margin: auto;
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fila {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .fila:last-child {
+            border-bottom: none;
+        }
+
+        .campo {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 150px;
+            border-right: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .fila .campo:last-child {
+            border-right: none;
+        }
+
+        .titulo {
+            /* font-weight: bold; */
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .valor {
+            font-size: 14px;
+            color: #656565;
+        }
+
+        /* Esquinas redondeadas */
+        .fila:first-child .campo:first-child {
+            border-top-left-radius: 15px;
+        }
+
+        .fila:first-child .campo:last-child {
+            border-top-right-radius: 15px;
+        }
+
+        .fila:last-child .campo:first-child {
+            border-bottom-left-radius: 15px;
+        }
+
+        .fila:last-child .campo:last-child {
+            border-bottom-right-radius: 15px;
+        }
+
+        .pequeno {
+            flex: 0 0 30px;
+            min-width: 0;
+        }
+
+        .mediano {
+            flex: 0 0 45px;
+            min-width: 0;
+        }
+
+        .circle-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            z-index: 1;
+            top: 10px;
+        }
+
+        #scoreCanvas {
+            position: absolute;
+            top: -20px;
+            right: 0;
+            width: 150px !important;
+            height: 150px !important;
+        }
+
+        .circle-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .circle-text .score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .circle-text .label {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            /* padding: 20px 40px 0 40px; */
+            position: relative;
+            margin-bottom: 20px;
+            height: 155px;
+
+        }
+
+
+        .header .line-gradent {
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            height: 10px;
+            background: linear-gradient(to right, #3BF4B5, #3CF7E9);
+            border-radius: 10px;
+            width: calc(100% - 70px);
+
+        }
+
+        .logo-container {
+            flex: 1;
+            text-align: start;
+        }
+
+
+        .container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 40px;
+            align-items: center;
+            text-align: center;
+            width: 95%;
+        }
+
+        .chart-block {
+            width: 100px;
+        }
+
+        canvas {
+            width: 100px !important;
+            height: 100px !important;
+        }
+
+        .label {
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .vertical-label {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            margin-right: 20px;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .vertical-label .label-main {
+            font-size: 16px;
+            font-weight: bold;
+            color: #111;
+        }
+
+        .vertical-label .label-sub {
+            font-size: 14px;
+            color: #999;
+            font-weight: normal;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(to right, #E9F7F3, #E3F4F9);
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding: 14px;
+        }
+
+
+        .tabla {
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #ccc;
+            max-width: 900px;
+            margin: auto;
+            margin-top: 10px;
+        }
+
+        .fila {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            color: #656565;
+        }
+
+
+        .p-10 {
+            padding: 10px;
+        }
+
+        .fila.encabezado {
+            background-color: #4A9CD6;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .fila.totales {
+            background-color: #4A9CD6;
+            color: white;
+            font-weight: bold;
+        }
+
+        .celda {
+            flex: 1;
+            text-align: center;
+        }
+
+        .celda.area {
+            flex: 2;
+            text-align: left;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <img src="<%= logoUrl %>" alt="Logo Formarte" height="150">        </div>
+
+        <div class="circle-container">
+            <canvas id="scoreCanvas" width="150" height="150"></canvas>
+        </div>
+
+        <div class="line-gradent"></div>
+    </div>
+
+    <div class="info-user">
+        <!-- Fila 1 -->
+        <div class="fila">
+            <div class="campo">
+                <div class="titulo">EVALUACIÓN</div>
+                <div class="valor">
+                    <%= student.evaluacion %>
+                </div>
+            </div>
+            <div class="campo">
+                <div class="titulo">FECHA</div>
+                <div class="valor">
+                    <%= student.fecha %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fila 2 -->
+        <div class="fila">
+            <div class="campo">
+                <div class="titulo">NOMBRES – APELLIDOS</div>
+                <div class="valor">
+                    <%= student.nombre %>
+                </div>
+            </div>
+            <div class="campo">
+                <div class="titulo">CÓDIGO</div>
+                <div class="valor">
+                    <%= student.codigo %>
+                </div>
+            </div>
+            <div class="campo">
+                <div class="titulo"># DE LISTA</div>
+                <div class="valor">
+                    <%= student.puesto %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fila 3 -->
+        <div class="fila">
+            <div class="campo">
+                <div class="titulo">INSTITUCIÓN</div>
+                <div class="valor">
+                    <%= student.institucion %>
+                </div>
+            </div>
+            <div class="campo">
+                <div class="titulo">GRUPO</div>
+                <div class="valor">
+                    <%= student.grupo %>
+                </div>
+            </div>
+            <div class="campo mediano">
+                <div class="titulo">PUESTO</div>
+                <div class="valor">
+                    <%= student.puesto %>
+                </div>
+            </div>
+            <div class="campo pequeno">
+                <div class="titulo">GRA</div>
+                <div class="valor"></div>
+            </div>
+            <div class="campo pequeno">
+                <div class="titulo">GRU</div>
+                <div class="valor"></div>
+            </div>
+            <div class="campo">
+                <div class="titulo">CIUDAD</div>
+                <div class="valor">
+                    <%= student.ciudad %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de resultados -->
+    <div class="tabla">
+        <div class="fila p-10 encabezado">
+            <div class="celda area">ÁREA</div>
+            <div class="celda">RESPUESTAS CORRECTAS</div>
+            <div class="celda">#PREGUNTAS</div>
+            <div class="celda">PUNTAJE POR ÁREA</div>
+        </div>
+
+        <% let totalCorrectas=0; let totalPreguntas=0; %>
+            <% student.areas.forEach(area=> { %>
+                <div class="fila p-10">
+                    <div class="celda area">
+                        <%= area.nombre %>
+                    </div>
+                    <div class="celda">
+                        <%= area.correctas %>
+                    </div>
+                    <div class="celda">
+                        <%= area.total %>
+                    </div>
+                    <div class="celda">
+                        <%= area.puntaje %>
+                    </div>
+                </div>
+                <% totalCorrectas +=area.correctas; totalPreguntas +=area.total; %>
+                    <% }) %>
+
+                        <div class="fila p-10 totales">
+                            <div class="celda area">TOTAL</div>
+                            <div class="celda">
+                                <%= totalCorrectas %>
+                            </div>
+                            <div class="celda">
+                                <%= totalPreguntas %>
+                            </div>
+                            <div class="celda"></div>
+                        </div>
+    </div>
+
+    <!-- Gráfica -->
+    <div class="row">
+        <div class="vertical-label">
+            <span class="label-sub">De 0 a 200</span>
+            <span class="label-title">GRÁFICA POR ÁREAS</span>
+
+        </div>
+        <div class="container">
+            <% student.areas.forEach((area, index)=> { %>
+                <div class="chart-block">
+                    <canvas id="chart<%= index %>"></canvas>
+                    <div class="label">
+                        <%= area.nombre %>
+                    </div>
+                </div>
+                <% }) %>
+        </div>
+    </div>
+
+
+    <!-- Scripts -->
+    <script>
+        const canvas = document.getElementById("scoreCanvas");
+        const ctx = canvas.getContext("2d");
+        const score = parseFloat('<%= student.puntaje %>');
+        const maxScore = 700.0;
+        const percentage = Math.min(score / maxScore, 1.0);
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = 60;
+
+        const startAngle = 0.12 * Math.PI;
+        const endAngle = startAngle + 2 * Math.PI * percentage;
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+        ctx.strokeStyle = "#EDF4F8";
+        ctx.lineWidth = 20;
+        ctx.lineCap = "round";
+        ctx.stroke();
+
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        gradient.addColorStop(0, "#7DDE8C");
+        gradient.addColorStop(1, "#74D0B3");
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = 20;
+        ctx.lineCap = "round";
+        ctx.stroke();
+
+        ctx.fillStyle = "#333";
+        ctx.font = "bold 24px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(score.toFixed(1), centerX, centerY - 10);
+
+        ctx.font = "bold 14px Arial";
+        ctx.fillStyle = "#777";
+        ctx.fillText("PUNTAJE", centerX, centerY + 12);
+
+        const areas = JSON.parse('<%- JSON.stringify(student.areas) %>');
+
+        areas.forEach((area, index) => {
+            new Chart(document.getElementById('chart' + index), {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [area.puntaje, 200 - area.puntaje],
+                        backgroundColor: ['#66CDAA', '#fff'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '80%',
+                    responsive: false,
+                    plugins: {
+                        tooltip: { enabled: false },
+                        legend: { display: false }
+                    }
+                },
+                plugins: [{
+                    id: 'textInside',
+                    beforeDraw: function (chart) {
+                        const { width, height } = chart;
+                        const ctx = chart.ctx;
+                        ctx.restore();
+
+                        const centerX = width / 2;
+                        const centerY = height / 2;
+                        const radius = height / 3.5;
+
+                        const gradient = ctx.createLinearGradient(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
+                        gradient.addColorStop(0, '#9adcb8');
+                        gradient.addColorStop(1, '#7dbdb5');
+
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                        ctx.fillStyle = gradient;
+                        ctx.fill();
+
+                        ctx.fillStyle = '#fff';
+                        ctx.font = `${(height / 6).toFixed(2)}px Arial`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(`${area.puntaje}`, centerX, centerY);
+
+                        ctx.save();
+                    }
+                }]
+            });
+        });
+
+
+    </script>
+</body>
+
+</html>

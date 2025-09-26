@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla de Calificaciones</title>
+    <style>
+        :root {
+            /* Color palette - Principal */
+            --color-primary-1: #27a1db;
+            --color-primary-2: #bd5785;
+            --color-primary-3: #d88008;
+
+            /* Color palette - Acentos */
+            --color-accent-1: #4b3e7a;
+            --color-accent-2: #0075af;
+            --color-accent-3: #4c8631;
+            --color-accent-4: #fcf1ef;
+            --color-accent-5: #2557a4;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+    
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+         
+       
+        }
+
+        th {
+            background-color: transparent;
+            color: white;
+            padding: 8px 3px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: bold;
+            border: none;
+            vertical-align: middle;
+        }
+
+        .th-content {
+            background-color: var(--color-accent-2);
+            border-radius: 5px;
+            padding: 4px 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 79px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .vertical-text {
+            writing-mode: vertical-lr;
+            text-orientation: mixed;
+            /* padding: 4px 2px; */
+            width: 25px;
+            height: 80px;
+        }
+
+        .vertical-text span {
+            display: block;
+            transform: rotate(180deg);
+        }
+
+        .vertical-text .th-content {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        td {
+            padding: 4px 6px;
+            text-align: center;
+            font-size: 11px;
+            border: 1px solid #d0d0d0;
+            background-color: white;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f8f8f8;
+        }
+
+        .nombres-col {
+            text-align: left;
+            padding-left: 8px;
+            width: 300px;
+        }
+
+        .numero-col {
+            width: 35px;
+            text-align: center;
+        }
+
+        .grupo-col {
+            width: 100px;
+            text-align: center;
+        }
+
+        .puntaje-col {
+            width: 50px;
+            text-align: center;
+        }
+
+        .materia-col {
+            width: 70px;
+            text-align: center;
+        }
+
+        .resumen-row td {
+            background-color: transparent !important;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            border: none;
+        }
+
+        .resumen-row .label-col {
+            text-align: left;
+            padding-left: 8px;
+        }
+
+        .td-content {
+            background-color: var(--color-accent-2);
+            border-radius: 5px;
+            padding: 8px 12px;
+            display: block;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            color: white;
+        }
+
+        .td-content.label {
+            text-align: left;
+        }
+
+        .dash {
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th class="vertical-text" >
+                    <div class="th-content">
+                        <span>Puesto grado</span>
+                    </div>
+                </th>
+                <th class="vertical-text" >
+                    <div class="th-content">
+                        <span>Puesto grupo</span>
+                    </div>
+                </th>
+                <th class="grupo-col">
+                    <div class="th-content ">Grupo</div>
+                </th>
+                <th class="nombres-col">
+                    <div class="th-content">Nombre</div>
+                </th>
+                <th class="vertical-text"  >
+                    <div class="th-content">
+                        <span>Puntaje</span>
+                    </div>
+                </th>
+                <th class="vertical-text" >
+                    <div class="th-content">
+                        <span>Categoría</span>
+                    </div>
+                </th>
+                <% const columnas = competencias || areas || columnas || []; %>
+                <% if (columnas && columnas.length > 0) { %>
+                    <% columnas.forEach(columna => { %>
+                        <th class="vertical-text">
+                            <div class="th-content">
+                                <span><%= columna %></span>
+                            </div>
+                        </th>
+                    <% }); %>
+                <% } %>
+
+            </tr>
+        </thead>
+        <tbody>
+            <% if (estudiantes && estudiantes.length > 0) { %>
+                <% estudiantes.forEach(estudiante => { %>
+                    <tr>
+                        <td><%= estudiante.puestoGrado %></td>
+                        <td><%= estudiante.puestoGrupo %></td>
+                        <td><%= estudiante.grupo %></td>
+                        <td><%= estudiante.nombre %></td>
+                        <td><%= estudiante.puntaje %></td>
+                        <td><%= estudiante.categoria %></td>
+                        <% const valoresEstudiante = estudiante.competencias || estudiante.areas || []; %>
+                        <% if (valoresEstudiante && valoresEstudiante.length > 0) { %>
+                            <% valoresEstudiante.forEach(valor => { %>
+                                <td><%= valor %></td>
+                            <% }); %>
+                        <% } %>
+                    </tr>
+                <% }); %>
+            <% } %>
+
+            <tr class="resumen-row">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="label-col">
+                    <div class="td-content label">Promedio General</div>
+                </td>
+                <td>
+                    <div class="td-content"><%= promedioGeneral || '-' %></div>
+                </td>
+                <td></td>
+                <% if (competencias && competencias.length > 0) { %>
+                    <% competencias.forEach(() => { %>
+                        <td>
+                            <div class="td-content">-</div>
+                        </td>
+                    <% }); %>
+                <% } %>
+            </tr>
+            <tr class="resumen-row">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="label-col">
+                    <div class="td-content label">Desviación estándar</div>
+                </td>
+                <td>
+                    <div class="td-content"><%= desviacionEstandar || '-' %></div>
+                </td>
+                <td></td>
+                <% if (competencias && competencias.length > 0) { %>
+                    <% competencias.forEach(() => { %>
+                        <td>
+                            <div class="td-content">-</div>
+                        </td>
+                    <% }); %>
+                <% } %>
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>

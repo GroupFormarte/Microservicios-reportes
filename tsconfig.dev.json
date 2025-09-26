@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"],
+      "@controllers/*": ["controllers/*"],
+      "@middleware/*": ["middleware/*"],
+      "@routes/*": ["routes/*"],
+      "@services/*": ["services/*"],
+      "@types/*": ["types/*"],
+      "@utils/*": ["utils/*"]
+    }
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
+}

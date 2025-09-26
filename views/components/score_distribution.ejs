@@ -1,0 +1,258 @@
+<style>
+    :root {
+        /* Color palette - Principal */
+        --primary-blue: #27a1db;
+        --primary-pink: #bd5785;
+        --primary-orange: #d88008;
+
+        /* Color palette - Acentos */
+        --accent-purple: #4b3e7a;
+        --accent-light: #fcf1ef;
+        --accent-green: #4c8631;
+
+
+  --color-rojo: #c55c5c;
+  --color-naranja: #d88008;
+  --color-amarillo: #f4d03f;
+  --color-verde: #58a55c;    }
+
+    .charts-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 60px;
+        justify-content: center;
+        align-items: flex-start;
+        margin: 40px auto;
+        width: 100%;
+        max-width: 100%;
+       
+    }
+
+    .chart-item {
+        text-align: center;
+        width: 336px;
+        flex-shrink: 0;
+        box-sizing: border-box;
+    }
+
+    .chart-item.horizontal {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        width: auto;
+    }
+
+    .chart-item.horizontal .chart-wrapper {
+        flex-shrink: 0;
+    }
+
+    .chart-item.horizontal .stats-section {
+        flex: 1;
+    }
+
+    .chart-item h3 {
+        color: var(--primary-blue);
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 30px;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        margin-bottom: 30px;
+        align-content: end;
+    }
+
+    .header-row {
+        display: flex;
+        margin-bottom: 8px;
+        justify-content: flex-end;
+    }
+
+    .header-box {
+        width: 60px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        margin-right: 0;
+        border-radius: 0;
+        box-sizing: border-box;
+    }
+
+    .header-color-1 {
+        background-color: var(--color-rojo);
+    }
+
+    .header-color-2 {
+        background-color: var(--color-naranja);
+    }
+
+    .header-color-3 {
+        background-color: var(--color-amarillo);
+    }
+
+    .header-color-4 {
+        background-color: var(--color-verde);
+    }
+
+    .stats-table {
+        width: 336px;
+        border-collapse: separate;
+        border-spacing: 0 5px;
+        margin-top: 10px;
+        font-size: 14px;
+        border-radius: 0;
+    }
+
+    .stats-table th {
+        background-color: var(--primary-blue);
+        color: white;
+        padding: 8px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 10px;
+        width: 500px;
+    }
+
+    .stats-table td {
+        padding-top: 4px;
+        margin: 0px !important;
+    }
+
+    .stats-table td div {
+        text-align: center;
+        background-color: var(--accent-light);
+    }
+
+    .stats-table tbody tr {
+        background-color: var(--accent-light);
+    }
+
+    .rounded-left {
+        border-radius: 0 5px 5px 0;
+    }
+
+    .rounded-right {
+        border-radius: 5px 0 0 5px;
+    }
+
+    .score-chart {
+        width: 150px !important;
+        margin: auto;
+    }
+</style>
+
+<div class="charts-container">
+    <!-- Chart for each subject -->
+    <% subjects.forEach(function(subject) { %>
+        <div class="chart-item">
+            <h3><%= subject.name %></h3>
+            
+            <div class="chart-wrapper">
+                <canvas id="<%= subject.chartId %>Chart" class="score-chart"></canvas>
+            </div>
+
+            <div class="stats-section">
+                <!-- Header -->
+                <div class="header-row">
+                    <div class="header-box header-color-1 rounded-right">1</div>
+                    <div class="header-box header-color-2">2</div>
+                    <div class="header-box header-color-3">3</div>
+                    <div class="header-box header-color-4 rounded-left">4</div>
+                </div>
+
+                <!-- Stats Table -->
+                <table class="stats-table">
+                    <thead>
+                        <tr>
+                            <th class="rounded-right">Rangos</th>
+                            <% subject.ranges.forEach(function(range, index) { %>
+                                <th <%= index === subject.ranges.length - 1 ? 'class="rounded-left"' : '' %>><%= range.label %></th>
+                            <% }); %>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="rounded-right">
+                                <div>% Estudiantes</div>
+                            </td>
+                            <% subject.ranges.forEach(function(range, index) { %>
+                                <td <%= index === subject.ranges.length - 1 ? 'class="rounded-left"' : '' %>>
+                                    <div><%= range.percentage %>%</div>
+                                </td>
+                            <% }); %>
+                        </tr>
+                        <tr>
+                            <td class="rounded-right">
+                                <div># Estudiantes</div>
+                            </td>
+                            <% subject.ranges.forEach(function(range, index) { %>
+                                <td <%= index === subject.ranges.length - 1 ? 'class="rounded-left"' : '' %>>
+                                    <div><%= range.count %></div>
+                                </td>
+                            <% }); %>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    <% }); %>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Check if Chart is available
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded');
+            return;
+        }
+
+        // Chart colors configuration
+        const chartColors = ['#d88008', '#4b3e7a', '#27a1db', '#4c8631'];
+
+        // Data from server
+        const chartsData = <%- JSON.stringify(subjects || []) %>;
+  
+        // Common donut configuration
+        const donutConfig = {
+            type: 'doughnut',
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                cutout: '60%'
+            }
+        };
+
+        // Create charts for each subject
+        if (chartsData && Array.isArray(chartsData) && chartsData.length > 0) {
+            chartsData.forEach(function (subject) {
+                const ctx = document.getElementById(subject.chartId + 'Chart').getContext('2d');
+                const chartData = {
+                    labels: subject.ranges.map(range => range.label),
+                    datasets: [{
+                        data: subject.ranges.map(range => range.percentage),
+                        backgroundColor: ['#c55c5c','#d88008','#f4d03f','#58a55c'],
+                        borderWidth: 0
+                    }]
+                };
+
+                new Chart(ctx, {
+                    ...donutConfig,
+                    data: chartData
+                });
+            });
+        } else {
+            console.warn('No chart data available for score_distribution component');
+        }
+    });
+</script>

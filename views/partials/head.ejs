@@ -1,0 +1,44 @@
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'Formarte - Reportes' %></title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    
+    <!-- Base CSS -->
+    <% 
+    const cssBaseUrl = (typeof isPdfGeneration !== 'undefined' && isPdfGeneration) ? (baseUrl || 'http://localhost:3000') : '';
+    %>
+    <link rel="stylesheet" href="<%= cssBaseUrl %>/api/reports/css/variables.css">
+    <link rel="stylesheet" href="<%= cssBaseUrl %>/api/reports/css/base.css">
+    
+    <!-- Extra CSS -->
+    <% if (extraCSS && extraCSS.length > 0) { %>
+        <% extraCSS.forEach(css => { %>
+            <link rel="stylesheet" href="<%= cssBaseUrl %><%= css %>">
+        <% }); %>
+    <% } %>
+    
+    <% if (isPdfGeneration) { %>
+    <!-- PDF-specific styles -->
+    <style>
+        /* Ensure all resources load properly in PDF */
+        @import url('<%= cssBaseUrl %>/api/reports/css/variables.css');
+        @import url('<%= cssBaseUrl %>/api/reports/css/base.css');
+        
+        /* PDF optimizations */
+        body { 
+            -webkit-print-color-adjust: exact !important; 
+            color-adjust: exact !important;
+        }
+        
+        .chart-container canvas { 
+            max-width: 100% !important; 
+            height: auto !important; 
+        }
+
+
+    </style>
+    <% } %>

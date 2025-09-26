@@ -1,0 +1,144 @@
+/* Shared component styles */
+
+/* Chart containers */
+.chart-container {
+    margin-bottom: 40px;
+}
+
+.chart-area {
+    background-color: #f8f9fa;
+    padding: 40px;
+    border-radius: 0 0 var(--border-radius-large) var(--border-radius-large);
+    border: 1px solid #e9ecef;
+    border-top: none;
+}
+
+.chart-container-inner {
+    position: relative;
+    height: 400px;
+    width: 100%;
+}
+
+/* Table styles */
+.table-container {
+    background-color: transparent;
+    border-radius: var(--border-radius-large);
+    padding: 0;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 4px;
+    font-size: 14px;
+    font-family: var(--font-family-primary);
+}
+
+.data-table th {
+    background-color: var(--color-accent-4);
+    color: #333;
+    padding: 12px;
+    text-align: center;
+    font-weight: var(--font-weight-semibold);
+    font-size: 16px;
+    border: none;
+}
+
+.data-table th:first-child {
+    background-color: var(--color-accent-4);
+    width: 250px;
+}
+
+.data-table td {
+    padding: 8px 12px;
+    text-align: center;
+    border: none;
+    font-size: 14px;
+    font-weight: var(--font-weight-regular);
+}
+
+.data-table tbody {
+    border-top: 15px solid transparent;
+}
+
+.data-table tbody tr td:not(:first-child) {
+    background-color: var(--color-accent-4);
+}
+
+.data-table tbody tr:nth-child(even) td:not(:first-child) {
+    background-color: #ffffff;
+}
+
+/* Legend styles */
+.legend-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 !important;
+}
+
+.legend-label {
+    color: white;
+    padding: 8px 16px;
+    border-radius: var(--border-radius-medium);
+    font-weight: var(--font-weight-semibold);
+    font-size: 14px;
+    min-width: 120px;
+    text-align: center;
+}
+
+.legend-bar {
+    width: var(--legend-bar-width);
+    height: var(--legend-bar-height);
+    border-radius: var(--border-radius-small);
+}
+
+.legend-bar-year {
+    width: var(--legend-bar-year-width);
+    height: var(--legend-bar-height);
+    border-radius: var(--border-radius-small);
+    margin-right: 10px;
+    color: white;
+    align-content: center;
+}
+
+/* Legend type colors */
+.legend-nacional .legend-label,
+.legend-nacional .legend-bar,
+.legend-nacional .legend-bar-year {
+    background-color: var(--color-primary-3);
+}
+
+.legend-departamento .legend-label,
+.legend-departamento .legend-bar,
+.legend-departamento .legend-bar-year {
+    background-color: var(--color-primary-2);
+}
+
+.legend-municipio .legend-label,
+.legend-municipio .legend-bar,
+.legend-municipio .legend-bar-year {
+    background-color: var(--color-accent-1);
+}
+
+.legend-institucion .legend-label,
+.legend-institucion .legend-bar,
+.legend-institucion .legend-bar-year {
+    background-color: var(--color-primary-1);
+}
+
+.legend-prueba .legend-label,
+.legend-prueba .legend-bar,
+.legend-prueba .legend-bar-year {
+    background-color: var(--color-accent-3);
+}
+
+.prueba-badge {
+    background-color: var(--color-accent-3);
+    color: white;
+    padding: 4px 8px;
+    border-radius: var(--border-radius-small);
+    font-size: 12px;
+    font-weight: var(--font-weight-semibold);
+    margin-left: 8px;
+}

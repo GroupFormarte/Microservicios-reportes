@@ -1,0 +1,201 @@
+version: '3.8'
+
+services:
+  # ===============================================
+  # Formarte Reports Microservice
+  # ===============================================
+  formarte-reports:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: formarte-reports-service
+    ports:
+      - "${PORT:-3001}:3001"
+    environment:
+      # Core Configuration
+      - NODE_ENV=production
+      - PORT=3001
+      - HOST=0.0.0.0
+      
+      # Security
+      - API_KEY=${API_KEY:-formarte-default-key-change-in-production}
+      - JWT_SECRET=${JWT_SECRET:-jwt-secret-change-in-production}
+      
+      # CORS Configuration
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:3000}
+      - CORS_CREDENTIALS=${CORS_CREDENTIALS:-true}
+      
+      # Rate Limiting
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-900000}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
+      
+      # Logging
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_FORMAT=${LOG_FORMAT:-combined}
+      
+      # Puppeteer Configuration
+      - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+    
+    volumes:
+      # Persistent PDF storage
+      - pdf_storage:/app/public/pdfs
+      # Logs storage
+      - logs_storage:/app/logs
+      # Read-only mounts for templates and static files
+      - ./views:/app/views:ro
+      - ./public/css:/app/public/css:ro
+      - ./public/js:/app/public/js:ro
+    
+    networks:
+      - formarte-network
+    
+    restart: unless-stopped
+    
+    # Memory and CPU limits
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    
+    # Enhanced health check
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+    
+    # Process limits
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+
+  # ===============================================
+  # Nginx Reverse Proxy (Production)
+  # ===============================================
+  nginx:
+    image: nginx:alpine
+    container_name: formarte-nginx
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+      - logs_storage:/var/log/nginx
+    depends_on:
+      formarte-reports:
+        condition: service_healthy
+    networks:
+      - formarte-network
+    restart: unless-stopped
+    profiles:
+      - production
+
+  # ===============================================
+  # Redis (Optional - for caching and queues)
+  # ===============================================
+  redis:
+    image: redis:7-alpine
+    container_name: formarte-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - formarte-network
+    restart: unless-stopped
+    profiles:
+      - cache
+      - production
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ===============================================
+  # Monitoring with Prometheus (Optional)
+  # ===============================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: formarte-prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - formarte-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # ===============================================
+  # Grafana Dashboard (Optional)
+  # ===============================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: formarte-grafana
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - formarte-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+# ===============================================
+# Networks
+# ===============================================
+networks:
+  formarte-network:
+    driver: bridge
+    name: formarte-network
+
+# ===============================================
+# Volumes
+# ===============================================
+volumes:
+  pdf_storage:
+    driver: local
+    name: formarte_pdfs
+  logs_storage:
+    driver: local
+    name: formarte_logs
+  redis_data:
+    driver: local
+    name: formarte_redis
+  prometheus_data:
+    driver: local
+    name: formarte_prometheus
+  grafana_data:
+    driver: local
+    name: formarte_grafana

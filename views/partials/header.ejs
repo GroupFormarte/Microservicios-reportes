@@ -1,0 +1,44 @@
+<div class="paddingMargen">
+    <div class="header <%= layout === 'vertical' ? 'vertical' : 'horizontal' %>">
+       
+        <img src="<%= headerInfo.logo %>" alt="Lexxi PRO" class="logo">
+        <div class="info-section">
+            <div class="info-item w80">
+                <div class="info-icon">
+                    <img src="<%= headerInfo.institucionImage %>" alt="Institución">
+                </div>
+                <div class="info-text">
+                    <div class="info-label">Institución</div>
+                    <div class="info-value"><%= headerInfo && headerInfo.institucion %></div>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">
+                    <img src="<%= headerInfo.evaluacionImage %>" alt="Evaluación">
+                </div>
+                <div class="info-text">
+                    <div class="info-label">Evaluación</div>
+                    <div class="info-value"><%= headerInfo && headerInfo.evaluacion %></div>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">
+                    <img src="<%= headerInfo.municipioImage %>" alt="Municipio">
+                </div>
+                <div class="info-text">
+                    <div class="info-label">Municipio</div>
+                    <div class="info-value"><%= headerInfo && headerInfo.municipio %></div>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">
+                    <img src="<%= headerInfo.fechaImage %>" alt="Fecha">
+                </div>
+                <div class="info-text">
+                    <div class="info-label">Fecha</div>
+                    <div class="info-value"><%= headerInfo && headerInfo.fecha %></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

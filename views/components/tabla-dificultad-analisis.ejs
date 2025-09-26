@@ -1,0 +1,331 @@
+<style>
+    :root {
+        --color-primary-1: #27a1db;
+        --color-accent-4: #fcf1ef;
+        --color-accent-3: #4c8631;
+
+
+    }
+
+    .table-header {
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 14px;
+        text-align: left;
+        color: #333;
+        width: 61px;
+    }
+
+    .subject-header {
+        color: #333;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 14px;
+        text-align: center;
+        width: 400px;
+    }
+
+    .header-container {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+
+    .left-headers {
+        display: flex;
+    }
+
+    .options-section {
+        position: relative;
+        flex: 0.92;
+    }
+
+    .percentages-header {
+        background-color: var(--color-primary-1);
+        color: white;
+        padding: 10px 8px;
+        font-weight: 600;
+        font-size: 14px;
+        text-align: center;
+        border-radius: 8px;
+        margin-bottom: 8px;
+    }
+
+    .options-spacer {
+        display: flex;
+        visibility: hidden;
+        height: 0;
+    }
+
+    .option-placeholder {
+        width: 0px;
+        padding: 4px 8px;
+        box-sizing: border-box;
+    }
+
+    .id-header-spacer {
+        width: 50px;
+        flex-shrink: 0;
+    }
+
+    .analysis-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Nunito', Arial, sans-serif;
+        margin-top: 20px;
+    }
+
+    .analysis-table .th-content {
+        background-color: var(--color-primary-1);
+        margin-bottom: 4px;
+    }
+
+    .p-th {
+        padding: 5px 11px;
+    }
+
+    .m-th {
+        margin-left: 2px;
+    }
+
+    .b-r-3 {
+        border-radius: 3px;
+    }
+
+    .analysis-table th {
+        color: white;
+        text-align: center;
+        font-weight: 600;
+        font-size: 12px;
+        border: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .analysis-table th:first-child {
+        border-radius: 8px;
+        width: 50px;
+        border-right: 2px solid #fff;
+    }
+
+    .analysis-table th:nth-child(2),
+    .analysis-table th:nth-child(3) {
+        border-radius: 8px;
+        border-right: 2px solid #fff;
+    }
+
+    .analysis-table th:nth-child(4) {
+        border-radius: 8px 0 0 8px;
+    }
+
+    .analysis-table th:nth-child(12) {
+        border-radius: 0 8px 8px 0;
+    }
+
+    .analysis-table th:nth-child(13) {
+        border-radius: 10px;
+        border-left: 1px solid #fff;
+    }
+
+    .analysis-table td {
+        padding: 6px 4px;
+        text-align: center;
+        font-size: 11px;
+    }
+
+    .analysis-table tbody tr:nth-child(even) {
+        background-color: var(--color-accent-4);
+    }
+
+    .question-number {
+        font-weight: 600;
+        text-align: center;
+        width: 30px;
+    }
+
+    .competencia-cell {
+        text-align: left;
+        padding-left: 10px;
+        font-weight: 500;
+        width: 200px;
+    }
+
+    .curricular-cell {
+        text-align: left;
+        padding-left: 10px;
+        width: 120px;
+    }
+
+    .percentage-cell {
+        font-weight: 600;
+        width: 50px;
+    }
+
+    .correct-answer {
+        background-color: var(--color-accent-3);
+        color: white;
+        font-weight: 600;
+        border-radius: 3px;
+    }
+</style>
+<!-- Analysis Table Section -->
+
+
+<div class="header-container">
+    <div class="left-headers">
+        <div class="table-header">Prueba</div>
+        <div class="subject-header">
+            <%= tableData.subject || 'Matemáticas - Sesión 1' %>
+        </div>
+    </div>
+    <div class="options-section">
+        <div class="percentages-header">Porcentajes</div>
+        <!-- Spacer invisible que simula las columnas de opciones -->
+
+    </div>
+    <div class="id-header-spacer"></div>
+</div>
+
+<table class="analysis-table">
+    <thead>
+        <tr>
+            <th>
+                <div class="th-content b-r-3 p-th m-th">#</div>
+            </th>
+            <th>
+                <div class="th-content b-r-3 p-th m-th">Competencias</div>
+            </th>
+            <th>
+                <div class="th-content b-r-3 p-th m-th">Componentes</div>
+            </th>
+            <% if (tableData.options && tableData.options.length> 0) { %>
+                <% tableData.options.forEach((option, index)=> { %>
+                    <th>
+                        <div class="th-content p-th <%= index === 0 ? 'm-th' : '' %>">
+                            <%= option %>
+                        </div>
+                    </th>
+                    <% }); %>
+                        <% } else { %>
+                            <th>
+                                <div class="th-content p-th m-th">A</div>
+                            </th>
+                            <th>
+                                <div class="th-content p-th">B</div>
+                            </th>
+                            <th>
+                                <div class="th-content p-th">C</div>
+                            </th>
+                            <th>
+                                <div class="th-content p-th">D</div>
+                            </th>
+                            <th>
+                                <div class="th-content p-th">E</div>
+                            </th>
+                            <th>
+                                <div class="th-content p-th">F</div>
+                            </th>
+                            <th>
+                                <div class="th-content p-th">G</div>
+                            </th>
+                            <th>
+                                <div class="th-content p-th">H</div>
+                            </th>
+                            <th>
+                                <div class="th-content p-th ">NR</div>
+                            </th>
+                            <% } %>
+                                <th>
+                                    <div class="th-content b-r-3 p-th m-th">ID</div>
+                                </th>
+        </tr>
+    </thead>
+    <tbody>
+        <% tableData.questions.forEach((question, index)=> { %>
+            <tr>
+                <td class="question-number">
+                    <div class="td-content">
+                        <%= question.number || index + 1 %>
+                    </div>
+                </td>
+                <td class="competencia-cell">
+                    <div class="td-content">
+                        <%= question.competence || 'Formulación y ejecución' %>
+                    </div>
+                </td>
+                <td class="curricular-cell">
+                    <div class="td-content">
+                        <%= question.component || 'No aplica' %>
+                    </div>
+                </td>
+                <% if (question.percentages && question.percentages.length> 0) { %>
+                    <% question.percentages.forEach((percentage, pIndex)=> { %>
+                        <td class="percentage-cell">
+                            <div class="td-content <%= question.correctAnswer === pIndex ? 'correct-answer' : '' %>"    >
+                                <%= percentage %>
+                            </div>
+                        </td>
+                        <% }); %>
+                            <% } else { %>
+                                <% for (let i=0; i < 9; i++) { %>
+                                    <td class="percentage-cell">
+                                        <div
+                                            class="td-content <%= question.correctAnswer === i ? 'correct-answer' : '' %>">
+                                            31.7</div>
+                                    </td>
+                                    <% } %>
+                                        <% } %>
+                                            <td class="percentage-cell">
+                                                <div
+                                                    class="td-content <%= question.correctAnswer === -1 ? 'correct-answer' : '' %>" style="color:white; background-color: <%= question.difficultyColor %>;">
+                                               
+                                                    <%= question.id || '31.7' %>
+                                                </div>
+                                            </td>
+            </tr>
+            <% }); %>
+    </tbody>
+</table>
+
+<!-- Legend Section -->
+<div style="margin-top: 30px; font-family: 'Nunito', Arial, sans-serif;">
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 1px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div
+                style="background-color: var(--color-primary-1); color: white; padding: 8px 12px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                ID</div>
+            <span style="font-size: 14px; color: #333;">Índice de dificultad</span>
+        </div>
+        <div style="display: flex; gap: 4px;">
+            <% tableData.nivels.forEach((nivel, index)=> { %>
+                <span
+                    style="background-color: <%= nivel.color %>; color: white; padding: 6px 10px; border-radius: 4px; font-weight: 600; font-size: 12px;">
+                    <%= nivel.label %>
+                </span>
+                <% }); %>
+        </div>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div
+                style="background-color: var(--color-primary-1); color: white; padding: 8px 10px; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                NR</div>
+            <span style="font-size: 14px; color: #333;">No respondió</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 14px; font-weight: 600; color: #333;">ID <%= tableData.subject || 'Área' %></span>
+            <% if (tableData.indiceDificultadArea) { %>
+                <span
+                    style="background-color: <%= tableData.indiceDificultadArea.color %>; color: white; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 12px;">
+                    <%= tableData.indiceDificultadArea.nivel %> [<%= tableData.indiceDificultadArea.valor %>]
+                </span>
+            <% } else { %>
+                <span
+                    style="background-color: #4CAF50; color: white; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 12px;">BAJO
+                    [31.7]</span>
+            <% } %>
+        </div>
+    </div>
+</div>

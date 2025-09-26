@@ -1,0 +1,509 @@
+<style>
+    .comparativo-puntaje-component {
+        /* Color palette - Principal */
+        --comp-color-primary-1: #27a1db;
+        --comp-color-primary-2: #bd5785;
+        --comp-color-primary-3: #d88008;
+
+        /* Color palette - Acentos */
+        --comp-color-accent-1: #4b3e7a;
+        --comp-color-accent-2: #0075af;
+        --comp-color-accent-3: #4c8631;
+        --comp-color-accent-4: #fcf1ef;
+        --comp-color-accent-5: #2557a4;
+    }
+
+    .comparativo-puntaje-component .comp-padding-margen {
+        padding-left: 60px;
+        padding-right: 60px;
+    }
+
+    /* Typography */
+    .comparativo-puntaje-component .comp-nunito-light {
+        font-weight: 300;
+    }
+
+    .comparativo-puntaje-component .comp-nunito-regular {
+        font-weight: 400;
+    }
+
+    .comparativo-puntaje-component .comp-nunito-medium {
+        font-weight: 500;
+    }
+
+    .comparativo-puntaje-component .comp-nunito-semibold {
+        font-weight: 600;
+    }
+
+    .comparativo-puntaje-component .comp-nunito-bold {
+        font-weight: 700;
+    }
+
+    .comparativo-puntaje-component .comp-nunito-extrabold {
+        font-weight: 800;
+    }
+
+    /* Header */
+    .comparativo-puntaje-component .comp-header {
+        position: relative;
+        margin-bottom: 30px;
+        padding-top: 20px;
+        border-radius: 8px;
+        border-bottom: 2px solid #ccc;
+    }
+
+    .comparativo-puntaje-component .comp-logo {
+        position: absolute;
+        top: 15px;
+        right: 30px;
+        height: 40px;
+    }
+
+    .comparativo-puntaje-component .comp-info-section {
+        display: flex;
+        gap: 0;
+        align-items: center;
+        margin-top: 60px;
+    }
+
+    .comparativo-puntaje-component .comp-info-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        color: #333;
+        padding: 0 30px;
+        position: relative;
+    }
+
+    .comparativo-puntaje-component .comp-w80 {
+        width: 60%;
+    }
+
+    .comparativo-puntaje-component .comp-info-item:not(:last-child):after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 1px;
+        height: 40px;
+        background-color: #ccc;
+    }
+
+    .comparativo-puntaje-component .comp-info-icon {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .comparativo-puntaje-component .comp-info-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .comparativo-puntaje-component .comp-info-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .comparativo-puntaje-component .comp-info-label {
+        font-weight: 600;
+        color: var(--comp-color-primary-1);
+        font-size: 14px;
+    }
+
+    .comparativo-puntaje-component .comp-info-value {
+        color: #333;
+        font-size: 14px;
+        font-weight: 400;
+    }
+
+    /* Chart Section */
+    .comparativo-puntaje-component .comp-chart-container {
+        margin-bottom: 40px;
+    }
+
+    .comparativo-puntaje-component .comp-chart-title {
+        background-color: var(--comp-color-primary-1);
+        color: white;
+        padding: 15px 85px;
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        border-radius: 0 8px 8px 0;
+        width: 65%;
+        margin-bottom: 20px;
+    }
+
+    .comparativo-puntaje-component .comp-chart-area {
+        background-color: #f8f9fa;
+        padding: 40px;
+        border-radius: 0 0 8px 8px;
+        border: 1px solid #e9ecef;
+        border-top: none;
+    }
+
+    .comparativo-puntaje-component .comp-chart-container-inner {
+        position: relative;
+        height: 400px;
+        width: 100%;
+    }
+
+    /* Table */
+    .comparativo-puntaje-component .comp-table-container {
+        background-color: transparent;
+        border-radius: 8px;
+        padding: 0;
+    }
+
+    .comparativo-puntaje-component .comp-data-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 4px;
+        font-size: 14px;
+        font-family: 'Nunito', Arial, sans-serif;
+    }
+
+    .comparativo-puntaje-component .comp-data-table th {
+        background-color: var(--comp-color-accent-4);
+        color: #333;
+        padding: 12px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 16px;
+        border: none;
+    }
+
+    .comparativo-puntaje-component .comp-data-table th:first-child {
+        background-color: var(--comp-color-accent-4);
+        width: 250px;
+    }
+
+    .comparativo-puntaje-component .comp-data-table td {
+        padding: 8px 12px;
+        text-align: center;
+        border: none;
+        font-size: 14px;
+        font-weight: 400;
+    }
+
+    .comparativo-puntaje-component .comp-data-table tbody {
+        border-top: 15px solid transparent;
+    }
+
+    .comparativo-puntaje-component .comp-data-table tbody tr td:not(:first-child) {
+        background-color: var(--comp-color-accent-4);
+    }
+
+    .comparativo-puntaje-component .comp-data-table tbody tr:nth-child(even) td:not(:first-child) {
+        background-color: #ffffff;
+    }
+
+    .comparativo-puntaje-component .comp-legend-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 !important;
+    }
+
+    .comparativo-puntaje-component .comp-legend-label {
+        background-color: var(--comp-color-primary-3);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 14px;
+        min-width: 120px;
+        text-align: center;
+    }
+
+    .comparativo-puntaje-component .comp-legend-bar {
+        width: 15px;
+        height: 35px;
+        border-radius: 3px;
+        background-color: var(--comp-color-primary-3);
+    }
+
+    .comparativo-puntaje-component .comp-legend-bar-year {
+        width: 100px;
+        height: 35px;
+        border-radius: 3px;
+        background-color: var(--comp-color-primary-3);
+        margin-right: 10px;
+        color: white;
+        align-content: center;
+    }
+
+    .comparativo-puntaje-component .comp-legend-nacional .comp-legend-label {
+        background-color: var(--comp-color-primary-3);
+    }
+
+    .comparativo-puntaje-component .comp-legend-nacional .comp-legend-bar {
+        background-color: var(--comp-color-primary-3);
+    }
+
+    .comparativo-puntaje-component .comp-legend-nacional .comp-legend-bar-year {
+        background-color: var(--comp-color-primary-3);
+    }
+
+    .comparativo-puntaje-component .comp-legend-departamento .comp-legend-label {
+        background-color: var(--comp-color-primary-2);
+    }
+
+    .comparativo-puntaje-component .comp-legend-departamento .comp-legend-bar {
+        background-color: var(--comp-color-primary-2);
+    }
+
+    .comparativo-puntaje-component .comp-legend-departamento .comp-legend-bar-year {
+        background-color: var(--comp-color-primary-2);
+    }
+
+    .comparativo-puntaje-component .comp-legend-municipio .comp-legend-label {
+        background-color: var(--comp-color-accent-1);
+    }
+
+    .comparativo-puntaje-component .comp-legend-municipio .comp-legend-bar {
+        background-color: var(--comp-color-accent-1);
+    }
+
+    .comparativo-puntaje-component .comp-legend-municipio .comp-legend-bar-year {
+        background-color: var(--comp-color-accent-1);
+    }
+
+    .comparativo-puntaje-component .comp-legend-institucion .comp-legend-label {
+        background-color: var(--comp-color-primary-1);
+    }
+
+    .comparativo-puntaje-component .comp-legend-institucion .comp-legend-bar {
+        background-color: var(--comp-color-primary-1);
+    }
+
+    .comparativo-puntaje-component .comp-legend-institucion .comp-legend-bar-year {
+        background-color: var(--comp-color-primary-1);
+    }
+
+    .comparativo-puntaje-component .comp-legend-prueba .comp-legend-label {
+        background-color: var(--comp-color-accent-3);
+    }
+
+    .comparativo-puntaje-component .comp-legend-prueba .comp-legend-bar {
+        background-color: var(--comp-color-accent-3);
+    }
+
+    .comparativo-puntaje-component .comp-legend-prueba .comp-legend-bar-year {
+        background-color: var(--comp-color-accent-3);
+    }
+
+    .comparativo-puntaje-component .comp-prueba-badge {
+        background-color: var(--comp-color-accent-3);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+</style>
+<div class="comparativo-puntaje-component">
+    <div class="comp-chart-container">
+        <div class="comp-chart-container-inner">
+            <canvas id="<%= chartId || 'comparativoChart' %>"></canvas>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="comp-table-container">
+        <table class="comp-data-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <% if (subjects && subjects.length> 0) { %>
+                        <% subjects.forEach(subject=> { %>
+                            <th>
+                                <%= subject %>
+                            </th>
+                            <% }); %>
+                                <% } else { %>
+                                    <th>Matemáticas</th>
+                                    <th>Lectura Crítica</th>
+                                    <th>Sociales y Ciudadanas</th>
+                                    <th>Ciencias Naturales</th>
+                                    <th>Inglés</th>
+                                    <% } %>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (tableData && tableData.length> 0) { %>
+                    <% tableData.forEach((row, index)=> { %>
+                        <tr class="comp-legend-<%= row.type %>">
+                            <td class="comp-legend-cell">
+                                <div class="comp-legend-label">
+                                    <%= row.label %>
+                                </div>
+                                <div class="comp-legend-bar"></div>
+                                <div class="comp-legend-bar-year">
+                                    <%= row.year || '' %>
+                                </div>
+                            </td>
+                            <% if (row.values && row.values.length> 0) { %>
+                                <% row.values.forEach(value=> { %>
+                                    <td <%=row.type==='prueba' ? 'style="font-weight: 600;"' : '' %>><%= value %>
+                                    </td>
+                                    <% }); %>
+                                        <% } else { %>
+                                            <td>N/A</td>
+                                            <td>N/A</td>
+                                            <td>N/A</td>
+                                            <td>N/A</td>
+                                            <td>N/A</td>
+                                            <% } %>
+                        </tr>
+                        <% }); %>
+                            <% } else { %>
+                                <tr class="comp-legend-nacional">
+                                    <td class="comp-legend-cell">
+                                        <div class="comp-legend-label">Nacional</div>
+                                        <div class="comp-legend-bar"></div>
+                                        <div class="comp-legend-bar-year"></div>
+                                    </td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                </tr>
+                                <tr class="comp-legend-departamento">
+                                    <td class="comp-legend-cell">
+                                        <div class="comp-legend-label">Departamento</div>
+                                        <div class="comp-legend-bar"></div>
+                                        <div class="comp-legend-bar-year"></div>
+                                    </td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                </tr>
+                                <tr class="comp-legend-municipio">
+                                    <td class="comp-legend-cell">
+                                        <div class="comp-legend-label">Municipio</div>
+                                        <div class="comp-legend-bar"></div>
+                                        <div class="comp-legend-bar-year"></div>
+                                    </td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                </tr>
+                                <tr class="comp-legend-institucion">
+                                    <td class="comp-legend-cell">
+                                        <div class="comp-legend-label">Institución</div>
+                                        <div class="comp-legend-bar"></div>
+                                        <div class="comp-legend-bar-year"></div>
+                                    </td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                </tr>
+                                <tr class="comp-legend-prueba">
+                                    <td class="comp-legend-cell">
+                                        <div class="comp-legend-label">Prueba</div>
+                                        <div class="comp-legend-bar"></div>
+                                        <div class="comp-legend-bar-year">2025 A</div>
+                                    </td>
+                                    <td style="font-weight: 600;">36</td>
+                                    <td style="font-weight: 600;">46</td>
+                                    <td style="font-weight: 600;">57</td>
+                                    <td style="font-weight: 600;">38</td>
+                                    <td style="font-weight: 600;">41</td>
+                                </tr>
+                                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Check if Chart is available
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded');
+            return;
+        }
+        // Chart configuration 
+        const ctx = document.getElementById('<%= chartId || "comparativoChart" %>').getContext('2d');
+        const categoryPercentage = 0.7; // menos = más espacio entre grupos
+        const barPercentage = 0.6;
+        // Datos del gráfico - Validación y debugging
+        <% 
+        let safeLabels;
+  
+
+             safeLabels = chartData.labels;
+        %>
+        const data = {
+            labels: <%- JSON.stringify(chartData.labels) %>,
+            datasets: [
+        <% if(chartData && chartData.datasets && chartData.datasets.length > 0) { %>
+            <% const colors = ['#d88008','#bd5785','#4b3e7a','#27a1db','#4c8631']; %>
+            <% chartData.datasets.forEach((dataset, index) => { %>
+            {
+                label: '<%= dataset.label || "Dataset " + (index + 1) %>',
+                data: <%- JSON.stringify(dataset.data && dataset.data.length > 0 ? dataset.data : [0, 0, 0, 0, 0]) %>,
+                backgroundColor: '<%= colors[index % colors.length] %>',
+                borderColor: '<%= dataset.borderColor || "#333" %>',
+                categoryPercentage: categoryPercentage,
+                barPercentage: barPercentage,
+                borderRadius: {
+                    topLeft: 5,
+                    topRight: 5,
+                    bottomLeft: 0,
+                    bottomRight: 0
+                },
+                borderSkipped: false
+            } <%= index < chartData.datasets.length - 1 ? ',' : '' %>
+            <% }); %>
+        <% } else { %>
+        { label: 'Nacional', data: [26, 26, 26, 26, 26], backgroundColor: '#d88008', borderColor: '#333', categoryPercentage: categoryPercentage, barPercentage: barPercentage, borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 }, borderSkipped: false },
+        { label: 'Departamento', data: [16, 16, 6, 16, 10], backgroundColor: '#bd5785', borderColor: '#333', categoryPercentage: categoryPercentage, barPercentage: barPercentage, borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 }, borderSkipped: false },
+        { label: 'Municipio', data: [12, 12, 12, 12, 12], backgroundColor: '#4b3e7a', borderColor: '#333', categoryPercentage: categoryPercentage, barPercentage: barPercentage, borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 }, borderSkipped: false },
+        { label: 'Institución', data: [26, 26, 26, 26, 26], backgroundColor: '#27a1db', borderColor: '#333', categoryPercentage: categoryPercentage, barPercentage: barPercentage, borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 }, borderSkipped: false },
+        { label: 'Prueba', data: [36, 46, 5, 38, 41], backgroundColor: '#4c8631', borderColor: '#333', categoryPercentage: categoryPercentage, barPercentage: barPercentage, borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 }, borderSkipped: false }
+        <% } %>
+        ]
+    };
+
+    const config = {
+        type: 'bar',
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: 'Nunito', size: 13, weight: 500 }, color: '#333' }
+                },
+                y: {
+                    beginAtZero: true,
+                    max: <%= chartConfig.yAxisMax || 50 %>,
+                    grid: { color: '#e9ecef', lineWidth: 1 },
+                    ticks: { stepSize: <%= chartConfig.stepSize || 5 %>, font: { family: 'Nunito', size: 11 }, color: '#666' }
+                }
+            },
+            layout: { padding: { top: 20, right: 20, bottom: 20, left: 20 } }
+        }
+    };
+
+    new Chart(ctx, config);
+});
+</script>

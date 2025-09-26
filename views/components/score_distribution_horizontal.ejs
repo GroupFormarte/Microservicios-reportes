@@ -1,0 +1,321 @@
+<style>
+    :root {
+        /* Color palette - Principal */
+        --color-primary-1: #27a1db;
+        --color-primary-2: #bd5785;
+        --color-primary-3: #d88008;
+
+        /* Color palette - Acentos */
+        --color-accent-1: #4b3e7a;
+        --color-accent-2: #0075af;
+        --color-accent-3: #4c8631;
+        --color-accent-4: #fcf1ef;
+        --color-accent-5: #2557a4;
+    }
+
+
+    /* Typography */
+    .nunito-light {
+        font-weight: 300;
+    }
+
+    .nunito-regular {
+        font-weight: 400;
+    }
+
+    .nunito-medium {
+        font-weight: 500;
+    }
+
+    .nunito-semibold {
+        font-weight: 600;
+    }
+
+    .nunito-bold {
+        font-weight: 700;
+    }
+
+    .nunito-extrabold {
+        font-weight: 800;
+    }
+
+    /* Circular Charts */
+    .circular-charts-container {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        width: 75%;
+        margin: 20px auto;
+    }
+
+    .chart-item {
+        text-align: center;
+        width: 100%;
+    }
+
+    .chart-item h3 {
+        color: var(--color-primary-1);
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 30px;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        margin-bottom: 30px;
+        align-content: end;
+        flex-shrink: 0;
+        width: 250px;
+    }
+
+    .legend-row {
+        display: flex;
+        margin-bottom: 8px;
+        justify-content: flex-end;
+        width: 100%;
+        max-width: 600px;
+    }
+
+    .legend-color-box {
+        width: 80px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        margin-right: 0;
+        border-radius: 0;
+        box-sizing: border-box;
+    }
+
+    .legend-color-1 {
+        background-color: var(--color-primary-3);
+    }
+
+    .legend-color-2 {
+        background-color: var(--color-accent-1);
+    }
+
+    .legend-color-3 {
+        background-color: var(--color-primary-1);
+    }
+
+    .legend-color-4 {
+        background-color: var(--color-accent-3);
+    }
+
+    .ranges-table {
+        width: 100%;
+        max-width: 600px;
+        border-collapse: separate;
+        border-spacing: 0 5px;
+        margin-top: 10px;
+        font-size: 14px;
+        border-radius: 0;
+    }
+
+    .ranges-table th {
+        background-color: var(--color-primary-1);
+        color: white;
+        padding: 8px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 10px;
+        width: 500px;
+    }
+
+    .ranges-table td {
+        padding-top: 4px;
+        margin: 0px !important;
+    }
+
+    .ranges-table td div {
+        text-align: center;
+        background-color: var(--color-accent-4);
+    }
+
+    .ranges-table tbody tr {
+        background-color: var(--color-accent-4);
+    }
+
+    .border-radius-left {
+        border-radius: 0 5px 5px 0;
+    }
+
+    .border-radius-right {
+        border-radius: 5px 0 0 5px;
+    }
+
+    .chartCircle {
+        width: 250px !important;
+        height: 250px !important;
+        margin: auto;
+        flex-shrink: 0;
+    }
+
+    .info-colors {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .info-color {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+    }
+
+    .info-color .legend-color-box {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        font-size: 0;
+    }
+
+    .info-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+</style>
+
+
+<div class="circular-charts-container">
+    <!-- Dynamic legend definition -->
+    <% 
+    const defaultLegend = [
+      { color: "legend-color-1", label: "Insuficiente" },
+      { color: "legend-color-2", label: "Mínimo" },
+      { color: "legend-color-3", label: "Satisfactorio" },
+      { color: "legend-color-4", label: "Avanzado" }
+    ];
+    // Get legend from global level or from first subject, or use default
+    const globalLegend = (typeof legend !== 'undefined') ? legend : 
+                        (subjects && subjects[0] && subjects[0].legend) ? subjects[0].legend : 
+                        defaultLegend;
+    %>
+    
+    <!-- Chart for each subject -->
+    <% subjects.forEach(function(subject) { %>
+        <div class="chart-item">
+            <h3><%= subject.name %></h3>
+            <div style="display: flex; align-items: flex-start; gap: 30px; width: 100%;">
+                <div class="chart-wrapper">
+                    <canvas id="<%= subject.chartId %>Chart" class="chartCircle"></canvas>
+                </div>
+
+                <div style="flex: 1;">
+                    <!-- Legend -->
+                    <div class="legend-row">
+                        <div class="legend-color-box legend-color-1 border-radius-right">1</div>
+                        <div class="legend-color-box legend-color-2">2</div>
+                        <div class="legend-color-box legend-color-3">3</div>
+                        <div class="legend-color-box legend-color-4 border-radius-left">4</div>
+                    </div>
+
+                    <!-- Ranges Table -->
+                    <table class="ranges-table">
+                        <tbody>
+                            <tr>
+                                <td class="border-radius-right">
+                                    <div>% Estudiantes</div>
+                                </td>
+                                <% subject.ranges.forEach(function(range, index) { %>
+                                    <td <% if (index === 0) { %>class="border-radius-right"<% } else if (index === subject.ranges.length - 1) { %>class="border-radius-left"<% } %>>
+                                        <div><%= range.percentage %>%</div>
+                                    </td>
+                                <% }) %>
+                            </tr>
+                            <tr>
+                                <td class="border-radius-right">
+                                    <div># Estudiantes</div>
+                                </td>
+                                <% subject.ranges.forEach(function(range, index) { %>
+                                    <td <% if (index === 0) { %>class="border-radius-right"<% } else if (index === subject.ranges.length - 1) { %>class="border-radius-left"<% } %>>
+                                        <div><%= range.count %></div>
+                                    </td>
+                                <% }) %>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Info colors - Dynamic legend (conditional) -->
+                    <% if (typeof needGuide !== 'undefined' && needGuide === true) { %>
+                        <div class="info-colors">
+                            <% globalLegend.forEach(function(item) { %>
+                                <div class="info-color">
+                                    <div class="legend-color-box <%= item.color %>"></div>
+                                    <div class="info-text"><%= item.label %></div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    <% }) %>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Check if Chart is available
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded');
+            return;
+        }
+
+        // Chart colors configuration
+        const chartColors = ['#d88008', '#4b3e7a', '#27a1db', '#4c8631'];
+
+        // Data from server
+        const chartsData = <%- JSON.stringify(subjects || []) %>;
+        console.log("Score Distribution Debug:", {
+            hasSubjects: <%= !!subjects %>,
+            subjectsLength: <%= (subjects && subjects.length) || 0 %>,
+            needGuide: <%= typeof needGuide !== 'undefined' ? needGuide : false %>,
+            subjects: <%- JSON.stringify(subjects || []) %>
+        });
+
+    // Common donut configuration
+    const donutConfig = {
+        type: 'doughnut',
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            cutout: '60%'
+        }
+    };
+
+    // Create charts for each subject
+    if (chartsData && Array.isArray(chartsData) && chartsData.length > 0) {
+        chartsData.forEach(function (subject) {
+            const ctx = document.getElementById(subject.chartId + 'Chart').getContext('2d');
+            const chartData = {
+                labels: subject.ranges.map(range => range.label),
+                datasets: [{
+                    data: subject.ranges.map(range => range.percentage),
+                    backgroundColor: ['#d88008', '#4b3e7a', '#27a1db', '#4c8631'],
+                    borderWidth: 0
+                }]
+            };
+
+            new Chart(ctx, {
+                ...donutConfig,
+                data: chartData
+            });
+        });
+    } else {
+        console.warn('No chart data available for score_distribution component');
+    }
+    });
+</script>

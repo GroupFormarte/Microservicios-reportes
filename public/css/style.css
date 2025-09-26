@@ -1,0 +1,451 @@
+        :root {
+       /* Color palette - Principal */
+       --color-primary-1: #27a1db;
+       --color-primary-2: #bd5785;
+       --color-primary-3: #d88008;
+
+       /* Color palette - Acentos */
+       --color-accent-1: #4b3e7a;
+       --color-accent-2: #0075af;
+       --color-accent-3: #4c8631;
+       --color-accent-4: #fcf1ef;
+       --color-accent-5: #2557a4;
+   }
+
+   body {
+       margin: 0;
+       /* padding: 20px; */
+       background-color: #ffffff;
+       font-family: 'Nunito', Arial, sans-serif;
+       font-weight: 400;
+   }
+
+   .paddingMargen {
+       padding-left: 60px;
+       padding-right: 60px;
+   }
+
+   /* Typography */
+   .nunito-light {
+       font-weight: 300;
+   }
+
+   .nunito-regular {
+       font-weight: 400;
+   }
+
+   .nunito-medium {
+       font-weight: 500;
+   }
+
+   .nunito-semibold {
+       font-weight: 600;
+   }
+
+   .nunito-bold {
+       font-weight: 700;
+   }
+
+   .nunito-extrabold {
+       font-weight: 800;
+   }
+
+   /* Header */
+   .header {
+       position: relative;
+       margin-bottom: 30px;
+       padding-top: 20px;
+       border-radius: 8px;
+       border-bottom: 2px solid #ccc;
+   }
+
+   .logo {
+       position: absolute;
+       top: 15px;
+       right: 30px;
+       height: 26px;
+   }
+
+   .info-section {
+       display: flex;
+       gap: 0;
+       align-items: center;
+       margin-top: 60px;
+   }
+
+   .info-item {
+       display: flex;
+       align-items: center;
+       gap: 12px;
+       font-size: 14px;
+       color: #333;
+       padding: 0 15px;
+       position: relative;
+   }
+
+   .info-item.w80 {
+       padding: 0 40px;
+   }
+
+   .w80 {
+       width: 70%;
+   }
+
+   .info-item:not(:last-child):after {
+       content: '';
+       position: absolute;
+       right: 0;
+       top: 50%;
+       transform: translateY(-50%);
+       width: 1px;
+       height: 40px;
+       background-color: #ccc;
+   }
+
+   .info-icon {
+       width: 30px;
+       height: 30px;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+   }
+
+   .info-icon img {
+       width: 100%;
+       height: 100%;
+       object-fit: contain;
+   }
+
+   .info-text {
+       display: flex;
+       flex-direction: column;
+       gap: 2px;
+   }
+
+   .info-label {
+       /* font-weight: 600; */
+       /* color: var(--color-primary-1); */
+       font-size: 10px;
+   }
+
+   .info-value {
+       color: #333;
+       font-size: 12px;
+       font-weight: 600;
+   }
+
+   /* Chart Section */
+   .chart-container {
+       margin-bottom: 40px;
+   }
+
+   .chart-title {
+       background-color: var(--color-primary-1);
+       color: white;
+       padding: 5px 50px;
+       margin: 0;
+       font-size: 15px;
+       font-weight: 600;
+       border-radius: 0 8px 8px 0;
+       width: 60%;
+       margin-bottom: 20px;
+   }
+
+   .chart-area {
+       background-color: #f8f9fa;
+       padding: 40px;
+       border-radius: 0 0 8px 8px;
+       border: 1px solid #e9ecef;
+       border-top: none;
+   }
+
+   .chart-container-inner {
+       position: relative;
+       height: 400px;
+       width: 100%;
+   }
+
+   /* Table */
+   .table-container {
+       background-color: transparent;
+       border-radius: 8px;
+       padding: 0;
+   }
+
+   .data-table {
+       width: 100%;
+       border-collapse: separate;
+       border-spacing: 0 4px;
+       font-size: 14px;
+       font-family: 'Nunito', Arial, sans-serif;
+   }
+
+   .data-table th {
+       background-color: var(--color-accent-4);
+       color: #333;
+       padding: 12px;
+       text-align: center;
+       font-weight: 600;
+       font-size: 16px;
+       border: none;
+   }
+
+   .data-table th:first-child {
+       background-color: var(--color-accent-4);
+       width: 250px;
+   }
+
+   .data-table td {
+       padding: 8px 12px;
+       text-align: center;
+       border: none;
+       font-size: 10px;
+       font-weight: 400;
+   }
+
+   .data-table tbody {
+       border-top: 15px solid transparent;
+   }
+
+   .data-table tbody tr td:not(:first-child) {
+       background-color: var(--color-accent-4);
+   }
+
+   .data-table tbody tr:nth-child(even) td:not(:first-child) {
+       background-color: #ffffff;
+   }
+
+   .legend-cell {
+       display: flex;
+       align-items: center;
+       gap: 10px;
+       padding: 0 !important;
+   }
+
+   .legend-label {
+       background-color: var(--color-primary-3);
+       color: white;
+       padding: 8px 16px;
+       border-radius: 4px;
+       font-weight: 600;
+       font-size: 14px;
+       min-width: 120px;
+       text-align: center;
+   }
+
+   .legend-bar {
+       width: 15px;
+       height: 35px;
+       border-radius: 3px;
+       background-color: var(--color-primary-3);
+   }
+
+   .legend-bar-year {
+       width: 100px;
+       height: 35px;
+       border-radius: 3px;
+       background-color: var(--color-primary-3);
+       margin-right: 10px;
+       color: white;
+
+       align-content: center;
+
+   }
+
+   .legend-nacional .legend-label {
+       background-color: var(--color-primary-3);
+   }
+
+   .legend-nacional .legend-bar {
+       background-color: var(--color-primary-3);
+   }
+
+   .legend-nacional .legend-bar-year {
+       background-color: var(--color-primary-3);
+   }
+
+   .legend-departamento .legend-label {
+       background-color: var(--color-primary-2);
+   }
+
+   .legend-departamento .legend-bar {
+       background-color: var(--color-primary-2);
+   }
+
+   .legend-departamento .legend-bar-year {
+       background-color: var(--color-primary-2);
+   }
+
+   .legend-municipio .legend-label {
+       background-color: var(--color-accent-1);
+   }
+
+   .legend-municipio .legend-bar {
+       background-color: var(--color-accent-1);
+   }
+
+   .legend-municipio .legend-bar-year {
+       background-color: var(--color-accent-1);
+   }
+
+   .legend-institucion .legend-label {
+       background-color: var(--color-primary-1);
+   }
+
+   .legend-institucion .legend-bar {
+       background-color: var(--color-primary-1);
+   }
+
+   .legend-institucion .legend-bar-year {
+       background-color: var(--color-primary-1);
+   }
+
+   .legend-prueba .legend-label {
+       background-color: var(--color-accent-3);
+   }
+
+   .legend-prueba .legend-bar {
+       background-color: var(--color-accent-3);
+   }
+
+   .legend-prueba .legend-bar-year {
+       background-color: var(--color-accent-3);
+   }
+
+   .prueba-badge {
+       background-color: var(--color-accent-3);
+       color: white;
+       padding: 4px 8px;
+       border-radius: 3px;
+       font-size: 12px;
+       font-weight: 600;
+       margin-left: 8px;
+   }
+
+   /* Circular Charts */
+   .circular-charts-container {
+       display: flex;
+       gap: 10px;
+       justify-content: center;
+       margin: 40px 0;
+   }
+
+   .chart-item {
+       text-align: center;
+       
+       width: 336px;
+   }
+
+   .chart-item h3 {
+       color: var(--color-primary-1);
+       font-size: 24px;
+       font-weight: 600;
+       margin-bottom: 30px;
+   }
+
+   .chart-wrapper {
+       position: relative;
+       /* height: 300px; */
+       margin-bottom: 30px;
+       align-content: end;
+   }
+
+   .legend-table {
+       width: 100%;
+       border-collapse: collapse;
+       margin-top: 20px;
+   }
+
+   .legend-row {
+       display: flex;
+       margin-bottom: 8px;
+       justify-content: flex-end;
+   }
+
+   .legend-color-box {
+       width: 60px;
+       height: 30px;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       color: white;
+       font-weight: 600;
+       font-size: 14px;
+       margin-right: 0;
+       border-radius: 0;
+       box-sizing: border-box;
+   }
+
+   .legend-color-1 {
+       background-color: var(--color-primary-3);
+   }
+
+   .legend-color-2 {
+       background-color: var(--color-accent-1);
+   }
+
+   .legend-color-3 {
+       background-color: var(--color-primary-1);
+   }
+
+   .legend-color-4 {
+       background-color: var(--color-accent-3);
+   }
+
+   .ranges-table {
+       /* width: 100%; */
+       width: 336px;
+       border-collapse: separate;
+       border-spacing: 0 5px;
+       margin-top: 10px;
+       font-size: 14px;
+       border-radius: 0;
+   }
+
+   .ranges-table thead {
+
+       border-radius: 20px;
+   }
+
+   .ranges-table th {
+       background-color: var(--color-primary-1);
+       color: white;
+       padding: 8px;
+       text-align: center;
+       font-weight: 600;
+       font-size: 10px;
+       width: 500px;
+
+
+   }
+
+   .ranges-table td {
+       padding-top: 4px;
+       margin: 0px !important;
+
+   }
+
+   .ranges-table td div {
+       text-align: center;
+       background-color: var(--color-accent-4);
+
+   }
+
+   .ranges-table tbody tr {
+            background-color: var(--color-accent-4);
+        }
+
+   .border-radius-left {
+       border-radius: 0 5px 5px 0;
+   }
+
+   .border-radius-right {
+       border-radius: 5px 0 0 5px;
+   }
+
+
+   .chartCircle {
+       width: 150px !important;
+       height: 150px !important;
+       margin: auto;
+   }

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfica de Barras Simple</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
+        rel="stylesheet">
+  <style>
+        :root {
+            /* Color palette - Principal */
+            --primary-blue: #27a1db;
+            --primary-pink: #bd5785;
+            --primary-orange: #d88008;
+
+            /* Color palette - Acentos */
+            --accent-purple: #4b3e7a;
+            --accent-blue: #0075af;
+            --accent-green: #4c8631;
+            --accent-light: #fcf1ef;
+            --accent-dark-blue: #2557a4;
+
+            /* Bar colors */
+            --bar-red: #c55c5c;
+            --bar-orange: #d88008;
+            --bar-yellow: #f4d03f;
+            --bar-green: #58a55c;
+        }
+
+        .chart-container {
+            width: 336px!important;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 200px;
+            margin-bottom: 20px;
+        }
+
+        .chart-label {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Nunito', Arial, sans-serif;
+            margin-top: 20px;
+        }
+
+        .stats-table thead {
+            border-bottom: 10px solid transparent;
+        }
+
+        .header-box {
+            padding: 3px 16px;
+            color: white;
+            font-weight: 600;
+            font-size: 20px;
+            text-align: center;
+            min-width: 40px;
+            vertical-align: middle;
+        }
+
+        .header-color-1 {
+            background-color: var(--bar-red);
+        }
+
+        .header-color-2 {
+            background-color: var(--bar-orange);
+        }
+
+        .header-color-3 {
+            background-color: var(--bar-yellow);
+        }
+
+        .header-color-4 {
+            background-color: var(--bar-green);
+        }
+
+        .rounded-left {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .rounded-right {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        .stats-table td {
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .data-cell {
+            background-color: var(--accent-light);
+            color: #333;
+        }
+
+        .count-row .data-cell::before {
+            content: '#';
+        }
+
+        .percentage-row .data-cell::after {
+            content: '%';
+        }
+
+        .percentage-row .data-cell {
+            background-color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chart-container">
+        <div class="chart-wrapper">
+            <canvas id="<%= chartId %>"></canvas>
+        </div>
+
+        <div class="chart-label">
+            <%= title %>
+        </div>
+
+        <!-- Stats Table -->
+        <table class="stats-table">
+            <thead>
+                <tr class="header-row">
+                    <% ranges.forEach(function(range, index) { %>
+                        <th
+                            class="header-box  <%= index === 0 ? 'rounded-right' : (index === ranges.length - 1 ? 'rounded-left' : '') %>"  style="background-color: <%= colors[index] %>;">
+                            <%= labels[index] %>
+                        </th>
+                        <% }); %>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr class="count-row">
+                    <% ranges.forEach(function(range, index) { %>
+                        <td
+                            class="data-cell <%= index === 0 ? 'rounded-right' : (index === ranges.length - 1 ? 'rounded-left' : '') %>">
+                            <%= range.count %>
+                        </td>
+                        <% }); %>
+                </tr>
+                <tr class="percentage-row">
+                    <% ranges.forEach(function(range, index) { %>
+                        <td
+                            class="data-cell <%= index === 0 ? 'rounded-right' : (index === ranges.length - 1 ? 'rounded-left' : '') %>">
+                            <%= range.percentage %>
+                        </td>
+                        <% }); %>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if Chart is available
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js is not loaded');
+                return;
+            }
+
+            // Chart data from server
+            const chartData_<%= chartId %> = <%- JSON.stringify(chartData) %>;
+            const labels_<%= chartId %> = <%- JSON.stringify(labels) %>;
+            const colors_<%= chartId %> = <%- JSON.stringify(colors) %>;
+            const ctx_<%= chartId %> = document.getElementById('<%= chartId %>').getContext('2d');
+
+            const config_<%= chartId %> = {
+                type: 'bar',
+                data: {
+                    labels: labels_<%= chartId %>,
+                    datasets: [{
+                        data: chartData_<%= chartId %>.values,
+                        backgroundColor: colors_<%= chartId %>,
+                            borderWidth: 0,
+                            borderRadius: 4,
+                            barThickness: 40,
+                }]
+            },
+            options: {
+                type: 'bar',
+                    responsive: true,
+                        maintainAspectRatio: false,
+                            plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                            max: <%= maxValue || 80 %>,
+                                ticks: {
+                            stepSize:  20,
+                                font: {
+                                family: 'Nunito',
+                                    size: 12
+                            },
+                            color: '#666'
+                        },
+                        grid: {
+                            color: '#e0e0e0',
+                                lineWidth: 1
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            display: false
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        };
+
+        new Chart(ctx_<%= chartId %>, config_<%= chartId %>);
+        });
+    </script>
+</body>
+
+</html>

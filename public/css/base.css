@@ -1,0 +1,132 @@
+/* Base styles shared across all components */
+body {
+    margin: 0;
+    background-color: #ffffff;
+    font-family: var(--font-family-primary);
+    font-weight: var(--font-weight-regular);
+}
+
+.paddingMargen {
+    padding-left: var(--padding-horizontal);
+    padding-right: var(--padding-horizontal);
+    padding-top: 50px;
+    /* Grid layouts will override this with their own padding/margins */
+}
+
+/* Typography utility classes */
+.nunito-light {
+    font-weight: var(--font-weight-light);
+}
+
+.nunito-regular {
+    font-weight: var(--font-weight-regular);
+}
+
+.nunito-medium {
+    font-weight: var(--font-weight-medium);
+}
+
+.nunito-semibold {
+    font-weight: var(--font-weight-semibold);
+}
+
+.nunito-bold {
+    font-weight: var(--font-weight-bold);
+}
+
+.nunito-extrabold {
+    font-weight: var(--font-weight-extrabold);
+}
+
+/* Header common styles */
+.header {
+    position: relative;
+    margin-bottom: 30px;
+    padding-top: 20px;
+    border-radius: var(--border-radius-large);
+    border-bottom: 2px solid #ccc;
+}
+
+.logo {
+    position: absolute;
+    top: 15px;
+    right: 30px;
+    height: var(--header-logo-height);
+}
+
+.info-section {
+    display: flex;
+    gap: 0;
+    align-items: center;
+    margin-top: 60px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: #333;
+    padding: 0 30px;
+    position: relative;
+}
+
+.info-item.w80 {
+    width: 60%;
+}
+
+.info-item:not(:last-child):after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 40px;
+    background-color: #ccc;
+}
+
+.info-icon {
+    width: var(--info-icon-size);
+    height: var(--info-icon-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.info-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.info-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.info-label {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-primary-1);
+    font-size: 14px;
+}
+
+.info-value {
+    color: #333;
+    font-size: 14px;
+    font-weight: var(--font-weight-regular);
+}
+
+/* Chart title common styles */
+.chart-title {
+    background-color: var(--color-primary-1);
+    color: white;
+    padding: 15px 85px;
+    margin: 0;
+    font-size: 18px;
+    font-weight: var(--font-weight-semibold);
+    border-radius: 0 var(--border-radius-large) var(--border-radius-large) 0;
+    width: 65%;
+    margin-bottom: 20px;
+}

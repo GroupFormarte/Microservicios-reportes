@@ -1,0 +1,9 @@
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Extra JavaScript -->
+    <% if (extraJS && extraJS.length > 0) { %>
+        <% extraJS.forEach(js => { %>
+            <script src="<%= js %>"></script>
+        <% }); %>
+    <% } %>

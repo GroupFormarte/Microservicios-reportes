@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            background: white;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #2c5aa0;
+            padding-bottom: 15px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            color: #2c5aa0;
+            margin-bottom: 5px;
+        }
+
+        .header .meta {
+            font-size: 10px;
+            color: #666;
+        }
+
+        .question-container {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            page-break-inside: avoid;
+        }
+
+        .question-header {
+            background-color: #f8f9fa;
+            padding: 8px 12px;
+            margin: -15px -15px 15px -15px;
+            border-radius: 8px 8px 0 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .question-code {
+            font-weight: bold;
+            color: #2c5aa0;
+            font-size: 13px;
+        }
+
+        .question-content {
+            margin: 15px 0;
+            line-height: 1.5;
+        }
+
+        .question-content img,
+        .answer-content img,
+        .image-container img {
+            max-width: 100% !important;
+            height: auto !important;
+            margin: 10px 0 !important;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: block !important;
+            page-break-inside: avoid;
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 15px 0;
+            page-break-inside: avoid;
+        }
+
+        .answers-section {
+            margin-top: 15px;
+        }
+
+        .answer-item {
+            display: flex;
+            margin: 8px 0;
+            align-items: flex-start;
+        }
+
+        .answer-label {
+            min-width: 30px;
+            font-weight: bold;
+            color: #2c5aa0;
+            margin-right: 8px;
+            margin-top: 2px;
+        }
+
+        .answer-content {
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        li {
+            margin: 3px 0;
+        }
+
+        /* Blockquotes */
+        blockquote {
+            margin: 10px 0;
+            padding: 8px 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #2c5aa0;
+            font-style: italic;
+        }
+
+        /* Code blocks */
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+        }
+
+        /* Checklist */
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        /* Headings */
+        h1, h2, h3, h4, h5, h6 {
+            margin: 15px 0 8px 0;
+            color: #2c5aa0;
+        }
+
+        h1 { font-size: 16px; }
+        h2 { font-size: 15px; }
+        h3 { font-size: 14px; }
+        h4 { font-size: 13px; }
+        h5 { font-size: 12px; }
+        h6 { font-size: 11px; }
+
+        /* Mathematical formulas and scientific content */
+        .formula {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-size: 14px;
+            margin: 5px 0;
+            display: inline-block;
+        }
+        
+        sup, sub {
+            font-size: 0.8em;
+            line-height: 0;
+            position: relative;
+            vertical-align: baseline;
+        }
+        
+        sup {
+            top: -0.5em;
+        }
+        
+        sub {
+            bottom: -0.25em;
+        }
+        
+        /* Scientific symbols and special characters */
+        .scientific-notation {
+            font-family: 'Times New Roman', serif;
+            white-space: nowrap;
+        }
+
+        /* Dividers */
+        hr {
+            margin: 15px 0;
+            border: none;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Page breaks */
+        .page-break {
+            page-break-before: always;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .question-container {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><%= title %></h1>
+            <div class="meta">
+                Total de preguntas: <%= totalQuestions %> | 
+                Generado el: <%= timestamp %>
+            </div>
+        </div>
+
+        <% questions.forEach((question, index) => { %>
+            <div class="question-container">
+                <div class="question-header">
+                    <div class="question-code">
+                        Pregunta <%= index + 1 %>: <%= question.codigo %>
+                    </div>
+                </div>
+
+                <div class="question-content">
+                    <%- question.preguntaHtml %>
+                </div>
+
+                <% if (question.respuestasHtml && question.respuestasHtml.length > 0) { %>
+                    <div class="answers-section">
+                        <% question.respuestasHtml.forEach((respuesta, respIndex) => { %>
+                            <div class="answer-item">
+                                <div class="answer-label">
+                                    <%= String.fromCharCode(65 + respIndex) %>)
+                                </div>
+                                <div class="answer-content">
+                                    <%- respuesta %>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } %>
+            </div>
+        <% }); %>
+
+        <div class="footer">
+            Documento generado por FormArte - Sistema de Gestión Educativa
+        </div>
+    </div>
+</body>
+</html>

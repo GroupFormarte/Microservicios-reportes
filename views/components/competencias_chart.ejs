@@ -1,0 +1,253 @@
+
+
+<style>
+    :root {
+        /* Color palette - Principal */
+        --color-primary-1: #27a1db;
+        --color-primary-2: #bd5785;
+        --color-primary-3: #d88008;
+
+        /* Color palette - Acentos */
+        --color-accent-1: #4b3e7a;
+        --color-accent-2: #0075af;
+        --color-accent-3: #4c8631;
+        --color-accent-4: #fcf1ef;
+        --color-accent-5: #2557a4;
+
+        /* Bar colors */
+        --bar-color: #d88008;
+    }
+
+    body {
+        margin: 0;
+        font-family: 'Nunito', Arial, sans-serif;
+        font-weight: 400;
+        padding: 0px;
+        background: white;
+    }
+
+    .chart-container {
+        width: 100%;
+        max-width: 100%;
+        background: white;
+        padding: 20px;
+        overflow-x: hidden;
+        box-sizing: border-box;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        height: 300px;
+        margin-bottom: 10px;
+    }
+
+    .data-table {
+        width: 100%;
+        max-width: 100%;
+        border-collapse: collapse;
+        font-family: 'Nunito', Arial, sans-serif;
+        margin-top: 10px;
+        table-layout: fixed;
+    }
+
+    .header-row th {
+        background-color: #f5e6d3;
+        padding: 12px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .header-row th:first-child {
+        width: 25%;
+        text-align: left;
+        padding-left: 15px;
+    }
+
+    .header-row th:not(:first-child) {
+        width: 15%;
+    }
+
+    .header-row th:nth-child(1) {
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+    }
+
+    .header-row th:last-child {
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    .data-table tbody {
+        margin-top: 10px;
+    }
+
+    .data-table tbody::before {
+        content: "";
+        display: block;
+        height: 20px;
+    }
+
+    .data-row {
+        margin-bottom: 15px;
+    }
+
+    .data-row td {
+        padding: 12px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .data-label {
+        background-color: var(--color-primary-1);
+        color: white;
+        font-weight: 600;
+        text-align: center;
+        padding: 8px 16px;
+        border-radius: 8px;
+    }
+
+    .data-row:first-child td:not(:first-child) div {
+        background-color: #f5e6d3;
+        padding: 12px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .data-row:first-child td:nth-child(2) div {
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+    }
+
+    .data-row:first-child td:last-child div {
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    .data-row:last-child td:not(:first-child) div {
+        background-color: white;
+        padding: 12px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .data-row:last-child td:nth-child(2) div {
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+    }
+
+    .data-row:last-child td:last-child div {
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    .data-row td:not(:first-child) {
+        padding: 0;
+    }
+</style>
+<div class="chart-container">
+    <div class="chart-wrapper">
+        <canvas id="competenciasChart_<%= chartId || 'default' %>"></canvas>
+    </div>
+
+    <!-- Data Table -->
+    <table class="data-table">
+        <thead>
+            <tr class="header-row">
+                <th></th>
+                <% labels.forEach(function(label) { %>
+                    <th><%= label %></th>
+                <% }); %>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr class="data-row">
+                <td>
+                    <div class="data-label">Histórico de ese cod de simulacro</div>
+                </td>
+                <% historicoPromedios.forEach(function(historico) { %>
+                    <td><div><%= historico || 'N/A' %></div></td>
+                <% }); %>
+            </tr>
+            <tr class="data-row">
+                <td>
+                    <div class="data-label">Puntajes promedio de grupo</div>
+                </td>
+                <% promedioGrupal.forEach(function(promedio) { %>
+                    <td><div><%= promedio || 'N/A' %></div></td>
+                <% }); %>
+            </tr>
+        </tbody>
+    </table>
+</div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Chart data
+    const ctx_<%= chartId || 'default' %> = document.getElementById('competenciasChart_<%= chartId || 'default' %>').getContext('2d');
+
+    const chartData_<%= chartId || 'default' %> = {
+        labels: <%- JSON.stringify(labels) %>,
+        datasets: [{
+            data: <%- JSON.stringify(promedioGrupal) %>,
+            backgroundColor: '#d88008',
+            borderWidth: 0,
+            borderRadius: 4,
+            barThickness: 60,
+        }]
+    };
+
+    const config_<%= chartId || 'default' %> = {
+        type: 'bar',
+        data: chartData_<%= chartId || 'default' %>,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: <%= maxYValue+10 %>,
+                    ticks: {
+                        stepSize: 2,
+                        font: {
+                            family: 'Nunito',
+                            size: 12
+                        },
+                        color: '#666'
+                    },
+                    grid: {
+                        color: '#e0e0e0',
+                        lineWidth: 1
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            family: 'Nunito',
+                            size: 12
+                        },
+                        color: '#666',
+                        maxRotation: 0
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    };
+
+    new Chart(ctx_<%= chartId || 'default' %>, config_<%= chartId || 'default' %>);
+</script>

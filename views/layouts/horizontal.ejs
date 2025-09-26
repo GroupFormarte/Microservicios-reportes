@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('../partials/head', {
+        title: title,
+        extraCSS: [
+            '/api/reports/css/horizontal-layout.css',
+  
+        ]
+    }) %>
+    <!-- Chart.js - Load before components -->
+     <style>
+        .chart-subtitle {
+                font-size: 1.2em;
+                color: #467abb;
+                margin-bottom: 10px;
+                text-align: center;
+                
+        }
+     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+</head>
+<body class="horizontal-layout">
+    <%- include('../partials/header', {
+   
+                layout: 'horizontal'
+    }) %>
+    
+    <% if (chartTitle) { %>
+        <div class="chart-title"><%= chartTitle %></div>
+    <% } %>
+       <% if (subTitle) { %>
+            <div class="chart-subtitle"><%= subTitle %></div>
+        <% } %>
+    <div class="paddingMargen">
+
+     
+        <%- content %>
+    </div>
+
+</body>
+</html>

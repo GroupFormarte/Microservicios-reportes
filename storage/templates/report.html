@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diseño estilo tarjeta</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="logo-container">
+            <img src="logo_podium.png" alt="Logo Formarte" height="150">
+        </div>
+
+        <div class="circle-container">
+            <canvas id="scoreCanvas" width="150" height="150"></canvas>
+        </div>
+
+        <div class="line-gradent"></div>
+    </div>
+    <div class="info-user">
+        <!-- Fila 1 -->
+        <div class="fila">
+            <div class="campo">
+                <div class="titulo">EVALUACIÓN</div>
+                <div class="valor">SD1–UN–PV–AI</div>
+            </div>
+            <div class="campo">
+                <div class="titulo">FECHA</div>
+                <div class="valor">2025-04-19 09:17:07.319</div>
+            </div>
+        </div>
+
+        <!-- Fila 2 -->
+        <div class="fila">
+            <div class="campo">
+                <div class="titulo">NOMBRES – APELLIDOS</div>
+                <div class="valor">jeison miller</div>
+            </div>
+            <div class="campo">
+                <div class="titulo">CÓDIGO</div>
+                <div class="valor">3233386633</div>
+            </div>
+            <div class="campo">
+                <div class="titulo"># DE LISTA</div>
+                <div class="valor">1</div>
+            </div>
+        </div>
+
+        <!-- Fila 3 -->
+        <div class="fila">
+            <div class="campo">
+                <div class="titulo">INSTITUCIÓN</div>
+                <div class="valor">FORMARTE MEDELLIN</div>
+            </div>
+            <div class="campo">
+                <div class="titulo">GRUPO</div>
+                <div class="valor">PRE UNA NOCHE</div>
+            </div>
+            <div class="campo">
+                <div class="titulo">PUESTO</div>
+                <div class="valor">10</div>
+            </div>
+            <div class="campo pequeno">
+                <div class="titulo">GRA</div>
+                <div class="valor">5</div>
+            </div>
+            <div class="campo pequeno">
+                <div class="titulo">GRU</div>
+                <div class="valor">5</div>
+            </div>
+            <div class="campo">
+                <div class="titulo">CIUDAD</div>
+                <div class="valor">Medellín</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de resultados  -->
+
+
+    <div class="tabla">
+        <!-- Encabezado -->
+        <div class="fila p-10 encabezado">
+            <div class="celda area">ÁREA</div>
+            <div class="celda">RESPUESTAS CORRECTAS</div>
+            <div class="celda">#PREGUNTAS</div>
+            <div class="celda">PUNTAJE POR ÁREA</div>
+        </div>
+
+        <!-- Filas de datos -->
+        <div class="fila p-10">
+            <div class="celda area">Matemáticas</div>
+            <div class="celda">7</div>
+            <div class="celda">20</div>
+            <div class="celda">70.0</div>
+        </div>
+        <div class="fila p-10 ">
+            <div class="celda area">Ciencias Naturales</div>
+            <div class="celda">8</div>
+            <div class="celda">20</div>
+            <div class="celda">80.0</div>
+        </div>
+        <div class="fila p-10">
+            <div class="celda area">Sociales y ciudadanas</div>
+            <div class="celda">15</div>
+            <div class="celda">20</div>
+            <div class="celda">150.0</div>
+        </div>
+        <div class="fila p-10">
+            <div class="celda area">Análisis de la imagen</div>
+            <div class="celda">11</div>
+            <div class="celda">20</div>
+            <div class="celda">110.0</div>
+        </div>
+        <div class="fila p-10">
+            <div class="celda area">Interdisciplinar</div>
+            <div class="celda">23</div>
+            <div class="celda">20</div>
+            <div class="celda">115.0</div>
+        </div>
+
+        <!-- Totales -->
+        <div class="fila p-10 totales">
+            <div class="celda area">TOTAL</div>
+            <div class="celda">64</div>
+            <div class="celda">120</div>
+            <div class="celda"></div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="vertical-label">GRÁFICA POR ÁREAS<br>De 0 a 200</div>
+        <div class="container">
+            <div class="chart-block">
+                <canvas id="matematicas"></canvas>
+                <div class="label">Matemáticas</div>
+            </div>
+            <div class="chart-block">
+                <canvas id="naturales"></canvas>
+                <div class="label">Ciencias Naturales</div>
+            </div>
+            <div class="chart-block">
+                <canvas id="sociales"></canvas>
+                <div class="label">Sociales y Ciudadanas</div>
+            </div>
+            <div class="chart-block">
+                <canvas id="imagen"></canvas>
+                <div class="label">Análisis de la imagen</div>
+            </div>
+            <div class="chart-block">
+                <canvas id="inter"></canvas>
+                <div class="label">Interdisciplinar</div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        // ========= CÍRCULO DE PUNTAJE PRINCIPAL =========
+        const canvas = document.getElementById("scoreCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const score = 525.0;
+        const maxScore = 700.0;
+        const percentage = Math.min(score / maxScore, 1.0);
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = 60;
+
+        const startAngle = -0.75 * Math.PI; // 10 en punto
+        const endAngle = startAngle + 2 * Math.PI * percentage;
+
+        // Fondo del círculo
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+        ctx.strokeStyle = "#EDF4F8";
+        ctx.lineWidth = 30;
+        ctx.lineCap = "round";
+        ctx.stroke();
+
+        // Gradiente de progreso
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        gradient.addColorStop(0, "#7DDE8C");
+        gradient.addColorStop(1, "#74D0B3");
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = 30;
+        ctx.lineCap = "round";
+        ctx.stroke();
+
+        // Texto dentro del canvas
+        ctx.fillStyle = "#333";
+        ctx.font = "bold 24px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(score.toFixed(1), centerX, centerY - 10);
+
+        ctx.font = "bold 14px Arial";
+        ctx.fillStyle = "#777";
+        ctx.fillText("PUNTAJE", centerX, centerY + 12);
+
+        // ========= CHART.JS GRÁFICAS POR ÁREAS =========
+        const areas = [
+            { id: 'matematicas', valor: 70 },
+            { id: 'naturales', valor: 80 },
+            { id: 'sociales', valor: 150 },
+            { id: 'imagen', valor: 110 },
+            { id: 'inter', valor: 115 }
+        ];
+
+        areas.forEach(area => {
+            new Chart(document.getElementById(area.id), {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [area.valor, 200 - area.valor],
+                        backgroundColor: ['#66CDAA', '#fff'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '80%',
+                    responsive: false,
+                    plugins: {
+                        tooltip: { enabled: false },
+                        legend: { display: false }
+                    }
+                },
+                plugins: [{
+                    id: 'textInside',
+                    beforeDraw: function (chart) {
+                        const { width, height } = chart;
+                        const ctx = chart.ctx;
+                        ctx.restore();
+
+                        const centerX = width / 2;
+                        const centerY = height / 2;
+                        const radius = height / 3.5;
+
+                        const gradient = ctx.createLinearGradient(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
+                        gradient.addColorStop(0, '#9adcb8');
+                        gradient.addColorStop(1, '#7dbdb5');
+
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                        ctx.fillStyle = gradient;
+                        ctx.fill();
+
+                        ctx.fillStyle = '#fff';
+                        ctx.font = `${(height / 6).toFixed(2)}px Arial`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(`${area.valor}%`, centerX, centerY);
+
+                        ctx.save();
+                    }
+                }]
+            });
+        });
+
+
+    </script>
+
+</body>
+
+</html>

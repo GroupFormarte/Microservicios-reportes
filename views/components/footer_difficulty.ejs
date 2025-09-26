@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Footer Índice de Dificultad</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            /* Color palette - Principal */
+            --color-primary-1: #27a1db;
+            --color-primary-2: #bd5785;
+            --color-primary-3: #d88008;
+
+            /* Color palette - Acentos */
+            --color-accent-1: #4b3e7a;
+            --color-accent-2: #0075af;
+            --color-accent-3: #4c8631;
+            --color-accent-4: #fcf1ef;
+            --color-accent-5: #2557a4;
+
+            /* Difficulty colors */
+            --difficulty-low: #4c8631;
+            --difficulty-medium: #d88008;
+            --difficulty-high: #bd5785;
+            
+            /* Level colors */
+            --level-a-minus: #4c8631;
+            --level-a1: #7cb342;
+            --level-a2: #fdd835;
+            --level-b1: #ff8a65;
+            --level-b-plus: #e57373;
+        }
+
+        body {
+            margin: 0;
+            background-color: #ffffff;
+            font-family: 'Nunito', Arial, sans-serif;
+            font-weight: 400;
+        }
+
+        .footer-container {
+            padding: 2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .footer-block {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .block-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .text-with-background {
+            background-color: var(--color-accent-4);
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        .difficulty-levels {
+            display: flex;
+            gap: 0;
+        }
+
+        .legend-box {
+            padding: 8px 13px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            border-radius: 4px;
+            min-width: 40px;
+            margin-left: 6px;
+        }
+
+        .legend-id {
+            background-color: var(--color-primary-1);
+        }
+
+        .legend-nr {
+            background-color: var(--color-primary-1);
+        }
+
+        .legend-rc {
+            background-color: var(--color-accent-5);
+        }
+
+        .difficulty-low {
+            background-color: var(--difficulty-low);
+        }
+
+        .difficulty-medium {
+            background-color: var(--difficulty-medium);
+        }
+
+        .difficulty-high {
+            background-color: var(--difficulty-high);
+        }
+
+        /* Level-specific colors */
+        .level-a-minus {
+            background-color: var(--level-a-minus);
+        }
+
+        .level-a1 {
+            background-color: var(--level-a1);
+        }
+
+        .level-a2 {
+            background-color: var(--level-a2);
+        }
+
+        .level-b1 {
+            background-color: var(--level-b1);
+        }
+
+        .level-b-plus {
+            background-color: var(--level-b-plus);
+        }
+
+        .legend-text {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .result-label {
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .result-value {
+            background-color: var(--difficulty-medium);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .footer-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .footer-block {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .block-row {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .difficulty-levels {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="footer-container">
+        <!-- Bloque 1: ID y NR -->
+        <div class="footer-block">
+            <div class="block-row">
+                <div class="legend-box legend-id">ID</div>
+                <span class="legend-text text-with-background">Índice de dificultad</span>
+                <div class="difficulty-levels">
+                    <% if (difficultyType === 'levels') { %>
+                        <!-- Levels A-, A1, A2, B1, B+ -->
+                        <% levels.forEach(function(level, index) { %>
+                        <div class="legend-box level-<%= level.class %>"><%= level.label %></div>
+                        <% }); %>
+                    <% } else { %>
+                        <!-- Standard BAJO, MEDIO, ALTO -->
+                        <div class="legend-box difficulty-low">BAJO</div>
+                        <div class="legend-box difficulty-medium">MEDIO</div>
+                        <div class="legend-box difficulty-high">ALTO</div>
+                    <% } %>
+                </div>
+            </div>
+            <div class="block-row">
+                <div class="legend-box legend-nr">NR</div>
+                <span class="legend-text text-with-background" style="width: 352px">No respondió</span>
+            </div>
+        </div>
+
+        <!-- Bloque 2: RC y Resultado -->
+        <div class="footer-block">
+            <div class="block-row">
+                <div class="legend-box legend-rc">RC</div>
+                <span class="legend-box legend-rc">Respuesta correcta</span>
+            </div>
+            <div class="block-row">
+                <span class="result-label text-with-background"><%= subjectLabel || 'ID Ciencias Naturales' %></span>
+                <div class="result-value" style="background-color: <%= resultColor || 'var(--difficulty-medium)' %>"><%= resultText || 'MEDIO [57.4]' %></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

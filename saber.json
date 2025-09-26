@@ -1,0 +1,267 @@
+{
+    "campus": "FORMARTE MEDELLIN",
+    "course": "ICFES SABER 11 -  DOMINGOS",
+    "simulationId": "68d2b028745905f85547e214",
+    "programName": "ICFES SABER 11",
+    "code": "S11-M4-U-V2-p",
+    "tipe_inform": "saber",
+    "detailQuestion": [
+        {
+            "id": "6841b5f76adaaca0894123ec",
+            "cod": "S11-PS-M2-U-39",
+            "componente": "Pragmático",
+            "competencia": "Reflexiona y evalúa",
+            "periodo": "N/A",
+            "id_recurso": null,
+            "nameUser": "Myriam",
+            "eje_tematico": "Niveles de lectura",
+            "grado": "Pre Saber",
+            "programa": "Pre Saber",
+            "area": "Lectura Crítica",
+            "status": false,
+            "id_material_refuerzo": null,
+            "asignatura": "Lectura Crítica",
+            "tipo": null,
+            "tipo_platform": "Examen",
+            "created": "2025-06-05 10:25:35.157",
+            "cant_respuesta": "4",
+            "pregunta": "6841b5d86adaaca0894123e2",
+            "pregunta_correcta": "6841b5db6adaaca0894123e4",
+            "question_depend_others": "",
+            "respuestas": [
+                "6841b5db6adaaca0894123e4",
+                "6841b5df6adaaca0894123e6",
+                "6841b5e46adaaca0894123e8",
+                "6841b5e76adaaca0894123ea"
+            ]
+        }
+    ],
+    "results": {
+        "68d45631745905f85549245a": {
+            "position": 5,
+            "score": 677.6705265480606,
+            "totalStudents": 50,
+            "correctAnswers": 64,
+            "incorrectAnswers": 157,
+            "totalAnswered": 221
+        }
+    },
+    "students": [
+        {
+            "id": "68d45631745905f85549245d",
+            "id_estudiante": "98",
+            "id_campus": "3",
+            "course_id": "7",
+            "document": "1038263411",
+            "program_id": null,
+            "examenes_asignados": [
+                {
+                    "index": 0,
+                    "id_simulacro": "68d2b028745905f85547e214",
+                    "score": 676.7697964939348,
+                    "position": 7,
+                    "respuesta_sesion": [
+                        {
+                            "session": 1,
+                            "respuestas": [
+                                {
+                                    "id_pregunta": "6871216d6adaaca08942a7af",
+                                    "id_respuesta": "687121536adaaca08942a79f",
+                                    "competence": "Indagación",
+                                    "cod_question": "S11-SS-M4-U-V2-67",
+                                    "letra": "B",
+                                    "number_session": "1",
+                                    "index_question": "133",
+                                    "es_correcta": false
+                                }
+                            ],
+                            "status": true,
+                            "tiempo_trancurrido": "00:00:00"
+                        },
+                        {
+                            "session": 2,
+                            "respuestas": [
+                                {
+                                    "id_pregunta": "6871216d6adaaca08942a7af",
+                                    "id_respuesta": "687121536adaaca08942a79f",
+                                    "competence": "Indagación",
+                                    "cod_question": "S11-SS-M4-U-V2-67",
+                                    "letra": "B",
+                                    "number_session": "1",
+                                    "index_question": "133",
+                                    "es_correcta": false
+                                }
+                            ],
+                            "status": true,
+                            "tiempo_trancurrido": "00:00:00"
+                        }
+                    ],
+                    "materias": [
+                        {
+                            "name": "Lectura Crítica",
+                            "porcentaje": "34.15",
+                            "components": [
+                                {
+                                    "name": "Pragmático",
+                                    "skills": [
+                                        {
+                                            "name": "Pragmático",
+                                            "porcentaje": "0.00"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "competencies": [
+                                {
+                                    "name": "Reflexiona y evalúa",
+                                    "skills": [
+                                        {
+                                            "name": "Reflexiona y evalúa",
+                                            "porcentaje": "28.57"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Identifica y entiende",
+                                    "skills": [
+                                        {
+                                            "name": "Identifica y entiende",
+                                            "porcentaje": "27.27"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Comprende",
+                                    "skills": [
+                                        {
+                                            "name": "Comprende",
+                                            "porcentaje": "43.75"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "correct_answers": 14,
+                            "incorrect_answers": 27
+                        },
+                        {
+                            "name": "Matemáticas",
+                            "porcentaje": "22.00",
+                            "components": [
+                                {
+                                    "name": "N/A",
+                                    "skills": [
+                                        {
+                                            "name": "N/A",
+                                            "porcentaje": "25.00"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "competencies": [
+                                {
+                                    "name": "Interpretación y representación",
+                                    "skills": [
+                                        {
+                                            "name": "Interpretación y representación",
+                                            "porcentaje": "16.67"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "correct_answers": 11,
+                            "incorrect_answers": 39
+                        },
+                        {
+                            "name": "Ciencias Sociales",
+                            "porcentaje": "24.00",
+                            "components": [
+                                {
+                                    "name": "N/A",
+                                    "skills": [
+                                        {
+                                            "name": "N/A",
+                                            "porcentaje": "15.38"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "competencies": [
+                                {
+                                    "name": "Pensamiento reflexivo y sistémico",
+                                    "skills": [
+                                        {
+                                            "name": "Pensamiento reflexivo y sistémico",
+                                            "porcentaje": "18.75"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "correct_answers": 12,
+                            "incorrect_answers": 38
+                        },
+                        {
+                            "name": "Ciencias Naturales",
+                            "porcentaje": "20.69",
+                            "components": [
+                                {
+                                    "name": "Químico",
+                                    "skills": [
+                                        {
+                                            "name": "Químico",
+                                            "porcentaje": "26.67"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "competencies": [
+                                {
+                                    "name": "Uso del conocimiento",
+                                    "skills": [
+                                        {
+                                            "name": "Uso del conocimiento",
+                                            "porcentaje": "41.18"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "correct_answers": 12,
+                            "incorrect_answers": 46
+                        },
+                        {
+                            "name": "Inglés",
+                            "porcentaje": "30.91",
+                            "components": [
+                                {
+                                    "name": "Parte 1",
+                                    "skills": [
+                                        {
+                                            "name": "Parte 1",
+                                            "porcentaje": "16.67"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "competencies": [
+                                {
+                                    "name": "Semántica",
+                                    "skills": [
+                                        {
+                                            "name": "Semántica",
+                                            "porcentaje": "19.05"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "correct_answers": 17,
+                            "incorrect_answers": 38
+                        }
+                    ]
+                }
+            ],
+            "promedio": null,
+            "evaluaciones": null,
+            "proceso": null,
+            "name": "Mesa"
+        }
+    ]
+}

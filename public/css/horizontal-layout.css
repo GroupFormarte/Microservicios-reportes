@@ -1,0 +1,81 @@
+/* Horizontal layout specific styles */
+.horizontal-layout {
+    /* Any specific styles for horizontal pages */
+}
+
+.horizontal-layout .header {
+    /* Horizontal header adjustments if needed */
+}
+
+.horizontal-layout .chart-title {
+    /* Horizontal chart title adjustments if needed */
+}
+
+/* Grid layout for horizontal components */
+.horizontal-layout .paddingMargen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
+    align-items: start;
+}
+
+/* Full width components in horizontal layout */
+.horizontal-layout .component-tabla-dificultad-analisis,
+.horizontal-layout .component-comparativo-puntaje {
+    grid-column: 1 / -1; /* Span all columns */
+}
+
+/* Compact components that can share space */
+.horizontal-layout .component-bar-chart-with-title,
+.horizontal-layout .component-bar-chart-simple,
+.horizontal-layout .component-score-distribution {
+    /* These will automatically fit in grid cells */
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/* Ensure bar chart components are responsive within grid */
+.horizontal-layout .component-bar-chart-with-title .chart-container,
+.horizontal-layout .component-bar-chart-simple .chart-container {
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+/* Score distribution components - same width as bar charts */
+.horizontal-layout .component-score-distribution {
+    /* Remove grid-column span - let it fit in grid cells like other compact components */
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+/* Score distribution internal layout - single chart per component */
+.horizontal-layout .component-score-distribution .circular-charts-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.horizontal-layout .component-score-distribution .chart-item {
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+}
+
+/* Responsive adjustments for horizontal layout */
+@media (max-width: 1000px) {
+    .horizontal-layout .paddingMargen {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .horizontal-layout .paddingMargen {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
