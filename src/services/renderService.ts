@@ -13,9 +13,35 @@ import {
 
 export class RenderService {
   private viewsPath: string;
+  private cache: Map<string, any> = new Map();
 
   constructor() {
     this.viewsPath = path.join(__dirname, '../../views');
+  }
+
+  // Method to clear cache after report completion
+  clearCache(): void {
+    try {
+      const cacheSize = this.cache.size;
+      this.cache.clear();
+
+      // Clear EJS cache as well
+      ejs.clearCache();
+
+      // Force garbage collection if available
+      if (global.gc) {
+        global.gc();
+      }
+
+      logger.info(`Cache cleared successfully`, {
+        previousCacheSize: cacheSize,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      logger.error('Error clearing cache', {
+        error: (error as Error).message
+      });
+    }
   }
 
   async renderBarChart(data: BarChartConfig): Promise<RenderResult> {

@@ -177,11 +177,34 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+    // Function to wait for Chart.js to be fully loaded
+    function waitForChart() {
+        return new Promise((resolve) => {
+            let attempts = 0;
+            const maxAttempts = 20;
+
+            function check() {
+                if (typeof Chart !== 'undefined' && Chart.Chart) {
+                    console.log('Chart.js is ready after', attempts, 'attempts');
+                    resolve(true);
+                } else if (attempts < maxAttempts) {
+                    attempts++;
+                    setTimeout(check, 500);
+                } else {
+                    console.error('Chart.js failed to load after', maxAttempts, 'attempts');
+                    resolve(false);
+                }
+            }
+            check();
+        });
+    }
+
     // Wait for Chart.js to be available and DOM to be ready
-    document.addEventListener('DOMContentLoaded', function () {
-        // Check if Chart is available
-        if (typeof Chart === 'undefined') {
-            console.error('Chart.js is not loaded');
+    document.addEventListener('DOMContentLoaded', async function () {
+        // Wait for Chart.js to be fully available
+        const chartReady = await waitForChart();
+        if (!chartReady) {
+            console.error('Chart.js is not available, skipping chart creation');
             return;
         }
 

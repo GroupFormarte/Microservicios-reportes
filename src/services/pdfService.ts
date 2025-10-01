@@ -278,11 +278,11 @@ export class PdfService {
           // Check for charts
           const checkCharts = () => {
             if (typeof window.Chart !== 'undefined') {
-              // Wait for all charts to be rendered
+              // Wait for all charts to be rendered - increased timeout for better reliability
               setTimeout(() => {
                 chartsReady = true;
                 if (resourcesReady) resolve();
-              }, 3000);
+              }, 8000);
             } else {
               chartsReady = true;
               if (resourcesReady) resolve();
@@ -356,6 +356,16 @@ export class PdfService {
       return pdf;
 
     } catch (error) {
+      // Clear cache on error to prevent memory leaks
+      try {
+        this.renderService.clearCache();
+        logger.info('Cache cleared after PDF generation error');
+      } catch (cacheError) {
+        logger.warn('Failed to clear cache after PDF error', {
+          cacheError: (cacheError as Error).message
+        });
+      }
+
       logger.error('Error generating PDF', {
         error: error.message,
         stack: error.stack,

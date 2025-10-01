@@ -484,22 +484,38 @@ export const getDefaultHeaderImages = () => {
 // New endpoint: Process simulation data
 export const processSimulationData = asyncHandler(async (req: Request, res: Response) => {
   const simulationData = req.body;
-  const sessionId = `session_${Date.now()}`;
+  const sessionId = req.headers['x-session-id'] as string || `session_${Date.now()}`;
 
   console.log('=== SIMULATION DATA RECEIVED ===');
   console.log(simulationData.tipe_inform);
   console.log('=== END SIMULATION DATA ===');
+  console.log('Session ID:', sessionId);
 
+  // Emit initial progress
+  websocketService.emitProgress({
+    sessionId,
+    stage: 'initializing',
+    progress: 0,
+    message: 'Iniciando procesamiento del reporte',
+    timestamp: new Date()
+  });
 
   const images = getDefaultHeaderImages();
   const baseHeaderInfo = generarBaseHeaderInfo(simulationData, images);
 
+  websocketService.emitProgress({
+    sessionId,
+    stage: 'generating_cover',
+    progress: 10,
+    message: 'Generando página de portada',
+    timestamp: new Date()
+  });
 
   const portadaPage = generarPaginaPortada(simulationData, images);
 
   let allPages: any[] = [];
   if (simulationData.tipe_inform.trim().includes("udea")) {
-  
+
     /* 
     - la pagina principal es la de portada.
     - diagrama comparativo de puntajes tiene diagrama de barra horizontal ( no se ha creado)
@@ -616,15 +632,19 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
 
 
 
-    const tablaEstudiantesData = procesarTablaEstudiantes(simulationData);
+    const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData);
 
+    let indiceDificultadPorCompetencia: any[] = [];
+    for (const inD of tablaEstudiantesDataArray) {
+      indiceDificultadPorCompetencia.push(inD)
+    }
 
     const tablaDificultadData = procesarTablaDificultadAnalisis(simulationData);
 
     const tablaAnalisisData = generarDatosTablaDificultad(
       tablaDificultadData,
       undefined,
-      tablaEstudiantesData.data.indiceDificultadPorCompetencia
+      indiceDificultadPorCompetencia
     );
 
 
@@ -732,13 +752,15 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
       analisisPages.push(analisisPage);
     }
 
-    // Página 6: Tabla de estudiantes (horizontal)
-    const estudiantesPage: PageRequest = {
+    // Página 6: Tabla de estudiantes (horizontal) - Puede ser múltiples páginas
+    const estudiantesPages: PageRequest[] = tablaEstudiantesDataArray.map((tablaData, index) => ({
       layout: "horizontal",
-      chartTitle: "Tabla de Estudiantes",
+      chartTitle: tablaEstudiantesDataArray.length > 1
+        ? `Tabla de Estudiantes (Página ${index + 1} de ${tablaEstudiantesDataArray.length})`
+        : "Tabla de Estudiantes",
       headerInfo: baseHeaderInfo,
-      components: [tablaEstudiantesData]
-    };
+      components: [tablaData]
+    }));
 
     // Generar PDFs individuales
     allPages = [
@@ -746,7 +768,7 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
       ...competenciasPage,
       ...areasPages,
       ...analisisPages,
-      estudiantesPage
+      ...estudiantesPages
     ];
 
 
@@ -778,7 +800,7 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
       • 3 [>500 a 700]
       • 4 [>700 a 1000]
     */
-   
+
     const areasRanges = [
       { min: 0, max: 350, label: '1' },
       { min: 351, max: 500, label: '2' },
@@ -810,13 +832,16 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
       areasPages.push(areasPage);
     }
 
-    const tablaEstudiantesData = procesarTablaEstudiantes(simulationData);
+    const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData);
     const tablaDificultadData = procesarTablaDificultadAnalisis(simulationData);
-
+    let indiceDificultadPorCompetencia: any[] = [];
+    for (const inD of tablaEstudiantesDataArray) {
+      indiceDificultadPorCompetencia.push(inD)
+    }
     const tablaAnalisisData = generarDatosTablaDificultad(
       tablaDificultadData,
       undefined,
-      tablaEstudiantesData.data.indiceDificultadPorCompetencia
+      indiceDificultadPorCompetencia
     );
     // Página 5: Tabla de análisis de dificultad (vertical)
     let analisisPages: PageRequest[] = []
@@ -830,13 +855,15 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
       analisisPages.push(analisisPage);
     }
 
-    // Página 6: Tabla de estudiantes (horizontal)
-    const estudiantesPage: PageRequest = {
+    // Página 6: Tabla de estudiantes (horizontal) - Puede ser múltiples páginas
+    const estudiantesPages: PageRequest[] = tablaEstudiantesDataArray.map((tablaData, index) => ({
       layout: "horizontal",
-      chartTitle: "Tabla de Estudiantes",
+      chartTitle: tablaEstudiantesDataArray.length > 1
+        ? `Tabla de Estudiantes (Página ${index + 1} de ${tablaEstudiantesDataArray.length})`
+        : "Tabla de Estudiantes",
       headerInfo: baseHeaderInfo,
-      components: [tablaEstudiantesData]
-    };
+      components: [tablaData]
+    }));
 
     // Generar PDFs individuales para UNAL
     allPages = [
@@ -844,10 +871,10 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
       competenciasPageUnal,
       ...areasPages,
       ...analisisPages,
-      estudiantesPage
+      ...estudiantesPages
     ];
   } else {
-console.log("Hola saber");
+
 
     const comparativoData = procesarCompetenciasComparativo(simulationData);
     const competenciasUnal = procesarCompetenciasUNAL(simulationData);
@@ -970,14 +997,19 @@ console.log("Hola saber");
       }
     ];
 
-    const tablaEstudiantesData = procesarTablaEstudiantes(simulationData);
+    const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData);
+    let indiceDificultadPorCompetencia: any[] = [];
+    for (const inD of tablaEstudiantesDataArray) {
+      indiceDificultadPorCompetencia.push(inD)
+    }
+
 
     const tablaDificultadData = procesarTablaDificultadAnalisis(simulationData);
 
     const tablaAnalisisData = generarDatosTablaDificultad(
       tablaDificultadData,
       nivel,
-      tablaEstudiantesData.data.indiceDificultadPorCompetencia
+      indiceDificultadPorCompetencia
     );
 
     // Página 5: Tabla de análisis de dificultad (vertical)
@@ -1066,22 +1098,26 @@ console.log("Hola saber");
       ejeTematicosPages.push(ejeTematicosPage);
     }
 
-    // Página 6: Tabla de estudiantes (horizontal)
-    const listadoEstudiantesCompetenciasPage: PageRequest = {
+    // Página 6: Tabla de estudiantes por competencias (horizontal) - Puede ser múltiples páginas
+    const listadoEstudiantesCompetenciasPages: PageRequest[] = tablaEstudiantesDataArray.map((tablaData, index) => ({
       layout: "horizontal",
-      chartTitle: "Listado general por competencias",
+      chartTitle: tablaEstudiantesDataArray.length > 1
+        ? `Listado general por competencias (Página ${index + 1} de ${tablaEstudiantesDataArray.length})`
+        : "Listado general por competencias",
       headerInfo: baseHeaderInfo,
-      components: [tablaEstudiantesData]
-    };
+      components: [tablaData]
+    }));
 
-    // Página 7: Tabla de estudiantes por áreas (horizontal)
-    const tablaEstudiantesAreasData = procesarTablaEstudiantesPorArea(simulationData);
-    const listadoEstudiantesAreasPage: PageRequest = {
+    // Página 7: Tabla de estudiantes por áreas (horizontal) - Puede ser múltiples páginas
+    const tablaEstudiantesAreasDataArray = procesarTablaEstudiantesPorArea(simulationData);
+    const listadoEstudiantesAreasPages: PageRequest[] = tablaEstudiantesAreasDataArray.map((tablaData, index) => ({
       layout: "horizontal",
-      chartTitle: "Listado general por pruebas",
+      chartTitle: tablaEstudiantesAreasDataArray.length > 1
+        ? `Listado general por pruebas (Página ${index + 1} de ${tablaEstudiantesAreasDataArray.length})`
+        : "Listado general por pruebas",
       headerInfo: baseHeaderInfo,
-      components: [tablaEstudiantesAreasData]
-    };
+      components: [tablaData]
+    }));
 
     allPages = [
       portadaPage,
@@ -1090,8 +1126,8 @@ console.log("Hola saber");
       ...areasPages,
       ...asignaturasPages,
       ...analisisPages,
-      listadoEstudiantesCompetenciasPage,
-      listadoEstudiantesAreasPage,
+      ...listadoEstudiantesCompetenciasPages,
+      ...listadoEstudiantesAreasPages,
       ...ejeTematicosPages
     ];
   }
@@ -1099,13 +1135,19 @@ console.log("Hola saber");
 
 
 
- 
+
+
+  websocketService.emitProgress({
+    sessionId,
+    stage: 'generating_pdfs',
+    progress: 70,
+    message: `Generando PDFs individuales (${allPages.length} páginas)`,
+    timestamp: new Date()
+  });
 
   const individualPdfFiles = [];
   for (let index = 0; index < allPages.length; index++) {
     const pageData = allPages[index];
-
-
 
     try {
       // Determinar orientación basada en el layout de la página
@@ -1127,7 +1169,13 @@ console.log("Hola saber");
     }
   }
 
-
+  websocketService.emitProgress({
+    sessionId,
+    stage: 'merging_pdfs',
+    progress: 90,
+    message: 'Combinando páginas en PDF final',
+    timestamp: new Date()
+  });
 
   const mergedFileName = `reporte_completo_${simulationData.campus.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
   await pdfService.mergePdfs(individualPdfFiles, mergedFileName);
@@ -1137,14 +1185,27 @@ console.log("Hola saber");
 
   const finalPdfUrl = `${req.protocol}://${req.get('host')}/api/reports/pdfs/${mergedFileName}`;
 
+  // Clear cache and cleanup resources after successful report generation
+  try {
+    renderService.clearCache();
+    logger.info('Cache cleared after report completion', {
+      reportType: simulationData.tipe_inform,
+      institution: simulationData.campus,
+      totalPages: allPages.length
+    });
+  } catch (cacheError) {
+    // Don't fail the entire process if cache clearing fails
+    logger.warn('Cache clearing failed, but report generation was successful', {
+      error: (cacheError as Error).message
+    });
+  }
+
   // Emit completion
-  // websocketService.emitComplete(sessionId, {
-  //   fileName: mergedFileName,
-  //   url: finalPdfUrl,
-  //   totalPages: allPages.length,
-  //   reportType: simulationData.tipe_inform,
-  //   institution: simulationData.campus
-  // });
+  logger.info('About to emit completion websocket notification', {
+    sessionId,
+    fileName: mergedFileName,
+    url: finalPdfUrl
+  });
 
   websocketService.emitProgress({
     sessionId,
@@ -1155,12 +1216,23 @@ console.log("Hola saber");
     data: { fileName: mergedFileName, url: finalPdfUrl }
   });
 
+    // Enviar el evento SSE
+  // pushToWSClients({
+  //   status: 'pdf-ready',
+  //   // userId,
+  //   url: fileUrl,
+  //   message: 'Tu archivo está listo para descargar',
+  // });
+
+  logger.info('Completion websocket notification sent', { sessionId });
+
   res.json({
     success: true,
     data: {
-      message: "Reporte UDEA generado exitosamente",
+      message: `Reporte ${simulationData.programName} generado exitosamente`,
+      sessionId: sessionId,
       totalPages: allPages.length,
-      reportType: "UDEA",
+      reportType: simulationData.programName,
       metadata: {
         institution: simulationData.campus,
         course: simulationData.course,
@@ -1173,7 +1245,6 @@ console.log("Hola saber");
       },
       rawData: {
         portada: portadaPage
-
       }
     }
   });

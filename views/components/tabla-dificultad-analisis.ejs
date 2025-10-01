@@ -168,6 +168,13 @@
         font-weight: 600;
         border-radius: 3px;
     }
+
+    /* Estilo para celdas con guiones (opciones no disponibles) */
+    .empty-option {
+        color: #ccc;
+        font-style: italic;
+        text-align: center;
+    }
 </style>
 <!-- Analysis Table Section -->
 
@@ -262,7 +269,7 @@
                 <% if (question.percentages && question.percentages.length> 0) { %>
                     <% question.percentages.forEach((percentage, pIndex)=> { %>
                         <td class="percentage-cell">
-                            <div class="td-content <%= question.correctAnswer === pIndex ? 'correct-answer' : '' %>"    >
+                            <div class="td-content <%= question.correctAnswer === pIndex ? 'correct-answer' : '' %> <%= percentage === '-' ? 'empty-option' : '' %>"    >
                                 <%= percentage %>
                             </div>
                         </td>

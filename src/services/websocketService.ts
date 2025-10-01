@@ -94,13 +94,24 @@ export class WebSocketService {
     }
 
     this.io.to(update.sessionId).emit('progress-update', update);
-    
-    logger.debug('Progress update emitted', {
-      sessionId: update.sessionId,
-      stage: update.stage,
-      progress: update.progress,
-      message: update.message
-    });
+
+    // Log completion stage with INFO level for visibility
+    if (update.stage === 'completed') {
+      logger.info('COMPLETION WEBSOCKET EMITTED', {
+        sessionId: update.sessionId,
+        stage: update.stage,
+        progress: update.progress,
+        message: update.message,
+        data: update.data
+      });
+    } else {
+      logger.debug('Progress update emitted', {
+        sessionId: update.sessionId,
+        stage: update.stage,
+        progress: update.progress,
+        message: update.message
+      });
+    }
   }
 
   emitError(sessionId: string, error: string, details?: any): void {

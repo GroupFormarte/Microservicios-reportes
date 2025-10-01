@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test - Reporte Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.connected {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.processing {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #007bff;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .log {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .log-info { background-color: #d1ecf1; color: #0c5460; }
+        .log-success { background-color: #d4edda; color: #155724; }
+        .log-error { background-color: #f8d7da; color: #721c24; }
+        .log-progress { background-color: #fff3cd; color: #856404; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            align-items: center;
+        }
+        input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 WebSocket Test - Generador de Reportes</h1>
+
+        <div class="controls">
+            <button onclick="connectWebSocket()">Conectar WebSocket</button>
+            <button onclick="disconnectWebSocket()">Desconectar</button>
+            <button onclick="testReportGeneration()" id="generateBtn">Generar Reporte de Prueba</button>
+        </div>
+
+        <div id="connectionStatus" class="status disconnected">
+            🔴 Desconectado
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+        <div id="progressText">0% - Esperando...</div>
+
+        <div class="log" id="logContainer">
+            <div class="log-entry log-info">📋 Logs del WebSocket aparecerán aquí...</div>
+        </div>
+
+        <div id="resultSection" style="display: none;">
+            <h3>✅ Resultado del Reporte:</h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <!-- No external libraries needed for native WebSocket -->
+    <script>
+        let socket = null;
+
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function updateStatus(status, message) {
+            const statusDiv = document.getElementById('connectionStatus');
+            statusDiv.className = `status ${status}`;
+            statusDiv.textContent = message;
+        }
+
+        function updateProgress(progress, message) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `${progress}% - ${message}`;
+        }
+
+        function connectWebSocket() {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                addLog('Ya está conectado al WebSocket', 'info');
+                return;
+            }
+
+            addLog('Conectando al WebSocket...', 'info');
+
+            // Use native WebSocket instead of Socket.IO
+            socket = new WebSocket('ws://localhost:3001/ws/notifications');
+
+            socket.onopen = () => {
+                updateStatus('connected', '🟢 Conectado al WebSocket');
+                addLog('✅ Conectado al WebSocket server', 'success');
+            };
+
+            socket.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+
+                    if (data.status === 'progress') {
+                        addLog(`📊 Progreso: ${data.progress}% - ${data.message}`, 'progress');
+                        updateProgress(data.progress, data.message);
+                    } else if (data.status === 'pdf-ready') {
+                        addLog('🎉 ¡Reporte completado exitosamente!', 'success');
+                        updateStatus('connected', '🟢 Reporte Completado');
+
+                        // Mostrar resultado
+                        const resultSection = document.getElementById('resultSection');
+                        const resultContent = document.getElementById('resultContent');
+                        resultContent.innerHTML = `
+                            <p><strong>Archivo:</strong> ${data.fileName || 'N/A'}</p>
+                            <p><strong>URL:</strong> <a href="${data.url || '#'}" target="_blank">${data.url || 'N/A'}</a></p>
+                            <p><strong>Mensaje:</strong> PDF listo para descarga</p>
+                        `;
+                        resultSection.style.display = 'block';
+                        updateProgress(100, 'PDF listo para descarga');
+                    } else if (data.status === 'error') {
+                        addLog(`❌ Error: ${data.message}`, 'error');
+                        updateStatus('connected', '🔴 Error en procesamiento');
+                    } else {
+                        addLog(`📨 Mensaje: ${data.message || JSON.stringify(data)}`, 'info');
+                    }
+                } catch (error) {
+                    addLog(`❌ Error parsing message: ${event.data}`, 'error');
+                }
+            };
+
+            socket.onclose = () => {
+                updateStatus('disconnected', '🔴 Desconectado');
+                addLog('🔌 Desconectado del WebSocket', 'error');
+            };
+
+            socket.onerror = (error) => {
+                addLog(`❌ Error en WebSocket: ${error}`, 'error');
+                updateStatus('disconnected', '🔴 Error de conexión');
+            };
+        }
+
+        function disconnectWebSocket() {
+            if (socket) {
+                socket.close();
+                socket = null;
+                updateStatus('disconnected', '🔴 Desconectado');
+                addLog('🔌 Desconectado manualmente', 'info');
+                updateProgress(0, 'Desconectado');
+            }
+        }
+
+        async function testReportGeneration() {
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                addLog('❌ Conecta el WebSocket primero', 'error');
+                alert('Debes conectar el WebSocket primero');
+                return;
+            }
+
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generando...';
+
+            // Ocultar resultado anterior
+            document.getElementById('resultSection').style.display = 'none';
+            updateProgress(0, 'Iniciando generación...');
+
+            const testData = {
+                tipe_inform: "udea",
+                programName: "UDEA Test",
+                campus: "Campus Test WebSocket",
+                course: "Curso Test WebSocket",
+                students: [
+                    {
+                        id: 1,
+                        nombre: "Estudiante Test 1",
+                        course_id: "TEST-001",
+                        examenes_asignados: [
+                            {
+                                id_simulacro: "test-sim-001",
+                                score: 85.5,
+                                position: 1,
+                                materias: [
+                                    {
+                                        name: "Matemáticas",
+                                        porcentaje: "80",
+                                        competencies: [
+                                            {
+                                                name: "Razonamiento Cuantitativo",
+                                                skills: [{ porcentaje: "75" }]
+                                            }
+                                        ]
+                                    }
+                                ],
+                                respuesta_sesion: []
+                            }
+                        ]
+                    }
+                ]
+            };
+
+            try {
+                addLog('🚀 Enviando solicitud de generación de reporte...', 'info');
+
+                const response = await fetch('http://localhost:3001/api/pdf-generation/generate-report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const result = await response.json();
+                addLog(`📤 Respuesta HTTP recibida: ${response.status}`, 'info');
+
+                if (response.ok) {
+                    addLog('✅ Solicitud exitosa. Procesando reporte...', 'success');
+                    updateStatus('processing', '🟡 Generando reporte...');
+                } else {
+                    addLog(`❌ Error en solicitud: ${result.message || 'Error desconocido'}`, 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Error de conexión: ${error.message}`, 'error');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Generar Reporte de Prueba';
+            }
+        }
+
+        // Auto-conectar al cargar la página
+        window.addEventListener('load', () => {
+            addLog('🌐 Página cargada. Haz clic en "Conectar WebSocket" para empezar', 'info');
+        });
+    </script>
+</body>
+</html>
