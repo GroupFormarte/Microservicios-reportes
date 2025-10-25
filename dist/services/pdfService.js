@@ -39,7 +39,12 @@ class PdfService {
                     '--no-first-run',
                     '--no-zygote',
                     '--single-process',
-                    '--disable-gpu'
+                    '--disable-gpu',
+                    '--disable-web-security',
+                    '--disable-features=VizDisplayCompositor',
+                    '--allow-running-insecure-content',
+                    '--disable-extensions-except',
+                    '--disable-extensions'
                 ]
             });
         }
@@ -223,12 +228,12 @@ class PdfService {
                     // Check for charts
                     const checkCharts = () => {
                         if (typeof window.Chart !== 'undefined') {
-                            // Wait for all charts to be rendered
+                            // Wait for all charts to be rendered - increased timeout for better reliability
                             setTimeout(() => {
                                 chartsReady = true;
                                 if (resourcesReady)
                                     resolve();
-                            }, 3000);
+                            }, 8000);
                         }
                         else {
                             chartsReady = true;
@@ -297,6 +302,16 @@ class PdfService {
             return pdf;
         }
         catch (error) {
+            // Clear cache on error to prevent memory leaks
+            try {
+                this.renderService.clearCache();
+                logger_1.logger.info('Cache cleared after PDF generation error');
+            }
+            catch (cacheError) {
+                logger_1.logger.warn('Failed to clear cache after PDF error', {
+                    cacheError: cacheError.message
+                });
+            }
             logger_1.logger.error('Error generating PDF', {
                 error: error.message,
                 stack: error.stack,
@@ -354,6 +369,65 @@ class PdfService {
                 outputFileName
             });
             throw new Error(`Failed to merge PDFs: ${error instanceof Error ? error.message : String(error)}`);
+        }
+    }
+    async generatePdfFromTemplate(templateName, data, options = {}) {
+        const browser = await this.getBrowser();
+        let page = null;
+        try {
+            page = await browser.newPage();
+            // Configure page
+            await page.setViewport({ width: 1200, height: 800 });
+            // Render template with data
+            const html = await this.renderService.renderTemplate(templateName, data);
+            // Set content
+            await page.setContent(html, {
+                waitUntil: 'networkidle0', // Wait for all network requests to finish
+                timeout: 60000
+            });
+            // Wait for images to load
+            await page.evaluate(() => {
+                return Promise.all(Array.from(document.images).map(img => {
+                    if (img.complete)
+                        return Promise.resolve();
+                    return new Promise((resolve, reject) => {
+                        img.onload = resolve;
+                        img.onerror = reject;
+                        setTimeout(reject, 10000); // 10 second timeout per image
+                    });
+                }));
+            }).catch(error => {
+                console.error('Some images failed to load:', error);
+            });
+            // Generate PDF
+            const pdfOptions = {
+                format: options.format || 'A4',
+                landscape: options.orientation === 'landscape',
+                margin: options.margin || { top: '0.5cm', right: '0.5cm', bottom: '0.5cm', left: '0.5cm' },
+                printBackground: options.printBackground ?? true,
+                scale: options.scale || 0.75,
+                displayHeaderFooter: options.displayHeaderFooter || false,
+                headerTemplate: options.headerTemplate || '',
+                footerTemplate: options.footerTemplate || ''
+            };
+            const pdfBuffer = await page.pdf(pdfOptions);
+            logger_1.logger.info('PDF generated from template', {
+                templateName,
+                size: pdfBuffer.length,
+                options: pdfOptions
+            });
+            return pdfBuffer;
+        }
+        catch (error) {
+            logger_1.logger.error('Error generating PDF from template', {
+                error: error instanceof Error ? error.message : String(error),
+                templateName
+            });
+            throw new Error(`Failed to generate PDF from template: ${error instanceof Error ? error.message : String(error)}`);
+        }
+        finally {
+            if (page)
+                await page.close();
         }
     }
     async deletePdfs(fileNames) {

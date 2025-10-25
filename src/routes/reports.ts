@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import path from 'path';
 import {
-
-  processSimulationData
+  processSimulationData,
+  generateExcelReport,
+  generateExcelAnswers,
+  regenerateReport
 } from '../controllers/reportsController';
 
 const router = Router();
@@ -10,9 +12,18 @@ const router = Router();
 // 🎯 NEW ENDPOINT - Process simulation data
 router.post('/simulation', processSimulationData);
 
+// 🔄 REGENERATE ENDPOINT - Regenerate reports from report_data
+router.post('/regenerate', regenerateReport);
+
+// 📊 EXCEL ENDPOINT - Generate Excel report from simulation data (scores)
+router.post('/excel-puntajes', generateExcelReport);
+
+// 📝 EXCEL ANSWERS ENDPOINT - Generate Excel report with student answers
+router.post('/excel-respuestas', generateExcelAnswers);
+
 // 🧪 TEST ENDPOINT - WebSocket test page
 router.get('/test-websocket', (req, res) => {
   res.sendFile(path.join(__dirname, '../../public/test-websocket.html'));
 });
 
-export default router;
+export default router; 

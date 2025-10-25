@@ -23,6 +23,16 @@ exports.generarPaginasAnalisisDificultadUDEA = generarPaginasAnalisisDificultadU
 exports.generarPaginaEstudiantesUDEA = generarPaginaEstudiantesUDEA;
 const logger_1 = require("./logger");
 /**
+ * Helper function to split students array into chunks of specified size
+ */
+function chunkArray(array, chunkSize) {
+    const chunks = [];
+    for (let i = 0; i < array.length; i += chunkSize) {
+        chunks.push(array.slice(i, i + chunkSize));
+    }
+    return chunks;
+}
+/**
  * Función para calificar competencias según porcentaje de aciertos
  * I: 0-35%, II: 36-75%, III: 76-100%
  */
@@ -65,7 +75,17 @@ function procesarDistribucionCompetencias(simulationData) {
                 competencias[comp.name] = { precorrectas: 0, totalPreguntas: 0, qualifier: '' };
             });
             // Contar respuestas correctas y totales por competencia
-            examen_asignado.respuesta_sesion.forEach((session) => {
+            // Limitar a máximo 2 sesiones
+            let sessionesToProcess = examen_asignado.respuesta_sesion.slice(0, 2);
+            //v validar que ninguna respuesta venga null
+            let sessionesToProcessAux = [];
+            for (const session of sessionesToProcess) {
+                if (session.respuestas !== null && session.respuestas !== undefined) {
+                    sessionesToProcessAux.push(session);
+                }
+            }
+            console.log({ sessionesToProcessAux });
+            sessionesToProcessAux.forEach((session) => {
                 session.respuestas.forEach((respuesta) => {
                     if (respuesta.competence && competencias[respuesta.competence]) {
                         competencias[respuesta.competence].totalPreguntas++;
@@ -568,7 +588,15 @@ function procesarTablaDificultadAnalisis(simulationData) {
                 return;
             // Buscar respuestas del estudiante para esta pregunta específica
             let estudianteRespondioEstaPregunta = false;
-            examen_asignado.respuesta_sesion.forEach((session) => {
+            // Limitar a máximo 2 sesiones
+            const sessionesToProcess = examen_asignado.respuesta_sesion.slice(0, 2);
+            let sessionesToProcessAux = [];
+            for (const session of sessionesToProcess) {
+                if (session.respuestas !== null && session.respuestas !== undefined) {
+                    sessionesToProcessAux.push(session);
+                }
+            }
+            sessionesToProcessAux.forEach((session) => {
                 session.respuestas.forEach((respuesta) => {
                     // Verificar si esta respuesta corresponde a nuestra pregunta actual
                     if (questionData.respuestasIds.includes(respuesta.id_respuesta)) {
@@ -771,6 +799,11 @@ function generarDatosTablaDificultad(tablaDificultadData, nivels = [
                         : 0;
                     return percentage + '%';
                 });
+                // Normalizar el array de porcentajes para que tenga exactamente maxOpciones elementos
+                // Rellenar con "-" si faltan opciones
+                while (percentages.length < maxOpciones) {
+                    percentages.push('-');
+                }
                 // Agregar porcentaje de NR al final
                 const nrPercentage = questionData.totalEstudiantes > 0
                     ? Math.round((questionData.noRespondio / questionData.totalEstudiantes) * 100 * 10) / 10
@@ -906,7 +939,7 @@ function procesarTablaEstudiantes(simulationData) {
             puestoGrado: posicion,
             puestoGrupo: posicion, // Asumir que es el mismo por ahora
             grupo: student.course_id || 'N/A',
-            nombre: student.nombre || `Estudiante ${index + 1}`, // Placeholder - no hay nombre en el JSON
+            nombre: student.name || `Estudiante ${index + 1}`, // Placeholder - no hay nombre en el JSON
             puntaje: Math.round(puntaje * 10) / 10, // Un decimal
             categoria: categoria,
             competencias: competenciasList.map(comp => competenciasData[comp] + '%')
@@ -950,7 +983,15 @@ function procesarTablaEstudiantes(simulationData) {
                     simulationData.students.forEach((student) => {
                         const examen_asignado = student.examenes_asignados.find((exam) => exam.id_simulacro === simulationData.simulationId);
                         if (examen_asignado) {
-                            examen_asignado.respuesta_sesion.forEach((session) => {
+                            // Limitar a máximo 2 sesiones
+                            const sessionesToProcess = examen_asignado.respuesta_sesion.slice(0, 2);
+                            let sessionesToProcessAux = [];
+                            for (const session of sessionesToProcess) {
+                                if (session.respuestas !== null && session.respuestas !== undefined) {
+                                    sessionesToProcessAux.push(session);
+                                }
+                            }
+                            sessionesToProcessAux.forEach((session) => {
                                 session.respuestas.forEach((respuesta) => {
                                     if (question.respuestas && question.respuestas.includes(respuesta.id_respuesta)) {
                                         totalEstudiantes++;
@@ -974,6 +1015,36 @@ function procesarTablaEstudiantes(simulationData) {
                 Math.round(totalIndiceDificultad / contadorPreguntas * 10) / 10 : 0;
         });
     }
+    // Si hay más de 22 estudiantes, dividir en múltiples tablas
+    if (estudiantes.length > 22) {
+        const studentChunks = chunkArray(estudiantes, 22);
+        const tablasData = studentChunks.map((chunk, chunkIndex) => ({
+            type: "tabla_con_puntaje",
+            data: {
+                competencias: competenciasList,
+                areas: competenciasList, // Para compatibilidad
+                columnas: competenciasList, // Nombre genérico
+                estudiantes: chunk,
+                promedioGeneral: promedioGeneral,
+                desviacionEstandar: desviacionEstandar,
+                indiceDificultadPorCompetencia: indiceDificultadPorCompetencia,
+                indiceDificultadGeneral: indiceDificultadPorCompetencia, // Para compatibilidad
+                tipoTabla: "competencias",
+                paginaActual: chunkIndex + 1,
+                totalPaginas: studentChunks.length
+            }
+        }));
+        logger_1.logger.info('Generated paginated student table data', {
+            totalStudents: estudiantes.length,
+            pages: studentChunks.length,
+            studentsPerPage: 22,
+            competencies: competenciasList.length,
+            averageScore: promedioGeneral,
+            standardDeviation: desviacionEstandar
+        });
+        return tablasData;
+    }
+    // Si hay 22 o menos estudiantes, devolver una sola tabla
     const tablaData = {
         type: "tabla_con_puntaje",
         data: {
@@ -994,7 +1065,7 @@ function procesarTablaEstudiantes(simulationData) {
         averageScore: promedioGeneral,
         standardDeviation: desviacionEstandar
     });
-    return tablaData;
+    return [tablaData];
 }
 /**
  * Procesa datos para la tabla de estudiantes con áreas en lugar de competencias
@@ -1041,7 +1112,7 @@ function procesarTablaEstudiantesPorArea(simulationData) {
             puestoGrado: posicion,
             puestoGrupo: posicion, // Asumir que es el mismo por ahora
             grupo: student.course_id || 'N/A',
-            nombre: student.nombre || `Estudiante ${index + 1}`,
+            nombre: student.name || `Estudiante ${index + 1}`,
             puntaje: Math.round(puntaje * 10) / 10, // Un decimal
             categoria: categoria,
             areas: valoresPorcentajes,
@@ -1086,7 +1157,9 @@ function procesarTablaEstudiantesPorArea(simulationData) {
                     simulationData.students.forEach((student) => {
                         const examen_asignado = student.examenes_asignados.find((exam) => exam.id_simulacro === simulationData.simulationId);
                         if (examen_asignado) {
-                            examen_asignado.respuesta_sesion.forEach((session) => {
+                            // Limitar a máximo 2 sesiones
+                            const sessionesToProcess = examen_asignado.respuesta_sesion.slice(0, 2);
+                            sessionesToProcess.forEach((session) => {
                                 session.respuestas.forEach((respuesta) => {
                                     if (question.respuestas && question.respuestas.includes(respuesta.id_respuesta)) {
                                         totalEstudiantes++;
@@ -1110,6 +1183,37 @@ function procesarTablaEstudiantesPorArea(simulationData) {
                 Math.round(totalIndiceDificultad / contadorPreguntas * 10) / 10 : 0;
         });
     }
+    // Si hay más de 22 estudiantes, dividir en múltiples tablas
+    if (estudiantes.length > 22) {
+        const studentChunks = chunkArray(estudiantes, 22);
+        const tablasData = studentChunks.map((chunk, chunkIndex) => ({
+            type: "tabla_con_puntaje",
+            data: {
+                areas: areasList,
+                competencias: areasList, // Para compatibilidad
+                columnas: areasList, // Nombre genérico
+                estudiantes: chunk,
+                promedioGeneral: promedioGeneral,
+                desviacionEstandar: desviacionEstandar,
+                indiceDificultadPorArea: indiceDificultadPorArea,
+                indiceDificultadPorCompetencia: indiceDificultadPorArea, // Para compatibilidad
+                indiceDificultadGeneral: indiceDificultadPorArea, // Para compatibilidad
+                tipoTabla: "areas",
+                paginaActual: chunkIndex + 1,
+                totalPaginas: studentChunks.length
+            }
+        }));
+        logger_1.logger.info('Generated paginated student areas table data', {
+            totalStudents: estudiantes.length,
+            pages: studentChunks.length,
+            studentsPerPage: 22,
+            areas: areasList.length,
+            averageScore: promedioGeneral,
+            standardDeviation: desviacionEstandar
+        });
+        return tablasData;
+    }
+    // Si hay 22 o menos estudiantes, devolver una sola tabla
     const tablaData = {
         type: "tabla_con_puntaje",
         data: {
@@ -1131,7 +1235,7 @@ function procesarTablaEstudiantesPorArea(simulationData) {
         averageScore: promedioGeneral,
         standardDeviation: desviacionEstandar
     });
-    return tablaData;
+    return [tablaData];
 }
 /**
  * Procesa datos para competencias UNAL desde simulationData
@@ -1330,7 +1434,9 @@ function procesarPromediosDynamic(simulationData, ranges = [
             return;
         // Analizar respuestas del estudiante para determinar asignaturas
         const asignaturasEstudiante = {};
-        examen_asignado.respuesta_sesion.forEach((sesion) => {
+        // Limitar a máximo 2 sesiones
+        const sessionesToProcess = examen_asignado.respuesta_sesion.slice(0, 2);
+        sessionesToProcess.forEach((sesion) => {
             if (!sesion.respuestas)
                 return;
             sesion.respuestas.forEach((respuesta) => {
@@ -1482,7 +1588,8 @@ function generarPaginasAreasUDEA(simulationData, baseHeaderInfo) {
  * Genera páginas de análisis de dificultad UDEA reutilizables (múltiples páginas)
  */
 function generarPaginasAnalisisDificultadUDEA(simulationData, baseHeaderInfo) {
-    const tablaEstudiantesData = procesarTablaEstudiantes(simulationData);
+    const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData);
+    const tablaEstudiantesData = tablaEstudiantesDataArray[0]; // Usar la primera tabla para análisis
     const tablaDificultadData = procesarTablaDificultadAnalisis(simulationData);
     const tablaAnalisisData = generarDatosTablaDificultad(tablaDificultadData, undefined, tablaEstudiantesData.data.indiceDificultadPorCompetencia);
     const analisisPages = [];
@@ -1501,11 +1608,13 @@ function generarPaginasAnalisisDificultadUDEA(simulationData, baseHeaderInfo) {
  * Genera página de estudiantes UDEA reutilizable
  */
 function generarPaginaEstudiantesUDEA(simulationData, baseHeaderInfo) {
-    const tablaEstudiantesData = procesarTablaEstudiantes(simulationData);
-    return {
+    const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData);
+    return tablaEstudiantesDataArray.map((tablaData, index) => ({
         layout: "vertical",
-        chartTitle: "Tabla de Estudiantes",
+        chartTitle: tablaEstudiantesDataArray.length > 1
+            ? `Tabla de Estudiantes (Página ${index + 1} de ${tablaEstudiantesDataArray.length})`
+            : "Tabla de Estudiantes",
         headerInfo: baseHeaderInfo,
-        components: [tablaEstudiantesData]
-    };
+        components: [tablaData]
+    }));
 }

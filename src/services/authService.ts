@@ -26,7 +26,8 @@ export interface RefreshResponse {
 }
 
 export class AuthService {
-  private readonly podiumApiUrl = 'https://stage-api.plataformapodium.com/api/user/';
+  // private readonly podiumApiUrl = 'https://stage-api.plataformapodium.com/api/user/';
+  private readonly podiumApiUrl = 'http://localhost:3200/api/user/';
   private readonly jwtSecret: string;
   private readonly jwtExpiresIn: string = '24h';
 
@@ -44,6 +45,7 @@ export class AuthService {
    * @param token - Token from client
    * @returns Promise<ValidatedUser> - Validation result
    */
+  
   async validateUserWithPodium(userId: string, token: string): Promise<ValidatedUser> {
     try {
       logger.info('Validating user with Podium API', { userId, tokenLength: token.length });
@@ -58,7 +60,6 @@ export class AuthService {
 
       if (response.status === 200 && response.data) {
         logger.info('User validation successful', { userId, status: response.status });
-
         return {
           userId,
           isValid: true,
@@ -69,7 +70,6 @@ export class AuthService {
           userId,
           status: response.status
         });
-
         return {
           userId,
           isValid: false

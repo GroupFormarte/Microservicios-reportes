@@ -11,6 +11,7 @@ import { logger } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { hybridAuth } from './middleware/auth';
 import { websocketService } from './services/websocketService';
+import { connectDatabase, disconnectDatabase } from './config/database';
 import reportsRoutes from './routes/reports';
 import { questionsRouter } from './routes/questions';
 import pdfRoutes from './routes/pdf';
@@ -74,6 +75,9 @@ app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 // PDF files access without authentication (specific route before general /api/reports)
 app.use('/api/reports/pdfs', express.static(path.join(__dirname, '../public/pdfs')));
 
+// Excel files access without authentication (specific route before general /api/reports)
+app.use('/api/reports/excels', express.static(path.join(__dirname, '../public/excels')));
+
 // CSS files access without authentication (specific route before general /api/reports)
 app.use('/api/reports/css', express.static(path.join(__dirname, '../public/css')));
 
@@ -110,27 +114,38 @@ app.use('*', (req, res) => {
 app.use(errorHandler);
 
 // Start server
-const startServer = () => {
-  // Initialize WebSocket service with the Express app
-  websocketService.initialize(app, config.port);
-  
-  logger.info(`Server with WebSocket running on http://${config.host}:${config.port}`);
-  logger.info(`Environment: ${config.nodeEnv}`);
+const startServer = async () => {
+  try {
+    // Connect to MongoDB
+    await connectDatabase();
+    logger.info('MongoDB connection established');
 
-  // Graceful shutdown
-  process.on('SIGTERM', async () => {
-    logger.info('SIGTERM received, shutting down gracefully');
-    await websocketService.close();
-    logger.info('Process terminated');
-    process.exit(0);
-  });
+    // Initialize WebSocket service with the Express app
+    websocketService.initialize(app, config.port);
 
-  process.on('SIGINT', async () => {
-    logger.info('SIGINT received, shutting down gracefully');
-    await websocketService.close();
-    logger.info('Process terminated');
-    process.exit(0);
-  });
+    logger.info(`Server with WebSocket running on http://${config.host}:${config.port}`);
+    logger.info(`Environment: ${config.nodeEnv}`);
+
+    // Graceful shutdown
+    process.on('SIGTERM', async () => {
+      logger.info('SIGTERM received, shutting down gracefully');
+      await websocketService.close();
+      await disconnectDatabase();
+      logger.info('Process terminated');
+      process.exit(0);
+    });
+
+    process.on('SIGINT', async () => {
+      logger.info('SIGINT received, shutting down gracefully');
+      await websocketService.close();
+      await disconnectDatabase();
+      logger.info('Process terminated');
+      process.exit(0);
+    });
+  } catch (error) {
+    logger.error('Failed to start server:', error);
+    process.exit(1);
+  }
 };
 
 if (require.main === module) {

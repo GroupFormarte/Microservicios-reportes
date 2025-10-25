@@ -3,14 +3,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.processSimulationData = exports.getDefaultHeaderImages = exports.getImageBase64 = exports.generatePdfPreview = exports.generatePdf = exports.previewHorizontal = exports.previewVertical = exports.renderVerticalExample = exports.renderMultipleCharts = exports.renderLayout = exports.renderComparative = exports.renderTable = exports.renderBarChart = exports.renderPage = void 0;
+exports.regenerateReport = exports.generateExcelAnswers = exports.generateExcelReport = exports.processSimulationData = exports.getDefaultHeaderImages = exports.getImageBase64 = exports.generatePdfPreview = exports.generatePdf = exports.previewHorizontal = exports.previewVertical = exports.renderVerticalExample = exports.renderMultipleCharts = exports.renderLayout = exports.renderComparative = exports.renderTable = exports.renderBarChart = exports.renderPage = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const renderService_1 = require("../services/renderService");
 const pdfService_1 = require("../services/pdfService");
 const websocketService_1 = require("../services/websocketService");
+const excelService_1 = require("../services/excelService");
 const errorHandler_1 = require("../middleware/errorHandler");
 const logger_1 = require("../utils/logger");
+const ReportData_1 = require("../models/ReportData");
+const reportConsolidation_1 = require("../services/reportConsolidation");
 const udeaReports_1 = require("../utils/udeaReports");
 // Funciones genéricas reutilizables
 const pageGenerators_1 = require("../utils/pageGenerators");
@@ -372,12 +375,15 @@ exports.generatePdfPreview = (0, errorHandler_1.asyncHandler)(async (req, res) =
     });
     // Return JSON response with PDF URL
     const pdfUrl = `${req.protocol}://${req.get('host')}/api/reports/pdfs/${fileName}`;
+    const downloadUrl = `${pdfUrl}?download=true`;
+    // Send Flutter-compatible notification
+    websocketService_1.websocketService.notifyPdfReady(downloadUrl, 'Reporte de simulación generado exitosamente');
     res.json({
         success: true,
         data: {
             fileName,
             url: pdfUrl,
-            downloadUrl: `${pdfUrl}?download=true`,
+            downloadUrl: downloadUrl,
             message: "PDF preview generated successfully",
             metadata: {
                 institution: exampleData.headerInfo.institucion,
@@ -418,25 +424,20 @@ exports.getDefaultHeaderImages = getDefaultHeaderImages;
 exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res) => {
     const simulationData = req.body;
     const sessionId = req.headers['x-session-id'] || `session_${Date.now()}`;
+    console.log('=== SIMULATION DATA RECEIVED ===');
+    console.log(simulationData.tipe_inform);
+    console.log('=== END SIMULATION DATA ===');
+    console.log('Session ID:', sessionId);
     // Emit initial progress
     websocketService_1.websocketService.emitProgress({
         sessionId,
         stage: 'initializing',
         progress: 0,
-        message: 'Iniciando procesamiento de datos de simulación',
-        timestamp: new Date()
-    });
-    // Generar datos base con funciones genéricas reutilizables
-    websocketService_1.websocketService.emitProgress({
-        sessionId,
-        stage: 'generating_base_data',
-        progress: 5,
-        message: 'Generando datos base y configuración inicial',
+        message: 'Iniciando procesamiento del reporte',
         timestamp: new Date()
     });
     const images = (0, exports.getDefaultHeaderImages)();
     const baseHeaderInfo = (0, pageGenerators_1.generarBaseHeaderInfo)(simulationData, images);
-    // Página 1: Portada (usando función genérica)
     websocketService_1.websocketService.emitProgress({
         sessionId,
         stage: 'generating_cover',
@@ -447,13 +448,6 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
     const portadaPage = (0, pageGenerators_1.generarPaginaPortada)(simulationData, images);
     let allPages = [];
     if (simulationData.tipe_inform.trim().includes("udea")) {
-        websocketService_1.websocketService.emitProgress({
-            sessionId,
-            stage: 'processing_udea',
-            progress: 15,
-            message: 'Procesando datos para reporte UDEA',
-            timestamp: new Date()
-        });
         /*
         - la pagina principal es la de portada.
         - diagrama comparativo de puntajes tiene diagrama de barra horizontal ( no se ha creado)
@@ -520,14 +514,6 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
           
           Cada competencia (Literal, Inferencial, etc.) se evalúa independientemente
         */
-        // ===== PÁGINA 3: Distribución de estudiantes por competencias =====
-        websocketService_1.websocketService.emitProgress({
-            sessionId,
-            stage: 'processing_competencies',
-            progress: 25,
-            message: 'Procesando distribución de competencias',
-            timestamp: new Date()
-        });
         const competenciasData = (0, udeaReports_1.procesarDistribucionCompetencias)(simulationData);
         // Configuración dinámica para competencias
         const competenciasRanges = [
@@ -541,14 +527,6 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
         // console.log('UDEA - Página 3 - Distribución por Competencias:');
         // console.log(JSON.stringify(barChartData, null, 2));
         // return res.json({ barChartDataGroupedByArea });
-        // ===== PÁGINA 4: Desempeño por área (score_distribution horizontal) =====
-        websocketService_1.websocketService.emitProgress({
-            sessionId,
-            stage: 'processing_areas',
-            progress: 35,
-            message: 'Procesando desempeño por área',
-            timestamp: new Date()
-        });
         const areaData = (0, udeaReports_1.procesarDesempenoPorArea)(simulationData);
         // const { areaStats, scoreDistributionData } = calcularEstadisticasArea(areaData);
         // console.log('UDEA - Página 4 - Desempeño por Área:');
@@ -562,25 +540,13 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
         ];
         const areasColors = ['#c55c5c', '#d88008', '#58a55c', '#4c8631'];
         const { scoreDistributionData } = (0, udeaReports_1.calcularEstadisticasAreaDynamic)(areaData, areasRanges, areasColors);
-        // ===== PÁGINA 6: Tabla con puntajes de estudiantes (necesario para calcular índice de dificultad) =====
-        websocketService_1.websocketService.emitProgress({
-            sessionId,
-            stage: 'processing_students',
-            progress: 45,
-            message: 'Procesando tabla de estudiantes',
-            timestamp: new Date()
-        });
-        const tablaEstudiantesData = (0, udeaReports_1.procesarTablaEstudiantes)(simulationData);
-        // ===== PÁGINA 5: Tabla de análisis de dificultad =====
-        websocketService_1.websocketService.emitProgress({
-            sessionId,
-            stage: 'processing_difficulty',
-            progress: 55,
-            message: 'Procesando análisis de dificultad',
-            timestamp: new Date()
-        });
+        const tablaEstudiantesDataArray = (0, udeaReports_1.procesarTablaEstudiantes)(simulationData);
+        let indiceDificultadPorCompetencia = [];
+        for (const inD of tablaEstudiantesDataArray) {
+            indiceDificultadPorCompetencia.push(inD);
+        }
         const tablaDificultadData = (0, udeaReports_1.procesarTablaDificultadAnalisis)(simulationData);
-        const tablaAnalisisData = (0, udeaReports_1.generarDatosTablaDificultad)(tablaDificultadData, undefined, tablaEstudiantesData.data.indiceDificultadPorCompetencia);
+        const tablaAnalisisData = (0, udeaReports_1.generarDatosTablaDificultad)(tablaDificultadData, undefined, indiceDificultadPorCompetencia);
         // Debug: Check the difficulty index calculation
         // console.log('DEBUG - Difficulty indices per competency:', tablaEstudiantesData.data.indiceDificultadPorCompetencia);
         // console.log('DEBUG - Table analysis data for each area:');
@@ -634,14 +600,6 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
         */
         // console.log('UDEA - Página 6 - Tabla de Estudiantes:');
         // console.log(JSON.stringify(tablaEstudiantesData, null, 2));
-        // ===== GENERAR PÁGINAS INDIVIDUALES =====
-        websocketService_1.websocketService.emitProgress({
-            sessionId,
-            stage: 'generating_pages',
-            progress: 65,
-            message: 'Generando páginas individuales',
-            timestamp: new Date()
-        });
         // Página 3: Distribución por competencias (horizontal - múltiples gráficos en una página)
         let competenciasPage = [];
         for (const chars of barChartDataGroupedByArea) {
@@ -681,30 +639,25 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
             };
             analisisPages.push(analisisPage);
         }
-        // Página 6: Tabla de estudiantes (horizontal)
-        const estudiantesPage = {
+        // Página 6: Tabla de estudiantes (horizontal) - Puede ser múltiples páginas
+        const estudiantesPages = tablaEstudiantesDataArray.map((tablaData, index) => ({
             layout: "horizontal",
-            chartTitle: "Tabla de Estudiantes",
+            chartTitle: tablaEstudiantesDataArray.length > 1
+                ? `Tabla de Estudiantes (Página ${index + 1} de ${tablaEstudiantesDataArray.length})`
+                : "Tabla de Estudiantes",
             headerInfo: baseHeaderInfo,
-            components: [tablaEstudiantesData]
-        };
+            components: [tablaData]
+        }));
         // Generar PDFs individuales
         allPages = [
             portadaPage,
             ...competenciasPage,
             ...areasPages,
             ...analisisPages,
-            estudiantesPage
+            ...estudiantesPages
         ];
     }
     else if (simulationData.tipe_inform.trim().includes("unal")) {
-        websocketService_1.websocketService.emitProgress({
-            sessionId,
-            stage: 'processing_unal',
-            progress: 15,
-            message: 'Procesando datos para reporte UNAL',
-            timestamp: new Date()
-        });
         // ===== PÁGINA 2: Competencias Chart UNAL (usando función genérica) =====
         const competenciasPageUnal = (0, pageGenerators_1.generarPaginaCompetenciasChart)(simulationData, baseHeaderInfo, {
             chartId: "unal_competencias",
@@ -717,11 +670,10 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
         const areaData = (0, udeaReports_1.procesarDesempenoPorArea)(simulationData);
         // Configuración dinámica para áreas
         /*
-        • 1 [>100 a 350]
-    • 2 [> 350 a 500]
-    • 3 [>500 a 700]
-    • 4 [>700 a 1000]
-        
+          • 1 [>100 a 350]
+          • 2 [> 350 a 500]
+          • 3 [>500 a 700]
+          • 4 [>700 a 1000]
         */
         const areasRanges = [
             { min: 0, max: 350, label: '1' },
@@ -747,9 +699,13 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
             };
             areasPages.push(areasPage);
         }
-        const tablaEstudiantesData = (0, udeaReports_1.procesarTablaEstudiantes)(simulationData);
+        const tablaEstudiantesDataArray = (0, udeaReports_1.procesarTablaEstudiantes)(simulationData);
         const tablaDificultadData = (0, udeaReports_1.procesarTablaDificultadAnalisis)(simulationData);
-        const tablaAnalisisData = (0, udeaReports_1.generarDatosTablaDificultad)(tablaDificultadData, undefined, tablaEstudiantesData.data.indiceDificultadPorCompetencia);
+        let indiceDificultadPorCompetencia = [];
+        for (const inD of tablaEstudiantesDataArray) {
+            indiceDificultadPorCompetencia.push(inD);
+        }
+        const tablaAnalisisData = (0, udeaReports_1.generarDatosTablaDificultad)(tablaDificultadData, undefined, indiceDificultadPorCompetencia);
         // Página 5: Tabla de análisis de dificultad (vertical)
         let analisisPages = [];
         for (const tabla of tablaAnalisisData) {
@@ -761,31 +717,25 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
             };
             analisisPages.push(analisisPage);
         }
-        // Página 6: Tabla de estudiantes (horizontal)
-        const estudiantesPage = {
+        // Página 6: Tabla de estudiantes (horizontal) - Puede ser múltiples páginas
+        const estudiantesPages = tablaEstudiantesDataArray.map((tablaData, index) => ({
             layout: "horizontal",
-            chartTitle: "Tabla de Estudiantes",
+            chartTitle: tablaEstudiantesDataArray.length > 1
+                ? `Tabla de Estudiantes (Página ${index + 1} de ${tablaEstudiantesDataArray.length})`
+                : "Tabla de Estudiantes",
             headerInfo: baseHeaderInfo,
-            components: [tablaEstudiantesData]
-        };
+            components: [tablaData]
+        }));
         // Generar PDFs individuales para UNAL
         allPages = [
             portadaPage,
             competenciasPageUnal,
             ...areasPages,
             ...analisisPages,
-            estudiantesPage
+            ...estudiantesPages
         ];
     }
     else {
-        // ===== REPORTE GENERAL CON COMPARATIVO DE COMPETENCIAS =====
-        websocketService_1.websocketService.emitProgress({
-            sessionId,
-            stage: 'processing_general',
-            progress: 15,
-            message: 'Procesando reporte general con comparativos',
-            timestamp: new Date()
-        });
         const comparativoData = (0, udeaReports_1.procesarCompetenciasComparativo)(simulationData);
         const competenciasUnal = (0, udeaReports_1.procesarCompetenciasUNAL)(simulationData);
         // return res.json({ comparativoData,competenciasUnal });
@@ -879,9 +829,13 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
                 max: 100
             }
         ];
-        const tablaEstudiantesData = (0, udeaReports_1.procesarTablaEstudiantes)(simulationData);
+        const tablaEstudiantesDataArray = (0, udeaReports_1.procesarTablaEstudiantes)(simulationData);
+        let indiceDificultadPorCompetencia = [];
+        for (const inD of tablaEstudiantesDataArray) {
+            indiceDificultadPorCompetencia.push(inD);
+        }
         const tablaDificultadData = (0, udeaReports_1.procesarTablaDificultadAnalisis)(simulationData);
-        const tablaAnalisisData = (0, udeaReports_1.generarDatosTablaDificultad)(tablaDificultadData, nivel, tablaEstudiantesData.data.indiceDificultadPorCompetencia);
+        const tablaAnalisisData = (0, udeaReports_1.generarDatosTablaDificultad)(tablaDificultadData, nivel, indiceDificultadPorCompetencia);
         // Página 5: Tabla de análisis de dificultad (vertical)
         let analisisPages = [];
         for (const tabla of tablaAnalisisData) {
@@ -952,21 +906,25 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
             };
             ejeTematicosPages.push(ejeTematicosPage);
         }
-        // Página 6: Tabla de estudiantes (horizontal)
-        const listadoEstudiantesCompetenciasPage = {
+        // Página 6: Tabla de estudiantes por competencias (horizontal) - Puede ser múltiples páginas
+        const listadoEstudiantesCompetenciasPages = tablaEstudiantesDataArray.map((tablaData, index) => ({
             layout: "horizontal",
-            chartTitle: "Listado general por competencias",
+            chartTitle: tablaEstudiantesDataArray.length > 1
+                ? `Listado general por competencias (Página ${index + 1} de ${tablaEstudiantesDataArray.length})`
+                : "Listado general por competencias",
             headerInfo: baseHeaderInfo,
-            components: [tablaEstudiantesData]
-        };
-        // Página 7: Tabla de estudiantes por áreas (horizontal)
-        const tablaEstudiantesAreasData = (0, udeaReports_1.procesarTablaEstudiantesPorArea)(simulationData);
-        const listadoEstudiantesAreasPage = {
+            components: [tablaData]
+        }));
+        // Página 7: Tabla de estudiantes por áreas (horizontal) - Puede ser múltiples páginas
+        const tablaEstudiantesAreasDataArray = (0, udeaReports_1.procesarTablaEstudiantesPorArea)(simulationData);
+        const listadoEstudiantesAreasPages = tablaEstudiantesAreasDataArray.map((tablaData, index) => ({
             layout: "horizontal",
-            chartTitle: "Listado general por pruebas",
+            chartTitle: tablaEstudiantesAreasDataArray.length > 1
+                ? `Listado general por pruebas (Página ${index + 1} de ${tablaEstudiantesAreasDataArray.length})`
+                : "Listado general por pruebas",
             headerInfo: baseHeaderInfo,
-            components: [tablaEstudiantesAreasData]
-        };
+            components: [tablaData]
+        }));
         allPages = [
             portadaPage,
             comparativePage,
@@ -974,37 +932,21 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
             ...areasPages,
             ...asignaturasPages,
             ...analisisPages,
-            listadoEstudiantesCompetenciasPage,
-            listadoEstudiantesAreasPage,
+            ...listadoEstudiantesCompetenciasPages,
+            ...listadoEstudiantesAreasPages,
             ...ejeTematicosPages
         ];
     }
-    // Procesar PDFs secuencialmente para evitar timeouts
     websocketService_1.websocketService.emitProgress({
         sessionId,
         stage: 'generating_pdfs',
         progress: 70,
-        message: 'Iniciando generación de PDFs individuales',
-        timestamp: new Date(),
-        data: { totalPages: allPages.length }
+        message: `Generando PDFs individuales (${allPages.length} páginas)`,
+        timestamp: new Date()
     });
     const individualPdfFiles = [];
     for (let index = 0; index < allPages.length; index++) {
         const pageData = allPages[index];
-        // Emit progress for each PDF
-        const progressPercentage = 70 + (index / allPages.length) * 20; // 70% to 90%
-        websocketService_1.websocketService.emitProgress({
-            sessionId,
-            stage: 'generating_pdf_page',
-            progress: Math.round(progressPercentage),
-            message: `Generando PDF ${index + 1} de ${allPages.length}`,
-            timestamp: new Date(),
-            data: {
-                currentPage: index + 1,
-                totalPages: allPages.length,
-                layout: pageData.layout
-            }
-        });
         try {
             // Determinar orientación basada en el layout de la página
             const orientation = pageData.layout === "horizontal" ? "landscape" : "portrait";
@@ -1025,34 +967,37 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
             throw error;
         }
     }
-    // Crear PDF unificado
     websocketService_1.websocketService.emitProgress({
         sessionId,
         stage: 'merging_pdfs',
         progress: 90,
-        message: 'Fusionando PDFs individuales en reporte final',
-        timestamp: new Date(),
-        data: { totalFiles: individualPdfFiles.length }
+        message: 'Combinando páginas en PDF final',
+        timestamp: new Date()
     });
     const mergedFileName = `reporte_completo_${simulationData.campus.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
     await pdfService_1.pdfService.mergePdfs(individualPdfFiles, mergedFileName);
-    // Eliminar PDFs individuales
-    websocketService_1.websocketService.emitProgress({
-        sessionId,
-        stage: 'cleaning_up',
-        progress: 95,
-        message: 'Limpiando archivos temporales',
-        timestamp: new Date()
-    });
     await pdfService_1.pdfService.deletePdfs(individualPdfFiles);
     const finalPdfUrl = `${req.protocol}://${req.get('host')}/api/reports/pdfs/${mergedFileName}`;
+    // Clear cache and cleanup resources after successful report generation
+    try {
+        renderService.clearCache();
+        logger_1.logger.info('Cache cleared after report completion', {
+            reportType: simulationData.tipe_inform,
+            institution: simulationData.campus,
+            totalPages: allPages.length
+        });
+    }
+    catch (cacheError) {
+        // Don't fail the entire process if cache clearing fails
+        logger_1.logger.warn('Cache clearing failed, but report generation was successful', {
+            error: cacheError.message
+        });
+    }
     // Emit completion
-    websocketService_1.websocketService.emitComplete(sessionId, {
+    logger_1.logger.info('About to emit completion websocket notification', {
+        sessionId,
         fileName: mergedFileName,
-        url: finalPdfUrl,
-        totalPages: allPages.length,
-        reportType: simulationData.tipe_inform,
-        institution: simulationData.campus
+        url: finalPdfUrl
     });
     websocketService_1.websocketService.emitProgress({
         sessionId,
@@ -1062,12 +1007,21 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
         timestamp: new Date(),
         data: { fileName: mergedFileName, url: finalPdfUrl }
     });
+    // Enviar el evento SSE
+    // pushToWSClients({
+    //   status: 'pdf-ready',
+    //   // userId,
+    //   url: fileUrl,
+    //   message: 'Tu archivo está listo para descargar',
+    // });
+    logger_1.logger.info('Completion websocket notification sent', { sessionId });
     res.json({
         success: true,
         data: {
-            message: "Reporte UDEA generado exitosamente",
+            message: `Reporte ${simulationData.programName} generado exitosamente`,
+            sessionId: sessionId,
             totalPages: allPages.length,
-            reportType: "UDEA",
+            reportType: simulationData.programName,
             metadata: {
                 institution: simulationData.campus,
                 course: simulationData.course,
@@ -1083,4 +1037,167 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
             }
         }
     });
+});
+// Excel generation endpoint
+exports.generateExcelReport = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const simulationData = req.body;
+    logger_1.logger.info('Generating Excel report', {
+        campus: simulationData.campus,
+        program: simulationData.programName,
+        students: simulationData.students?.length || 0
+    });
+    try {
+        const fileName = await excelService_1.excelService.generateExcelReport(simulationData);
+        // Generate download URL
+        const excelUrl = `${req.protocol}://${req.get('host')}/api/reports/excels/${fileName}`;
+        res.json({
+            success: true,
+            data: {
+                fileName,
+                url: excelUrl,
+                downloadUrl: `${excelUrl}?download=true`,
+                message: 'Excel generado exitosamente'
+            }
+        });
+    }
+    catch (error) {
+        logger_1.logger.error('Error generating Excel report', { error });
+        res.status(500).json({
+            success: false,
+            error: 'Error al generar el reporte Excel',
+            details: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+// Excel answers generation endpoint
+exports.generateExcelAnswers = (0, errorHandler_1.asyncHandler)(async (req, res) => {
+    const simulationData = req.body;
+    logger_1.logger.info('Generating Excel answers report', {
+        campus: simulationData.campus,
+        program: simulationData.programName,
+        students: simulationData.students?.length || 0
+    });
+    try {
+        const fileName = await excelService_1.excelService.generateExcelAnswers(simulationData);
+        // Generate download URL
+        const excelUrl = `${req.protocol}://${req.get('host')}/api/reports/excels/${fileName}`;
+        res.json({
+            success: true,
+            data: {
+                fileName,
+                url: excelUrl,
+                downloadUrl: `${excelUrl}?download=true`,
+                message: 'Excel de respuestas generado exitosamente'
+            }
+        });
+    }
+    catch (error) {
+        logger_1.logger.error('Error generating Excel answers report', { error });
+        res.status(500).json({
+            success: false,
+            error: 'Error al generar el Excel de respuestas',
+            details: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+});
+/**
+ * 🔄 REGENERATE REPORT ENDPOINT
+ * Regenera reportes desde report_data con filtros de fecha, instituto y tipo
+ * Consolida estudiantes y recalcula resultados según el tipo de informe
+ */
+exports.regenerateReport = (0, errorHandler_1.asyncHandler)(async (req, res, next) => {
+    const { fecha_inicio, fecha_finalizacion, idInstitute, tipe_inform, simulationId } = req.body;
+    // Validaciones
+    if (!fecha_inicio || !fecha_finalizacion || !idInstitute || !tipe_inform) {
+        return res.status(400).json({
+            success: false,
+            error: 'Missing required parameters: fecha_inicio, fecha_finalizacion, idInstitute, tipe_inform'
+        });
+    }
+    // Validar tipo de informe
+    const validTypes = ['saber', 'udea', 'unal'];
+    if (!validTypes.includes(tipe_inform)) {
+        return res.status(400).json({
+            success: false,
+            error: `Invalid tipe_inform. Must be one of: ${validTypes.join(', ')}`
+        });
+    }
+    logger_1.logger.info('Regenerating report', {
+        fecha_inicio,
+        fecha_finalizacion,
+        idInstitute,
+        tipe_inform,
+        simulationId
+    });
+    try {
+        // 1. Construir filtro de consulta
+        const filter = {
+            examDate: {
+                $gte: new Date(fecha_inicio),
+                $lte: new Date(fecha_finalizacion)
+            },
+            idInstitute: idInstitute,
+            tipe_inform: tipe_inform
+        };
+        // Agregar simulationId si viene
+        if (simulationId) {
+            filter.simulationId = simulationId;
+        }
+        logger_1.logger.info('Querying report_data with filter', filter);
+        // 2. Consultar report_data
+        const reportDocuments = await ReportData_1.ReportData.find(filter).lean();
+        if (reportDocuments.length === 0) {
+            return res.status(404).json({
+                success: false,
+                error: 'No reports found with the specified filters'
+            });
+        }
+        logger_1.logger.info(`Found ${reportDocuments.length} report documents`);
+        // Convertir examDate de Date a string ISO y results de Map a objeto plano
+        const normalizedDocs = reportDocuments.map(doc => {
+            const resultsObj = {};
+            if (doc.results && doc.results instanceof Map) {
+                doc.results.forEach((value, key) => {
+                    resultsObj[key] = value;
+                });
+            }
+            else if (doc.results) {
+                Object.assign(resultsObj, doc.results);
+            }
+            return {
+                ...doc,
+                examDate: doc.examDate ? doc.examDate.toISOString() : undefined,
+                results: Object.keys(resultsObj).length > 0 ? resultsObj : undefined
+            };
+        });
+        // 3. Consolidar datos
+        const consolidatedData = reportConsolidation_1.ReportConsolidationService.consolidateReports(normalizedDocs, simulationId);
+        logger_1.logger.info('Data consolidated', {
+            students: consolidatedData.students.length,
+            questions: consolidatedData.detailQuestion.length
+        });
+        // 4. Recalcular resultados
+        const withSimulationId = !!simulationId;
+        const results = reportConsolidation_1.ReportConsolidationService.recalculateResults(consolidatedData, withSimulationId);
+        logger_1.logger.info('Results recalculated', {
+            totalResults: Object.keys(results).length,
+            withSimulationId
+        });
+        // 5. Generar JSON final
+        const finalReport = reportConsolidation_1.ReportConsolidationService.generateFinalReport(consolidatedData, results);
+        logger_1.logger.info('Final report generated, sending to processSimulationData');
+        // 6. Procesar el reporte directamente
+        // Modificar el body del request actual con el reporte consolidado
+        req.body = finalReport;
+        // Delegar al processSimulationData para generar el PDF
+        return await (0, exports.processSimulationData)(req, res, next);
+    }
+    catch (error) {
+        logger_1.logger.error('Error regenerating report:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error al regenerar el reporte',
+            details: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
 });

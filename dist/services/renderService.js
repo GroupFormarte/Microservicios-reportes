@@ -9,7 +9,30 @@ const ejs_1 = __importDefault(require("ejs"));
 const logger_1 = require("../utils/logger");
 class RenderService {
     constructor() {
+        this.cache = new Map();
         this.viewsPath = path_1.default.join(__dirname, '../../views');
+    }
+    // Method to clear cache after report completion
+    clearCache() {
+        try {
+            const cacheSize = this.cache.size;
+            this.cache.clear();
+            // Clear EJS cache as well
+            ejs_1.default.clearCache();
+            // Force garbage collection if available
+            if (global.gc) {
+                global.gc();
+            }
+            logger_1.logger.info(`Cache cleared successfully`, {
+                previousCacheSize: cacheSize,
+                timestamp: new Date().toISOString()
+            });
+        }
+        catch (error) {
+            logger_1.logger.error('Error clearing cache', {
+                error: error.message
+            });
+        }
     }
     async renderBarChart(data) {
         const startTime = Date.now();
@@ -431,6 +454,24 @@ class RenderService {
         catch (error) {
             logger_1.logger.error('Error rendering tabla con puntaje', { error: error.message, data });
             throw new Error(`Failed to render tabla con puntaje: ${error.message}`);
+        }
+    }
+    async renderTemplate(templateName, data) {
+        const startTime = Date.now();
+        try {
+            const templatePath = path_1.default.join(this.viewsPath, `${templateName}.ejs`);
+            const html = await ejs_1.default.renderFile(templatePath, data);
+            const renderTime = Date.now() - startTime;
+            logger_1.logger.debug(`Template ${templateName} rendered in ${renderTime}ms`);
+            return html;
+        }
+        catch (error) {
+            logger_1.logger.error('Error rendering template', {
+                error: error.message,
+                templateName,
+                data: typeof data === 'object' ? Object.keys(data) : 'non-object'
+            });
+            throw new Error(`Failed to render template ${templateName}: ${error.message}`);
         }
     }
 }

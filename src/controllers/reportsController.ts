@@ -5,8 +5,11 @@ import path from 'path';
 import { RenderService } from '../services/renderService';
 import { pdfService } from '../services/pdfService';
 import { websocketService } from '../services/websocketService';
+import { excelService } from '../services/excelService';
 import { asyncHandler } from '../middleware/errorHandler';
 import { logger } from '../utils/logger';
+import { ReportData } from '../models/ReportData';
+import { ReportConsolidationService } from '../services/reportConsolidation';
 import {
   ApiResponse,
   PageRequest,
@@ -1249,4 +1252,211 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
     }
   });
 
+});
+
+// Excel generation endpoint
+export const generateExcelReport = asyncHandler(async (req: Request, res: Response) => {
+  const simulationData = req.body;
+
+  logger.info('Generating Excel report', {
+    campus: simulationData.campus,
+    program: simulationData.programName,
+    students: simulationData.students?.length || 0
+  });
+
+  try {
+    const fileName = await excelService.generateExcelReport(simulationData);
+
+    // Generate download URL
+    const excelUrl = `${req.protocol}://${req.get('host')}/api/reports/excels/${fileName}`;
+
+    res.json({
+      success: true,
+      data: {
+        fileName,
+        url: excelUrl,
+        downloadUrl: `${excelUrl}?download=true`,
+        message: 'Excel generado exitosamente'
+      }
+    });
+
+  } catch (error) {
+    logger.error('Error generating Excel report', { error });
+    res.status(500).json({
+      success: false,
+      error: 'Error al generar el reporte Excel',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// Excel answers generation endpoint
+export const generateExcelAnswers = asyncHandler(async (req: Request, res: Response) => {
+  const simulationData = req.body;
+
+  logger.info('Generating Excel answers report', {
+    campus: simulationData.campus,
+    program: simulationData.programName,
+    students: simulationData.students?.length || 0
+  });
+
+  try {
+    const fileName = await excelService.generateExcelAnswers(simulationData);
+
+    // Generate download URL
+    const excelUrl = `${req.protocol}://${req.get('host')}/api/reports/excels/${fileName}`;
+
+    res.json({
+      success: true,
+      data: {
+        fileName,
+        url: excelUrl,
+        downloadUrl: `${excelUrl}?download=true`,
+        message: 'Excel de respuestas generado exitosamente'
+      }
+    });
+
+  } catch (error) {
+    logger.error('Error generating Excel answers report', { error });
+    res.status(500).json({
+      success: false,
+      error: 'Error al generar el Excel de respuestas',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+/**
+ * 🔄 REGENERATE REPORT ENDPOINT
+ * Regenera reportes desde report_data con filtros de fecha, instituto y tipo
+ * Consolida estudiantes y recalcula resultados según el tipo de informe
+ */
+export const regenerateReport = asyncHandler(async (req: Request, res: Response, next: any) => {
+  const {
+    fecha_inicio,
+    fecha_finalizacion,
+    idInstitute,
+    tipe_inform,
+    simulationId
+  } = req.body;
+
+  // Validaciones
+  if (!fecha_inicio || !fecha_finalizacion || !idInstitute || !tipe_inform) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing required parameters: fecha_inicio, fecha_finalizacion, idInstitute, tipe_inform'
+    });
+  }
+
+  // Validar tipo de informe
+  const validTypes = ['saber', 'udea', 'unal'];
+  if (!validTypes.includes(tipe_inform)) {
+    return res.status(400).json({
+      success: false,
+      error: `Invalid tipe_inform. Must be one of: ${validTypes.join(', ')}`
+    });
+  }
+
+  logger.info('Regenerating report', {
+    fecha_inicio,
+    fecha_finalizacion,
+    idInstitute,
+    tipe_inform,
+    simulationId
+  });
+
+  try {
+    // 1. Construir filtro de consulta
+    const filter: any = {
+      examDate: {
+        $gte: new Date(fecha_inicio),
+        $lte: new Date(fecha_finalizacion)
+      },
+      idInstitute: idInstitute,
+      tipe_inform: tipe_inform
+    };
+
+    // Agregar simulationId si viene
+    if (simulationId) {
+      filter.simulationId = simulationId;
+    }
+
+    logger.info('Querying report_data with filter', filter);
+
+    // 2. Consultar report_data
+    const reportDocuments = await ReportData.find(filter).lean();
+
+    if (reportDocuments.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'No reports found with the specified filters'
+      });
+    }
+
+    logger.info(`Found ${reportDocuments.length} report documents`);
+
+    // Convertir examDate de Date a string ISO y results de Map a objeto plano
+    const normalizedDocs = reportDocuments.map(doc => {
+      const resultsObj: any = {};
+      if (doc.results && doc.results instanceof Map) {
+        doc.results.forEach((value, key) => {
+          resultsObj[key] = value;
+        });
+      } else if (doc.results) {
+        Object.assign(resultsObj, doc.results);
+      }
+
+      return {
+        ...doc,
+        examDate: doc.examDate ? doc.examDate.toISOString() : undefined,
+        results: Object.keys(resultsObj).length > 0 ? resultsObj : undefined
+      };
+    });
+
+    // 3. Consolidar datos
+    const consolidatedData = ReportConsolidationService.consolidateReports(
+      normalizedDocs as any,
+      simulationId
+    );
+
+    logger.info('Data consolidated', {
+      students: consolidatedData.students.length,
+      questions: consolidatedData.detailQuestion.length
+    });
+
+    // 4. Recalcular resultados
+    const withSimulationId = !!simulationId;
+    const results = ReportConsolidationService.recalculateResults(
+      consolidatedData,
+      withSimulationId
+    );
+
+    logger.info('Results recalculated', {
+      totalResults: Object.keys(results).length,
+      withSimulationId
+    });
+
+    // 5. Generar JSON final
+    const finalReport = ReportConsolidationService.generateFinalReport(
+      consolidatedData,
+      results
+    );
+
+    logger.info('Final report generated, sending to processSimulationData');
+
+    // 6. Procesar el reporte directamente
+    // Modificar el body del request actual con el reporte consolidado
+    req.body = finalReport;
+
+    // Delegar al processSimulationData para generar el PDF
+    return await processSimulationData(req, res, next);
+
+  } catch (error) {
+    logger.error('Error regenerating report:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al regenerar el reporte',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
 });

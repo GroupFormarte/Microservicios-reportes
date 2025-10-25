@@ -1,0 +1,2744 @@
+{
+  "questions": [
+    {
+      "codigo": "ASI-T-1",
+      "deltaPregunta": [
+        {
+          "insert": "De acuerdo con el contexto, una máxima (párrafo1) debe ser entendida como: \n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "Principio, regla o proposición de conducta, generalmente admitida por los que profesan una facultad u oficio.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " Frase aguda y sentenciosa de origen popular en la cual se expresa un pensamiento moral, un consejo o una enseñanza.\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Una idea, norma o designio a que se ajusta la manera de obrar.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Una proposición sentenciosa considerada apta para dirigir las acciones morales. \r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-2",
+      "deltaPregunta": [
+        {
+          "insert": "Si, como dice el autor, \"El mejor gobierno es el que no tiene que gobernar en absoluto\" y \"Un gobierno no es [...] más que un vehículo”, entonces el gobierno puede ser entendido como:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "Un fin en sí mismo.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Una máquina autónoma.\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Un medio para alcanzar un fin.\r\n\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Un producto de la sociedad. \r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-3",
+      "deltaPregunta": [
+        {
+          "insert": "Por el modo como el autor presenta la información en el texto, podemos afirmar que este:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Solo está haciendo un diagnóstico del gobierno de su época.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Está en desacuerdo con las formas de revolución llevadas a cabo hasta el momento.\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Invita abiertamente a la revolución frente a la ineficacia del gobierno. \r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Culpa a los hombres libres de los desmanes del gobierno por no ser votantes conscientes\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-4",
+      "deltaPregunta": [
+        {
+          "insert": "El conector “es decir” (párrafo 3) le sirve al autor para indicar una:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Causa, pues señala la razón por la que se da o sucede algo.\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Explicación, ya que introduce una clarificación o reformulación de una idea.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Consecuencia, porque alude a lo que se desprende de la idea anterior.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Secuencia, pues permite establecer una conexión temporal entre dos o más oraciones o enunciados.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-5",
+      "deltaPregunta": [
+        {
+          "insert": "El eje temático del párrafo tres está expresado en la idea:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "Todos los hombres reconocen el derecho a la revolución.\n"
+          }
+        ],
+        [
+          {
+            "insert": " Toda máquina genera sus fricciones.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Deshagámonos de esa máquina.\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Hay miles de personas cuyas opiniones están en contra de la esclavitud.\r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-6",
+      "deltaPregunta": [
+        {
+          "insert": "En la expresión “El mejor gobierno es el que no tiene que gobernar en absoluto” se presenta: \r\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Una paradoja, pues su sentido entraña una aparente contradicción.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Un retruécano, ya que se realiza un juego de palabras.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Una metáfora, dado que se habla en sentido figurado.\r\n\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Una ironía, porque se dice lo contrario de lo que se quiere dar a entender.\r\n\r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-7",
+      "deltaPregunta": [
+        {
+          "insert": "La palabra “máquina”, empleada varias veces en el tercer párrafo, se refiere a:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " La revolución.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " El pueblo.\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "La tiranía.\r\n\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "El gobierno.\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-8",
+      "deltaPregunta": [
+        {
+          "insert": "Con la expresión “Deshagámonos de esa máquina”, el autor pretende:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Dar una lección de ingeniería.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": "Defender el derecho de resistencia.\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Criticar el derecho a la revolución.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Denunciar el robo y la opren.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-9",
+      "deltaPregunta": [
+        {
+          "insert": "En el párrafo uno el autor dice estar de acuerdo con que “El mejor gobierno es el que no tiene que gobernar en absoluto”. Teniendo en cuenta el desarrollo del párrafo siguiente, lo que el autor pretende al usar esta frase es:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "Abogar a favor de que se establezca un mejor gobierno de inmediato.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": "Proponer una comunidad de hombres sin gobierno.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " Hacer desaparecer todo gobierno inmediatamente.\r\n\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Defender el derecho a la desobediencia civil.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-10",
+      "deltaPregunta": [
+        {
+          "insert": "En el párrafo cuarto el autor afirma que “La obligación, por tanto, nunca supera a la conveniencia”. De acuerdo con el texto, la obligación es ____________, mientras que la conveniencia es ______________:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " La defensa de lo justo – el derecho al voto.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " El deber de defender lo justo - el alivio moral de quien ejerce el voto.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " El deber de votar- la defensa de lo justo\r\n\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " El deber moral de quien ejerce el voto - el beneficio que trae la justicia\r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-11",
+      "deltaPregunta": [
+        {
+          "insert": "De acuerdo con el tema y la terminología del texto, este podría enmarcase dentro de los ámbitos de la:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Economía y la filosofía.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Política y la economía.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Administración y el gobierno.\r\n\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Política y la filosofía\r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-12",
+      "deltaPregunta": [
+        {
+          "insert": "El término homófono de ‘\"votar\", subrayado en el párrafo 4 del texto, alude a:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Dar su voto o decir su dictamen.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " Arrojar, tirar, echar fuera a alguien o algo.\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Hacer votos a Dios.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Hacer juramentos.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-13",
+      "deltaPregunta": [
+        {
+          "insert": "Votar, de acuerdo con el texto, debe ser entendido como:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " El derecho que tiene todo pueblo realmente libre.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Una garantía de la libertad.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Un medio efectivo para que prevalezca la justicia.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Un mecanismo insuficiente para imponer lo justo.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-14",
+      "deltaPregunta": [
+        {
+          "insert": "A partir de lo dicho en el texto, es correcto afirmar que:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " La ley establecida decide lo que es justo.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " La ley puede ir en contra del derecho y ser injusta.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "En tanto dictado jurídico, toda ley es justa.\r\n\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Derecho, justicia y ley son términos equivalentes.\r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-15",
+      "deltaPregunta": [
+        {
+          "insert": "“Deshagámonos de esa máquina” es una expresión que en el texto indica, EXCEPTO:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Revolución. \r\n"
+          }
+        ],
+        [
+          {
+            "insert": " Resistencia.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " Desobediencia.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Complicidad.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-16",
+      "deltaPregunta": [
+        {
+          "insert": " Mahatma Gandhi decía: \"Cuando una ley es injusta, lo correcto es desobedecer\". Con respecto a lo planteado en el texto, esta afirmación lo:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "Contradice.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " Complementa.\r\n\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Niega.\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Reafirma.\r\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "AS-T-17",
+      "deltaPregunta": [
+        {
+          "insert": "Siguiendo los argumentos del autor, el gobierno oprime al pueblo y comete injusticias para beneficiarse. Es válido que el pueblo reaccione a través de la:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Libertad y la tiranía.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Desobediencia y la ley.\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Libertad y la votación.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Resistencia y la revolución.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-18",
+      "deltaPregunta": [
+        {
+          "insert": "De acuerdo con el texto, la revolución es, EXCEPTO:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "Una vía política contra la tiranía. \r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Un recurso de las minorías para resistirse a la opresión.\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Un medio para oponerse al despotismo y la injusticia.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "El derecho de la mayoría para hacer uso de su poder.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-19",
+      "deltaPregunta": [
+        {
+          "insert": "Dentro del acervo del lenguaje popular se encuentran dichos, sentencias y refranes que encierran un sentido ya muy conocido. Uno de ellos es la expresión, subrayada en el párrafo seis, 'lavarse las manos', la cual se usa cuando alguien:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "No tiene razones para meterse donde no le incumbe o nadie lo ha invitado.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Quiere desentenderse de la culpa o responsabilidad en un asunto.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": "Finge no ver una injusticia, una traición o un acto de corrupción porque no le apetece, no le conviene o tiene miedo.\r\n\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Actúa de manera decidida y sin vacilar frente a hechos que afectan el bienestar individual y social.\r\n\r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-20",
+      "deltaPregunta": [
+        {
+          "insert": "El texto habla de, EXCEPTO:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "Justicia, gobierno y tiranía.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Opresión, derecho y ley.\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Resistencia, revolución y libertad.\r\n\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Estado, robo y crisis económica.\r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-21",
+      "deltaPregunta": [
+        {
+          "insert": "Con respecto a las preguntas planteadas en el párrafo seis, podemos decir que, EXCEPTO:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "Son un recurso de la argumentación. \r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Invitan a la reflexión. \r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Buscan involucrar al lector.\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Se responden en el texto.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-22",
+      "deltaPregunta": [
+        {
+          "insert": "El texto anterior está dirigido, principalmente, a:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "Todos los colombianos marchantes.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Los dirigentes del país.\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Las minorías que protestan.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Los profesionales de las Ciencias Sociales.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-23",
+      "deltaPregunta": [
+        {
+          "insert": "Son expresiones que posibilitan la identificación de la tipología del texto y la postura del autor, EXCEPTO:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " “Barbarie imperante”.\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "“Paro Nacional”.\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " “Régimen del terror”.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " “Se asesina la diferencia”.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-24",
+      "deltaPregunta": [
+        {
+          "insert": "De acuerdo con el autor del texto, lo que resulta siendo el reflejo de décadas de violencia es:\n\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " El Paro Nacional.\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " El hecho coyuntural.\n\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "\rLos sentimientos encontrados.\r\n\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Las movilizaciones realizadas.\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-25",
+      "deltaPregunta": [
+        {
+          "insert": "Cuando el autor afirma que “es lógico que tanta represión consiga su objetivo”, con la expresión subrayada pretende:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Indicar una consecuencia natural de un modo de proceder.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " Evidenciar la forma de razonamiento del Gobierno.\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Mostrar las consecuencias de marchar.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Señalar la obviedad en el modo de proceder del Estado.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-26",
+      "deltaPregunta": [
+        {
+          "insert": "En el párrafo cuatro, los que no “se diferencian claramente” son: \n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Los hogares y los sitios de trabajo.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Las plataformas digitales y la realidad.\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Los espacios cotidianos y de esparcimiento.\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " La barbarie imperante y el narcotráfico.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-27",
+      "deltaPregunta": [
+        {
+          "insert": "La expresión “Esa es la falacia de nuestra democracia”, la palabra subrayada tiene el mismo sentido que, EXCEPTO:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "Sofisma.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Falsedad.\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Verdad. \r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Mentira.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-28",
+      "deltaPregunta": [
+        {
+          "insert": "La metonimia se define como un tropo que consiste en darle a una cosa el nombre de otra con la que guarda una relación de contigüidad o cercanía, es decir, se produce un cambio semántico en virtud de una alguna relación existente. De acuerdo con esta definición, encontramos una metonimia en la expresión:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Asesinar la diferencia.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": "Régimen del terror.\r\n.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Muerte violenta. \r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Barbarie imperante.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-29",
+      "deltaPregunta": [
+        {
+          "insert": "Por el modo como se presenta la información en el párrafo cinco, se puede decir que este desarrolla ________, ya que __________:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Un contrargumento – se esgrime un argumento que rebate lo que se venía planteando\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Una introducción – se introduce una nueva temática de carácter positivista\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Una causa y su efecto – se mencionan las causas de la marcha para luego evidenciar los efectos positivos\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Un contraste – se evidencia un efecto positivo frente a un contexto desalentador\r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-30",
+      "deltaPregunta": [
+        {
+          "insert": "Las expresiones “no más autoritarismo, no más patriarcado, no más racismo, no más discriminación, no más asesinatos a líderes, no más masacres, no más hambre, no más neoliberalismo” son proferidas por:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "El autor del texto. \r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Los marchantes del paro.\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Las minorías afectadas.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Todo el pueblo colombiano.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-31",
+      "deltaPregunta": [
+        {
+          "insert": "Decir que el Gobierno es inepto, es lo mismo que decir que es: \n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Autoritario.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Incompetente.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Represivo. \r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Temerario. \r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-32",
+      "deltaPregunta": [
+        {
+          "insert": "En el párrafo ocho, lo que reclama justicia y dignidad son:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Los gritos. \r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Las voces.\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Las minorías.\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Las frases.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-33",
+      "deltaPregunta": [
+        {
+          "insert": "Siguiendo la lógica del texto, algunos gritos que se podrían sumar a los expresados en el segmento subrayado en el párrafo ocho podrían ser, EXCEPTO:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " No más corrupción.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " No más falsos positivos. \r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " No más abortos.\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " No más guerra.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-34",
+      "deltaPregunta": [
+        {
+          "insert": "A partir de las lecturas de ambos textos, podríamos decir que mientras el texto Dos __________, el texto Uno__________:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "Narra un acontecimiento concreto – realiza propuestas de intervención.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " Busca mover los ánimos de los lectores – invita a reflexionar sobre los hechos.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Se queda en el planteamiento de propuestas – busca acciones concretas.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Invita a la revolución pacífica – promueve la protesta social.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-35",
+      "deltaPregunta": [
+        {
+          "insert": "En Los caminos de la libertad, Russell afirma que “Los anarquistas generalmente tienen fe en la doctrina de la lucha de clases… Los anarquistas protestan contra los organismos policíacos y las leyes penales, por medio de los cuales la voluntad de una parte de la comunidad es forzada por la otra”. Esta definición de anarquismo:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Se relaciona con ambos textos por igual.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Se aplica más en el texto dos que en el uno.\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "No se relaciona con ninguno de los textos. \r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Se relaciona más con el texto uno que con el dos.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-36",
+      "deltaPregunta": [
+        {
+          "insert": "Una afirmación del texto Uno que soportaría las razones del paro expuestas en el texto Dos sería:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "\"Todos los hombres reconocen el derecho a resistirse al gobierno y negarle lealtad cuando su tiranía o su ineficacia sean desmesurados e insoportables\".\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "\"Dejemos que cada hombre declare qué tipo de gobierno sería merecedor de su respeto, y así se daría un primer paso en su consecución\".\r\n"
+          }
+        ],
+        [
+          {
+            "insert": "C. \"Por supuesto, un hombre no tiene el deber de dedicarse a la erradicación de las injusticias, por monstruosas que éstas sean\".\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " \"Si la injusticia tiene sus propios resortes, poleas, cables o manivelas, quizá podamos considerar un poco más hasta qué punto el remedio sería peor que la enfermedad\".\r\n\r\n\r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-37",
+      "deltaPregunta": [
+        {
+          "insert": "A partir de la lectura de los textos, \"no pagar el impuesto al consumo” podría ser clasificado como una forma de:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Protesta social.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Lucha de clases. \r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Revolución pacífica.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Sublevación social\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-38",
+      "deltaPregunta": [
+        {
+          "insert": "Para Thoreau “hay miles de personas cuyas opiniones están en contra de la esclavitud y de la guerra, y que, sin embargo, en la práctica, no hacen nada por acabar con ellas” (Párrafo 3). Una explicación para esta afirmación que se puede encontrar en lo expuesto en el texto Dos sería que: \n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " La violación de la ley no nos afecta de manera directa.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Se temen los efectos de la “política del terror”.\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Todo pasa a convertirse en hechos coyunturales.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Se ha generado un estado de desesperanza.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-39",
+      "deltaPregunta": [
+        {
+          "insert": "Según el Diccionario de la Real Academia Española, \"cómplice\" será una 'persona que, sin ser autora de un delito o falta, coopera en su ejecución con actos anteriores o simultáneos'. De acuerdo con esta definición, podemos afirmar que:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Ambos autores hacen alusión a la complicidad.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Solo el autor del texto uno habla de complicidad.\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " El texto dos menciona la complicidad implícitamente.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Ninguno de los textos hace referencia a la complicidad.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-40",
+      "deltaPregunta": [
+        {
+          "insert": "Claude Lefort, en Tiranía y servidumbre voluntaria, se pregunta “por qué los hombres soportan a un tirano solo, el cual solo tiene el poder que aquellos le dan; el cual no tiene el poder de hacerles daño sino en tanto que aquellos tienen la voluntad de soportarlo”. Esta pregunta que se hace el filósofo francés podría hallar una posible respuesta:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Solo en el texto Dos.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Solo en el texto Uno.\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Más en el texto uno que en el Dos.\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " En ambos textos por igual.\r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-41",
+      "deltaPregunta": [
+        {
+          "insert": "En una reunión de beneficencia, los doctores Arango, Benítez, Castillo y Domínguez se sentaron, cada uno en compañía de sus esposas, en una mesa redonda obedeciendo la siguiente disposición:\n1) Al frente del doctor Arango está el doctor Castillo\n2) No hay dos mujeres juntas\n3) A la derecha de la esposa del doctor Arango se sienta el doctor Benítez\n4) Ninguna esposa está sentada al lado de su esposo\nDe esta forma, de las opciones a continuación, la única verdadera es:\n\n\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "La esposa del doctor Arango está enfrente de la esposa de Domínguez.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " La esposa del doctor Benítez está enfrente de la esposa de Castillo.\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " La esposa del doctor Arango está enfrente de la esposa de Castillo.\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " La esposa del doctor Domínguez está enfrente de la esposa de Castillo.\r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-42",
+      "deltaPregunta": [
+        {
+          "insert": "Andrés, Camilo y Daniel son tres médicos especialistas que asisten al congreso nacional de medicina: uno es cardiólogo, otro es pediátra y el otro es endocrinólogo. Se conoce también que vienen de Medellín, Bogotá y Cali, no neceseriamente en este orden. Además, se sabe que:\n* Camilo es cardiólogo\r\n* El que viene de Medellín es pediátra\r\n* Andrés no viene de Cali ni es pediátra\r\nLa persona que es pediátra y la persona que viene de Cali, son respectivamente:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Daniel y Camilo.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " Andrés y Daniel.\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Andrés y Camilo.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Daniel y Daniel.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-43",
+      "deltaPregunta": [
+        {
+          "insert": "Cuatro vecinos, que viven sobre la misma calle, sostienen la siguiente conversación:\nAicardo: Mi casa no es verde\r\nBeto: Mi casa no es roja\r\nCarlos: Mi casa es roja\r\nDany: Mi casa no es blanca\r\nSi se conoce que la casa de uno de ellos es verde y que la casa de todos los demás es roja y que solo uno de ellos mintió en su afirmación, entonces el que vive en la casa verde, es:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Dany. \r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Beto.\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Aicardo.\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Carlos.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-44",
+      "deltaPregunta": [
+        {
+          "insert": "Diana, debido a su trabajo de ejecutiva, ha definido el siguiente código de vestimenta respecto al uso de las prendas: pantalón, botas, camisa, chaqueta, sandalias, falda y tenis:\r\n► Si usa pantalón, entonces usa botas o tenis\n► Si usa botas y camisa, entonces no usa falda\n► Si usa camisa y falda, entonces no usa tenis\n► Si usa falda, entonces usa sandalias o chaqueta\n► Nunca usa tenis y chaqueta al mismo tiempo\n\nDe los siguientes vestuarios:\nI. Tenis, falda y chaqueta.\nII. Botas, pantalón y camisa.\nIII. Falda, camisa y sandalias.\r\nEl que Diana puede utilizar sin contradecir su código, es:\r\n\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Solamente el I\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Solamente el III\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " I, II y II\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Solamente II y III\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-45",
+      "deltaPregunta": [
+        {
+          "insert": "Si u, v, y w representan números naturales diferentes que cumplen que u + v + w = 10, entonces el máximo valor posible para el producto u • v • w es: \n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "36 \n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 30\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "24 \r\n\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 20\r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-46",
+      "deltaPregunta": [
+        {
+          "insert": "En la resta a continuación, las expresiones LM5N y 47S6, representan números de 4 dígitos donde letras distintas corresponden a dígitos distintos.\n"
+        },
+        {
+          "insert": "\n",
+          "attributes": {
+            "heading": 6
+          }
+        },
+        {
+          "insert": {
+            "source_type": "url",
+            "source": "http://app.formarte.co/uploads/image-1750190647630-996319068.png",
+            "name": "Imagen4.png",
+            "id": "[#08811]",
+            "size": {
+              "w": 230,
+              "h": 207.125122070313
+            },
+            "_type": "image",
+            "_inline": true
+          }
+        },
+        {
+          "insert": "\n",
+          "attributes": {
+            "alignment": "center"
+          }
+        },
+        {
+          "insert": "\nAsí, la suma de los dígitos del número representado por LM5N es:\n\n\n\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 20 \n\n"
+          }
+        ],
+        [
+          {
+            "insert": "21\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "22\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "23\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-47",
+      "deltaPregunta": [
+        {
+          "insert": "El número de la casa de Víctor tiene ciertas peculiaridades: es un número de cinco dígitos distintos mnpqr formado por los dígitos 1, 2, 3, 4 y 5 (no necesariamente en ese orden). Además, el número de tres dígitos mnp es múltiplo de 4, el número de tres dígitos npq es múltiplo de 5 y el número de tres dígitos pqr es múltiplo de 3. Con \restas condiciones, el producto de los dígitos m y r que corresponden al número de la casa de Víctor es:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 3\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "  4\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 6 \r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 12\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-48",
+      "deltaPregunta": [
+        {
+          "insert": "En la tabla 1, mostrada a continuación, los números que la forman fueron ubicados de acuerdo con una ley de formación que siguen los números por fila y otra ley de formación para las columnas.Para hacer la tabla 2 se usaron las mismas leyes, pero comenzando con números distintos. Además, se borraron casi todos, dejando solo los dos números mostrados.\n"
+        },
+        {
+          "insert": {
+            "source_type": "url",
+            "source": "http://app.formarte.co/uploads/image-1750191685605-921341069.png",
+            "name": "Imagen5.png",
+            "id": "[#6c5ea]",
+            "size": {
+              "w": 660.728973388672,
+              "h": 331.687683105469
+            },
+            "_type": "image",
+            "_inline": true
+          }
+        },
+        {
+          "insert": "\n",
+          "attributes": {
+            "alignment": "center"
+          }
+        },
+        {
+          "insert": "\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 53\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "58\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "92\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 41\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-49",
+      "deltaPregunta": [
+        {
+          "insert": "Óscar quiere empacar 119 bolas en 10 cajas y desea que en cada caja haya mínimo 7 bolas y que todas tengan diferente cantidad. ¿Cuál es el máximo de bolas que una de las cajas puede contener?\n\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "10\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "19\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "20\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 21\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-50",
+      "deltaPregunta": [
+        {
+          "insert": "Para números enteros distintos p y q, se define la operación ∆ por: p ∆ q=(q−𝑝)2. \nDe las siguientes igualdades:\nI. p ∆ (−q) = −[p ∆ q]\nII. (−p) ∆ (−q) = p ∆ q\nSe puede afirmar que:\r\n\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " I y II son falsas\ra\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " I y II son verdaderas\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " Solo I es verdadera\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Solo II es verdadera\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-51",
+      "deltaPregunta": [
+        {
+          "insert": "La operación ф entre números reales está definida por:\n► 𝑥 ф 𝑦 = 5𝑥+1, 𝑠𝑖 𝑥≥𝑦\n► 𝑥 ф 𝑦 = 3, si 𝑥<𝑦\r\nEl resultado de la operación 5𝜙√5𝜙√5 es:\n\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "125\n"
+          }
+        ],
+        [
+          {
+            "insert": " 26\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "45\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "78\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-52",
+      "deltaPregunta": [
+        {
+          "insert": "Antonio, Santiago, Diego y Matias son muy buenos amigos. En cierta ocasión, Matias no tenía dinero y los otros amigos decidieron darle la misma cantidad de dinero cada uno. Así, Diego le entregó a Matias un tercio de su dinero, Antonio le entregó a Matias un cuarto de su dinero; Santiago le entregó a Matias un quinto de su dinero.\n\rDespués de que Matias recibe el dinero de sus amigos, la fracción del dinero del grupo con la que quedó es\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 1/5.\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "1/4.\r\n"
+          }
+        ],
+        [
+          {
+            "insert": "1/3.\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "2/5.\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-53",
+      "deltaPregunta": [
+        {
+          "insert": "En una cárcel de máxima seguridad se hacen revisiones periódicas a las celdas por 3 guardias distintos, A, B y C. El guardia A hace revisión cada 20 minutos, el guardia B la hace cada 30 minutos y el guardia C cada 40 minutos. Si los tres guardias inician sus revisiones a las 10:00 p.m. y trabajan hasta las 6:00 a.m., el número de revisiones conjuntas que hacen durante su turno es:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 3\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "4\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "\r8\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 6\r\n\r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-54",
+      "deltaPregunta": [
+        {
+          "insert": "En el diagrama de la figura deben colocarse los números del 1 al 8, sin repeticiones, de manera que para cualquier número, ninguno de sus posibles números vecinos (a izquierda, a derecha, arriba, abajo o diagonal), sea el inmediato sucesor o el inmediato predecesor de dicho número.\n\n"
+        },
+        {
+          "insert": {
+            "source_type": "url",
+            "source": "http://app.formarte.co/uploads/image-1750193964461-280861711.png",
+            "name": "Imagen6.png",
+            "id": "[#3525e]",
+            "size": {
+              "w": 461.46435546875,
+              "h": 313.379388427734
+            },
+            "_type": "image",
+            "_inline": true
+          }
+        },
+        {
+          "insert": "\n",
+          "attributes": {
+            "alignment": "center"
+          }
+        },
+        {
+          "insert": "\nSiguiendo estas condiciones, el número que debe ir en el lugar de la X es:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 2\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "3\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "6\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "7\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-55",
+      "deltaPregunta": [
+        {
+          "insert": "Pablo estaba parado al borde de la vía del Metro y al ver que se acercaba un tren decidió contar el tiempo que se tardaba todo el largo del tren en cruzar frente a él. Si Pablo estimó que el tren se tardó 16 segundos en cruzar frente a él y sabía de antemano que la velocidad del tren era de 63 km/h, entonces el largo del tren, en metros, es de:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 160\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 200\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 230\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 280\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-56",
+      "deltaPregunta": [
+        {
+          "insert": "El administrador de un bar distribuirá entre sus dos meseros los $240.000 recibidos en propinas. La distribución la hará en partes inversamente proporcionales al sueldo de sus dos empleados. Si los sueldos de los meseros son $900.000 y $1.800.000, entonces, el dinero de las propinas que recibirá el de mayor sueldo es:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " $ 80.000\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "$ 100.000\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " $ 120.000\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "$ 160.000\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-57",
+      "deltaPregunta": [
+        {
+          "insert": "Felipe y Claudia desean construir su hogar. Hacerlo requiere 20 millones en mano de obra y 25 millones en materiales. Al día de hoy Felipe ha recogido el 35% del valor de la mano de obra, Claudia el 60% del valor del material y sus amigos les han donado el 40% del valor total de la obra. Siendo así, la cantidad de millones faltantes para completar el dinero necesario equivale a:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 4\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 5\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "7\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 11\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-58",
+      "deltaPregunta": [
+        {
+          "insert": "Ulises compró su primera moto hace dos años por 5.000 dólares y ahora quiere cambiarla por una del mismo estilo, pero último modelo. Él sabe que el precio de la moto del último modelo se ha incrementado en un 15% con respecto a cuando compró su moto. Si Ulises vende su moto por un 80% del valor del último modelo, entonces, el porcentaje que representa la cantidad adicional de dólares que debe de pagar por la nueva moto respecto al valor pagado por su primera moto es:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 27% \n\n"
+          }
+        ],
+        [
+          {
+            "insert": "25%\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "23% \r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 20%\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-59",
+      "deltaPregunta": [
+        {
+          "insert": "Cinco candidatos, Pablo, José, Diego, Mario y Juan, que se han presentado a la convocatoria docente del Estado son evaluados en un examen de competencias básicas de 40 preguntas. El gráfico muestra el porcentaje de aciertos de cada uno de los candidatos en la prueba:\n\n"
+        },
+        {
+          "insert": {
+            "source_type": "url",
+            "source": "http://app.formarte.co/uploads/image-1750195955217-120733732.png",
+            "name": "Imagen7.png",
+            "id": "[#bfa7f]",
+            "size": 300,
+            "_type": "image",
+            "_inline": true
+          }
+        },
+        {
+          "insert": "\n\n\nSea RC el promedio de respuestas correctadas dadas por los candidatos y RI el promedio de respuestas incorrectas obtenido por el mismo grupo. La razón entre las variables RC y RI equivale a:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 1 \n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 4/5\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 2/3 \r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 1/2\r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-60",
+      "deltaPregunta": [
+        {
+          "insert": "El promedio de 6 enteros positivos distintos es 25. Si además se conoce que uno de los números es el 60, el mayor número que puede hacer parte del grupo es:\r\n\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "60\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "70\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 80\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "90\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-61",
+      "deltaPregunta": [
+        {
+          "insert": "Un profesor le propone a un alumno una tarea con 70 problemas de matemáticas, informándole que le asignará 5 puntos por cada problema que resuelva correctamente y que le restará dos puntos por cada problema mal resuelto o sin resolver. Después de calificar la tarea, el alumno solamente recibió 7 puntos. La cantidad de problemas que el alumno resolvió correctamente fue:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "12 \n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 15\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "18 \r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 21\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-62",
+      "deltaPregunta": [
+        {
+          "insert": "Se tienen 5 cajas con la misma cantidad de bolas. Se saca de la primera caja una cierta cantidad de bolas; de la segunda se saca el doble de bolas sacadas de la primera; de la tercera se saca el triple de bolas sacadas de la primera; de la cuarta se saca el cuádruple de bolas sacadas de la primera; y de la quinta se saca el quíntuple de bolas sacadas de la primera. Si en la quinta caja queda solo una bola y se sabe además que el total de bolas que quedaron en las 5 cajas es 45, entonces la cantidad de bolas que había inicialmente en cada caja es:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "20 \n\n"
+          }
+        ],
+        [
+          {
+            "insert": "10\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "11\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "21\r\n\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-64",
+      "deltaPregunta": [
+        {
+          "insert": "En la figura se muestra la vista superior de un velódromo de forma circular, que está formado por dos círculos concéntricos en C. Sabiendo que la cuerda PQ del circulo mayor toca el círculo menor en un punto y su medida es de 4 cm, entonces el área de la región sombreada, en cm2, es:\n"
+        },
+        {
+          "insert": {
+            "source_type": "url",
+            "source": "http://app.formarte.co/uploads/image-1750197284483-958043260.png",
+            "name": "Imagen9.png",
+            "id": "[#4b005]",
+            "size": 300,
+            "_type": "image",
+            "_inline": true
+          }
+        },
+        {
+          "insert": "\n",
+          "attributes": {
+            "alignment": "center"
+          }
+        },
+        {
+          "insert": "\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 4π\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "16π\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 8π\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 4𝜋2\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-65",
+      "deltaPregunta": [
+        {
+          "insert": "La figura muestra una pista de bicicross con obstáculos que está formada por 5 triángulos equiláteros iguales, que están dispuestos en un segmento de 30 cm de longitud.\n"
+        },
+        {
+          "insert": {
+            "source_type": "url",
+            "source": "http://app.formarte.co/uploads/image-1750197692617-925517330.png",
+            "name": "Imagen10.png",
+            "id": "[#5fa79]",
+            "size": {
+              "w": 738.029541015625,
+              "h": 301.6669921875
+            },
+            "_type": "image",
+            "_inline": true
+          }
+        },
+        {
+          "insert": "\n",
+          "attributes": {
+            "alignment": "center"
+          }
+        },
+        {
+          "insert": "El perímetro de la figura, en cm, es:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 45\r\n"
+          }
+        ],
+        [
+          {
+            "insert": "60\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 90\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "100\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-66",
+      "deltaPregunta": [
+        {
+          "insert": "En el patio de su casa, Carlos ha construido un corral de pollos que está formado por 5 cuadritos iguales. Si el área de cada cuadrito es de 20 cm2, entonces, el valor de x, en cm, es:\n"
+        },
+        {
+          "insert": {
+            "source_type": "url",
+            "source": "http://app.formarte.co/uploads/image-1750197965638-520817898.png",
+            "name": "Imagen12.png",
+            "id": "[#2e0cd]",
+            "size": 300,
+            "_type": "image",
+            "_inline": true
+          }
+        },
+        {
+          "insert": "\n",
+          "attributes": {
+            "alignment": "center"
+          }
+        },
+        {
+          "insert": "\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "2√5\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "5√2\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "4√5\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "10\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-67",
+      "deltaPregunta": [
+        {
+          "insert": "El cuadrado DEFG, mostrado en la figura, se dividió en 3 rectángulos cuyas áreas son iguales. Si el segmento DR mide 3 cm, entonces, el área del cuadrado, en cm2, es: \n"
+        },
+        {
+          "insert": {
+            "source_type": "url",
+            "source": "http://app.formarte.co/uploads/image-1750198591350-246680853.png",
+            "name": "Imagen14.png",
+            "id": "[#09215]",
+            "size": 300,
+            "_type": "image",
+            "_inline": true
+          }
+        },
+        {
+          "insert": "\n\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 64\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "81\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 100\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "121\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-68",
+      "deltaPregunta": [
+        {
+          "insert": "En un grupo de baile formado por 6 integrantes, hay 4 mujeres y 2 hombres, se desea organizar subgrupos con la misma cantidad de mujeres que de hombres. La cantidad total de subgrupos que se pueden encontrar con estas condiciones es:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 8\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "12\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "14\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "16\r\n\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-69",
+      "deltaPregunta": [
+        {
+          "insert": "Diego está jugando en el recreo a formar figuras con cerillas de madera y ha construido la siguiente secuencia:\n"
+        },
+        {
+          "insert": {
+            "source_type": "url",
+            "source": "http://app.formarte.co/uploads/image-1750200318168-668923674.png",
+            "name": "Imagen15.png",
+            "id": "[#82582]",
+            "size": {
+              "w": 622.597045898438,
+              "h": 284.531524658203
+            },
+            "_type": "image",
+            "_inline": true
+          }
+        },
+        {
+          "insert": "\n",
+          "attributes": {
+            "alignment": "center"
+          }
+        },
+        {
+          "insert": "Si Diego cuenta con suficientes cerillas y continúa con este mismo patrón armando más figuras, entonces la cantidad de cerillas empleadas para armar la figura 7 de la secuencia es:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "55\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " 52\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "62\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "59\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-70",
+      "deltaPregunta": [
+        {
+          "insert": "En una clase de Educación Física, el docente realiza junto con sus estudiantes algunos movimientos con los brazos siguiendo esta secuencia: brazos hacia adelante, brazos hacia arriba, brazos hacia abajo y brazos atrás; brazos hacia adelante, brazos hacia arriba, brazos hacia abajo y brazos atrás y así sucesivamente.Si se continúa esta secuencia, ¿qué posición tienen los brazos de los estudiantes en el movimiento número 47?\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " Brazos hacia adelante\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Brazos hacia atrás\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Brazos hacia abajo\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "Brazos hacia arriba\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-71",
+      "deltaPregunta": [
+        {
+          "insert": "Un proveedor de cerveza que se encuentra en A debe visitar todos los lugares de la ciudad representados en la figura y finalmente regresar a\n"
+        },
+        {
+          "insert": {
+            "source_type": "url",
+            "source": "http://app.formarte.co/uploads/image-1750201056871-461688832.png",
+            "name": "Imagen16.png",
+            "id": "[#b49ae]",
+            "size": {
+              "w": 451.997314453125,
+              "h": 285.552215576172
+            },
+            "_type": "image",
+            "_inline": true
+          }
+        },
+        {
+          "insert": "\n",
+          "attributes": {
+            "alignment": "center"
+          }
+        },
+        {
+          "insert": "La cantidad total de rutas que puede tomar el proveedor, pasando exactamente una vez por los lugares indicados, y regresando al punto de partida es\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 4 \n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 5\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 6 \r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "8\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-72",
+      "deltaPregunta": [
+        {
+          "insert": "Johana va a preparar unos pasteles navideños y para hacerlos dispone de masa para pasteles sabor a chocolate y sabor a arequipe; para el relleno dispone de tres sabores: tres leches, maní y chocolate; la decoración dispone de tres tipos de crema: mantequilla, limón y Mascarpone. Para preparar cada pastel Johana va a utilizar un único sabor de masa, un único sabor para el relleno y un único tipo de crema para la decoración. Si ella ha decidido que el sabor de la masa y del relleno no pueden ser el mismo, que si la masa es de arequipe el relleno no puede ser de maní y que la crema de limón no podrá utilizarse en un pastel relleno de tres leches, entonces la cantidad de pasteles diferentes que podrá preparar es:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "12\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "  10\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 18 \r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 8\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-73",
+      "deltaPregunta": [
+        {
+          "insert": "Los miembros de una pandilla de barrio solo salen a hacer vigilancia de a dos integrantes por turno. Alguien que siempre los ha visto caminar ha presenciado todas las combinaciones posibles de parejas y afirma que en la mitad de sus avistamientos ambos miembros de la pandilla tenían los ojos verdes. Por ende, el total de miembros de la pandilla y la cantidad de miembros de la pandilla que tienen un color de ojos diferente al verde son, respectivamente:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 4 y 1\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "5 y 1\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "5 y 2\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "6 y 2\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-74",
+      "deltaPregunta": [
+        {
+          "insert": "En las elecciones de personero de un colegio se han presentado cuatro candidatos: A, B, C y D. Los resultados preliminares de los votos se muestran a continuación:\n"
+        },
+        {
+          "insert": {
+            "source_type": "url",
+            "source": "http://app.formarte.co/uploads/image-1750253119460-259074233.png",
+            "name": "Imagen19.png",
+            "id": "[#94ba2]",
+            "size": {
+              "w": 445.823837280273,
+              "h": 298.260589599609
+            },
+            "_type": "image",
+            "_inline": true
+          }
+        },
+        {
+          "insert": "\n",
+          "attributes": {
+            "alignment": "center"
+          }
+        },
+        {
+          "insert": "La probabilidad de que las elecciones las haya ganado el candidato B o el candidato D es de\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 40% \n\n"
+          }
+        ],
+        [
+          {
+            "insert": "50%\r\n"
+          }
+        ],
+        [
+          {
+            "insert": " 60% \r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 70%\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-75",
+      "deltaPregunta": [
+        {
+          "insert": "En la siguiente secuencia se tienen arreglos, que están sobre el piso, formados por cubos iguales de lado una unidad.\n"
+        },
+        {
+          "insert": {
+            "source_type": "url",
+            "source": "http://app.formarte.co/uploads/image-1750253341443-140828290.png",
+            "name": "Imagen20.png",
+            "id": "[#f2aa1]",
+            "size": {
+              "w": 675.634674072266,
+              "h": 312.396057128906
+            },
+            "_type": "image",
+            "_inline": true
+          }
+        },
+        {
+          "insert": "\n",
+          "attributes": {
+            "alignment": "center"
+          }
+        },
+        {
+          "insert": "Si se continúa formando arreglos con el patrón mostrado en la secuencia, entonces el número de cubos que tendrá el arreglo que corresponde a la figura 8 es:\n\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "194\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 200\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "204\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 210\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-76",
+      "deltaPregunta": [
+        {
+          "insert": "En la siguiente secuencia se tienen arreglos, que están sobre el piso, formados por cubos iguales de lado una unidad.\n"
+        },
+        {
+          "insert": {
+            "source_type": "url",
+            "source": "http://app.formarte.co/uploads/image-1750253498180-805294688.png",
+            "name": "Imagen20.png",
+            "id": "[#3f4e5]",
+            "size": {
+              "w": 575.979217529297,
+              "h": 259.052703857422
+            },
+            "_type": "image",
+            "_inline": true
+          }
+        },
+        {
+          "insert": "\n",
+          "attributes": {
+            "alignment": "center"
+          }
+        },
+        {
+          "insert": "El número de cubos que se deben adicionar desde la figura 8 para formar la figura 11 es\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "302\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 204\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "221\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "366\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-77",
+      "deltaPregunta": [
+        {
+          "insert": "La siguiente figura representa una escultura formada por cubos que está posada sobre el suelo y es vista desde lo alto de una torre:\n"
+        },
+        {
+          "insert": {
+            "source_type": "url",
+            "source": "http://app.formarte.co/uploads/image-1750253747633-403226627.png",
+            "name": "Imagen22.png",
+            "id": "[#a5312]",
+            "size": {
+              "w": 436.23828125,
+              "h": 294.843841552734
+            },
+            "_type": "image",
+            "_inline": true
+          }
+        },
+        {
+          "insert": "\n",
+          "attributes": {
+            "alignment": "center"
+          }
+        },
+        {
+          "insert": "La cantidad de cubos que es necesario agregar a la escultura, sin cambiar el arreglo original, para formar un arreglo cúbico, es\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 45 \n\n"
+          }
+        ],
+        [
+          {
+            "insert": "113\r\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "33 \r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "125\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-78",
+      "deltaPregunta": [
+        {
+          "insert": "En todos los dados bien construidos la suma de los puntos de las caras opuestas siempre es 7. Un dado bien construido gira sin deslizar apoyando sus caras en las casillas etiquetadas con la secuencia A, B, C, D, E en las dos figuras en secuencias.\n"
+        },
+        {
+          "insert": {
+            "source_type": "url",
+            "source": "http://app.formarte.co/uploads/image-1750254012739-657147105.png",
+            "name": "Imagen24.png",
+            "id": "[#bfd70]",
+            "size": {
+              "w": 550.626007080078,
+              "h": 311.396057128906
+            },
+            "_type": "image",
+            "_inline": true
+          }
+        },
+        {
+          "insert": "\n",
+          "attributes": {
+            "alignment": "center"
+          }
+        },
+        {
+          "insert": "Si la cara superior del dado en la casilla inicial es un 4, entonces la cara superior del dado en la casilla final es:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 6\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 5\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "3\r\n\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 2\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-79",
+      "deltaPregunta": [
+        {
+          "insert": "41 estudiantes de idiomas, que hablan al menos uno de los siguientes: alemán, portugués o mandarín, son sometidos a un examen de verificación, en el cual se determinó que:\n• 22 hablan alemán y 10 solamente alemán.\n• 23 hablan portugués y 8 solamente portugués.\n• 19 hablan mandarín y 5 solo mandarín.\nEl número de estudiantes que hablan por lo menos 2 idiomas es\n\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "15\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 20\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "18\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "33\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-80",
+      "deltaPregunta": [
+        {
+          "insert": "La cantidad de estudiantes que hablan los tres idiomas es\n\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": " 3\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "4\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "5\r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": " 6\r\n\n"
+          }
+        ]
+      ]
+    },
+    {
+      "codigo": "ASI-T-63",
+      "deltaPregunta": [
+        {
+          "insert": "Se tienen 5 cajas con la misma cantidad de bolas. Se saca de la primera caja una cierta cantidad de bolas; de la segunda se saca el doble de bolas sacadas de la primera; de la tercera se saca el triple de bolas sacadas de la primera; de la cuarta se saca el cuádruple de bolas sacadas de la primera; y de la quinta se saca el quíntuple de bolas sacadas de la primera. Si en la quinta caja queda solo una bola y se sabe además que el total de bolas que quedaron en las 5 cajas es 45, entonces la cantidad de bolas que había inicialmente en cada caja es:\n"
+        }
+      ],
+      "deltaRespuestas": [
+        [
+          {
+            "insert": "20 \n\n"
+          }
+        ],
+        [
+          {
+            "insert": "10\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "11 \r\r\n\r\n\n"
+          }
+        ],
+        [
+          {
+            "insert": "21\r\n\n"
+          }
+        ]
+      ]
+    }
+  ],
+  "title": "Preguntas Seleccionadas",
+  "options": {
+    "format": "A4",
+    "orientation": "portrait",
+    "printBackground": true,
+    "scale": 0.75,
+    "margins": {
+      "top": "1cm",
+      "right": "1cm",
+      "bottom": "1cm",
+      "left": "1cm"
+    }
+  }
+}
