@@ -1219,7 +1219,7 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
     data: { fileName: mergedFileName, url: finalPdfUrl }
   });
 
-    // Enviar el evento SSE
+  // Enviar el evento SSE
   // pushToWSClients({
   //   status: 'pdf-ready',
   //   // userId,
@@ -1229,26 +1229,18 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
 
   logger.info('Completion websocket notification sent', { sessionId });
 
+  // Contar total de preguntas si existen
+  const totalQuestions = simulationData.detailQuestion?.length || 0;
+
   res.json({
     success: true,
+    message: `Reporte ${simulationData.programName} generado exitosamente`,
     data: {
-      message: `Reporte ${simulationData.programName} generado exitosamente`,
-      sessionId: sessionId,
+      fileName: mergedFileName,
+      url: finalPdfUrl,
+      downloadUrl: `${finalPdfUrl}?download=true`,
       totalPages: allPages.length,
-      reportType: simulationData.programName,
-      metadata: {
-        institution: simulationData.campus,
-        course: simulationData.course,
-        generatedAt: new Date().toISOString()
-      },
-      pdf: {
-        fileName: mergedFileName,
-        url: finalPdfUrl,
-        downloadUrl: `${finalPdfUrl}?download=true`
-      },
-      rawData: {
-        portada: portadaPage
-      }
+      totalQuestions: totalQuestions
     }
   });
 
@@ -1367,29 +1359,39 @@ export const regenerateReport = asyncHandler(async (req: Request, res: Response,
 
   try {
     // 1. Construir filtro de consulta
+    // Soportar examDate como String o Date en MongoDB
     const filter: any = {
       examDate: {
-        $gte: new Date(fecha_inicio),
-        $lte: new Date(fecha_finalizacion)
+         $gte: fecha_inicio.replace('Z', ''),           // "2025-01-01T00:00:00.000"
+    $lte: fecha_finalizacion.replace('Z', '') 
       },
-      idInstitute: idInstitute,
-      tipe_inform: tipe_inform
+      idInstitute,
+      tipe_inform
     };
 
-    // Agregar simulationId si viene
     if (simulationId) {
       filter.simulationId = simulationId;
     }
 
-    logger.info('Querying report_data with filter', filter);
+    logger.info('Querying report_data with filter', JSON.stringify(filter, null, 2));
 
     // 2. Consultar report_data
     const reportDocuments = await ReportData.find(filter).lean();
 
+    logger.info(`Found ${reportDocuments.length} documents`);
+
     if (reportDocuments.length === 0) {
+      // Debug: intentar consulta sin filtro de fecha
+      const totalDocs = await ReportData.countDocuments({ idInstitute, tipe_inform });
+      logger.info(`Total documents with idInstitute=${idInstitute} and tipe_inform=${tipe_inform}: ${totalDocs}`);
+
       return res.status(404).json({
         success: false,
-        error: 'No reports found with the specified filters'
+        error: 'No reports found with the specified filters',
+        debug: {
+          totalDocsWithoutDateFilter: totalDocs,
+          filterUsed: filter
+        }
       });
     }
 

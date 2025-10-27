@@ -30,7 +30,7 @@ class PdfService {
         if (!this.browser) {
             logger_1.logger.info('Launching Puppeteer browser');
             this.browser = await puppeteer_1.default.launch({
-                headless: 'new',
+                headless: true, // ✅ Corregido: cambiar 'new' por true
                 args: [
                     '--no-sandbox',
                     '--disable-setuid-sandbox',
@@ -64,19 +64,19 @@ class PdfService {
                 timeout: 30000
             });
             // Medir altura del contenido
-            const measurements = await page.evaluate(() => {
+            const measurements = await page.evaluate((opts) => {
                 const body = document.body;
                 const html = document.documentElement;
                 const contentHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
                 // Altura aproximada de página A4 en píxeles (96 DPI)
-                const a4HeightPx = options.orientation === 'landscape' ? 842 : 595;
+                const a4HeightPx = opts.orientation === 'landscape' ? 842 : 595;
                 const estimatedPages = Math.ceil(contentHeight / a4HeightPx);
                 return {
                     contentHeight,
                     estimatedPages,
                     willHavePageBreaks: estimatedPages > 1
                 };
-            });
+            }, options);
             return measurements;
         }
         catch (error) {
@@ -174,7 +174,9 @@ class PdfService {
                     inlineCSS += cssContent + '\n';
                 }
                 catch (error) {
-                    logger_1.logger.warn(`Could not read CSS file: ${cssFile}`, { error: error.message });
+                    // ✅ Corregido: Type guard para error
+                    const errorMessage = error instanceof Error ? error.message : String(error);
+                    logger_1.logger.warn(`Could not read CSS file: ${cssFile}`, { error: errorMessage });
                 }
             }
             // Convert images to base64 and replace in HTML
@@ -194,11 +196,13 @@ class PdfService {
                     const imageBuffer = await promises_1.default.readFile(fullImagePath);
                     const base64Image = `data:image/png;base64,${imageBuffer.toString('base64')}`;
                     // Replace all occurrences of the image path
-                    const regex = new RegExp(imagePath.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&'), 'g');
+                    const regex = new RegExp(imagePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
                     htmlWithInlineCSS = htmlWithInlineCSS.replace(regex, base64Image);
                 }
                 catch (error) {
-                    logger_1.logger.warn(`Could not convert image to base64: ${imagePath}`, { error: error.message });
+                    // ✅ Corregido: Type guard para error
+                    const errorMessage = error instanceof Error ? error.message : String(error);
+                    logger_1.logger.warn(`Could not convert image to base64: ${imagePath}`, { error: errorMessage });
                 }
             }
             // Inject inline CSS into HTML
@@ -227,6 +231,7 @@ class PdfService {
                     let resourcesReady = false;
                     // Check for charts
                     const checkCharts = () => {
+                        // ✅ Corregido: Extender Window interface o usar any
                         if (typeof window.Chart !== 'undefined') {
                             // Wait for all charts to be rendered - increased timeout for better reliability
                             setTimeout(() => {
@@ -264,8 +269,7 @@ class PdfService {
             await page.addStyleTag({
                 content: `
           @media print {
-            body { -webkit-print-color-adjust: exact; color-adjust: exact;    margin: 0;
-            padding: 0; }
+            body { -webkit-print-color-adjust: exact; color-adjust: exact; margin: 0; padding: 0; }
             .chart-container canvas { max-width: 100% !important; height: auto !important; }
             .component-bar-chart-with-title, .component-bar-chart-simple { 
               page-break-inside: avoid; 
@@ -275,8 +279,6 @@ class PdfService {
               page-break-inside: avoid;
               margin-bottom: 30px;
             }
-
-        
           }
         `
             });
@@ -299,7 +301,8 @@ class PdfService {
                 format: pdfOptions.format,
                 orientation: pdfOptions.orientation
             });
-            return pdf;
+            // ✅ Corregido: Convertir Uint8Array a Buffer
+            return Buffer.from(pdf);
         }
         catch (error) {
             // Clear cache on error to prevent memory leaks
@@ -312,15 +315,18 @@ class PdfService {
                     cacheError: cacheError.message
                 });
             }
+            // ✅ Corregido: Type guard para error
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorStack = error instanceof Error ? error.stack : undefined;
             logger_1.logger.error('Error generating PDF', {
-                error: error.message,
-                stack: error.stack,
+                error: errorMessage,
+                stack: errorStack,
                 data: {
                     layout: data.layout,
                     componentCount: data.components.length
                 }
             });
-            throw new Error(`Failed to generate PDF: ${error.message}`);
+            throw new Error(`Failed to generate PDF: ${errorMessage}`);
         }
         finally {
             if (page) {
@@ -416,7 +422,8 @@ class PdfService {
                 size: pdfBuffer.length,
                 options: pdfOptions
             });
-            return pdfBuffer;
+            // ✅ Corregido: Convertir Uint8Array a Buffer
+            return Buffer.from(pdfBuffer);
         }
         catch (error) {
             logger_1.logger.error('Error generating PDF from template', {

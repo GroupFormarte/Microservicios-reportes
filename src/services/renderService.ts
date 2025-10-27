@@ -540,7 +540,7 @@ export class RenderService {
       const renderTime = Date.now() - startTime;
       logger.debug(`Template ${templateName} rendered in ${renderTime}ms`);
 
-      return html;
+      return html as string;
     } catch (error) {
       logger.error('Error rendering template', { 
         error: (error as Error).message, 

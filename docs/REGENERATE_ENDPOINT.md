@@ -111,16 +111,34 @@ Cuando NO se proporciona `simulationId`:
 
 ### Success Response
 
-El endpoint delega la generación del PDF al endpoint `processSimulationData`, por lo que retorna el mismo formato:
+El endpoint retorna el siguiente formato compatible con `QuestionPdfResponse`:
 
 ```json
 {
   "success": true,
-  "pdfUrl": "http://localhost:3001/api/reports/pdfs/reporte_completo_FORMARTE_MEDELLIN_1234567890.pdf",
-  "sessionId": "session_1234567890",
-  "fileName": "reporte_completo_FORMARTE_MEDELLIN_1234567890.pdf"
+  "message": "Reporte ICFES SABER 11 generado exitosamente",
+  "data": {
+    "fileName": "reporte_completo_FORMARTE_MEDELLIN_1729753489621.pdf",
+    "url": "http://localhost:3001/api/reports/pdfs/reporte_completo_FORMARTE_MEDELLIN_1729753489621.pdf",
+    "downloadUrl": "http://localhost:3001/api/reports/pdfs/reporte_completo_FORMARTE_MEDELLIN_1729753489621.pdf?download=true",
+    "totalPages": 12,
+    "totalQuestions": 221
+  }
 }
 ```
+
+#### Campos de la Respuesta
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `success` | `boolean` | `true` si la operación fue exitosa |
+| `message` | `string` | Mensaje descriptivo del resultado |
+| `data` | `PdfResult` | Objeto con información del PDF generado |
+| `data.fileName` | `string` | Nombre del archivo PDF |
+| `data.url` | `string` | URL completa del PDF |
+| `data.downloadUrl` | `string` | URL con parámetro de descarga |
+| `data.totalPages` | `number` | Número total de páginas del PDF |
+| `data.totalQuestions` | `number` | Número total de preguntas procesadas |
 
 ### Error Responses
 

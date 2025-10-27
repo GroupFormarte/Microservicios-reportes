@@ -17,6 +17,8 @@ import { questionsRouter } from './routes/questions';
 import pdfRoutes from './routes/pdf';
 import healthRoutes from './routes/health';
 import authRoutes from './routes/auth';
+import { ReportData } from './models/ReportData';
+import mongoose, { Schema } from 'mongoose';
 
 const app = express();
 
@@ -120,6 +122,29 @@ const startServer = async () => {
     await connectDatabase();
     logger.info('MongoDB connection established');
 
+
+    // 1. Modelo auxiliar de migraciones
+    const Migration = mongoose.model('Migration', new Schema({
+      name: { type: String, unique: true }
+    }));
+
+    // 2. Al iniciar el servidor, ejecutas esto:
+    const alreadyRan = await Migration.findOne({ name: "fix-examDate-to-Date" });
+
+    if (!alreadyRan) {
+      console.log("⏳ Ejecutando migración: convertir examDate a Date...");
+
+      await ReportData.updateMany(
+        { examDate: { $type: "string" } },
+        [{ $set: { examDate: { $toDate: "$examDate" } } }]
+      );
+
+      await Migration.create({ name: "fix-examDate-to-Date" });
+
+      console.log("✅ Migración completada y registrada.");
+    } else {
+      console.log("✔️ Migración ya estaba aplicada, se ignora.");
+    }
     // Initialize WebSocket service with the Express app
     websocketService.initialize(app, config.port);
 

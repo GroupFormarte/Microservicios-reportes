@@ -33,7 +33,6 @@ export class PdfService {
     this.ensurePdfsDirectory();
   }
 
-
   private async ensurePdfsDirectory(): Promise<void> {
     try {
       await fs.access(this.pdfsDir);
@@ -47,7 +46,7 @@ export class PdfService {
     if (!this.browser) {
       logger.info('Launching Puppeteer browser');
       this.browser = await puppeteer.launch({
-        headless: 'new',
+        headless: true, // ✅ Corregido: cambiar 'new' por true
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
@@ -87,7 +86,7 @@ export class PdfService {
       });
 
       // Medir altura del contenido
-      const measurements = await page.evaluate(() => {
+      const measurements = await page.evaluate((opts) => {
         const body = document.body;
         const html = document.documentElement;
         
@@ -97,7 +96,7 @@ export class PdfService {
         );
         
         // Altura aproximada de página A4 en píxeles (96 DPI)
-        const a4HeightPx = options.orientation === 'landscape' ? 842 : 595;
+        const a4HeightPx = opts.orientation === 'landscape' ? 842 : 595;
         const estimatedPages = Math.ceil(contentHeight / a4HeightPx);
         
         return {
@@ -105,7 +104,7 @@ export class PdfService {
           estimatedPages,
           willHavePageBreaks: estimatedPages > 1
         };
-      });
+      }, options);
 
       return measurements;
     } catch (error) {
@@ -215,7 +214,9 @@ export class PdfService {
           const cssContent = await fs.readFile(cssFile, 'utf-8');
           inlineCSS += cssContent + '\n';
         } catch (error) {
-          logger.warn(`Could not read CSS file: ${cssFile}`, { error: error.message });
+          // ✅ Corregido: Type guard para error
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          logger.warn(`Could not read CSS file: ${cssFile}`, { error: errorMessage });
         }
       }
       
@@ -239,10 +240,12 @@ export class PdfService {
           const base64Image = `data:image/png;base64,${imageBuffer.toString('base64')}`;
           
           // Replace all occurrences of the image path
-          const regex = new RegExp(imagePath.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&'), 'g');
+          const regex = new RegExp(imagePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
           htmlWithInlineCSS = htmlWithInlineCSS.replace(regex, base64Image);
         } catch (error) {
-          logger.warn(`Could not convert image to base64: ${imagePath}`, { error: error.message });
+          // ✅ Corregido: Type guard para error
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          logger.warn(`Could not convert image to base64: ${imagePath}`, { error: errorMessage });
         }
       }
       
@@ -277,7 +280,8 @@ export class PdfService {
 
           // Check for charts
           const checkCharts = () => {
-            if (typeof window.Chart !== 'undefined') {
+            // ✅ Corregido: Extender Window interface o usar any
+            if (typeof (window as any).Chart !== 'undefined') {
               // Wait for all charts to be rendered - increased timeout for better reliability
               setTimeout(() => {
                 chartsReady = true;
@@ -314,8 +318,7 @@ export class PdfService {
       await page.addStyleTag({
         content: `
           @media print {
-            body { -webkit-print-color-adjust: exact; color-adjust: exact;    margin: 0;
-            padding: 0; }
+            body { -webkit-print-color-adjust: exact; color-adjust: exact; margin: 0; padding: 0; }
             .chart-container canvas { max-width: 100% !important; height: auto !important; }
             .component-bar-chart-with-title, .component-bar-chart-simple { 
               page-break-inside: avoid; 
@@ -325,8 +328,6 @@ export class PdfService {
               page-break-inside: avoid;
               margin-bottom: 30px;
             }
-
-        
           }
         `
       });
@@ -353,7 +354,8 @@ export class PdfService {
         orientation: pdfOptions.orientation
       });
 
-      return pdf;
+      // ✅ Corregido: Convertir Uint8Array a Buffer
+      return Buffer.from(pdf);
 
     } catch (error) {
       // Clear cache on error to prevent memory leaks
@@ -366,15 +368,19 @@ export class PdfService {
         });
       }
 
+      // ✅ Corregido: Type guard para error
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      
       logger.error('Error generating PDF', {
-        error: error.message,
-        stack: error.stack,
+        error: errorMessage,
+        stack: errorStack,
         data: {
           layout: data.layout,
           componentCount: data.components.length
         }
       });
-      throw new Error(`Failed to generate PDF: ${error.message}`);
+      throw new Error(`Failed to generate PDF: ${errorMessage}`);
     } finally {
       if (page) {
         await page.close();
@@ -489,7 +495,8 @@ export class PdfService {
         options: pdfOptions
       });
       
-      return pdfBuffer;
+      // ✅ Corregido: Convertir Uint8Array a Buffer
+      return Buffer.from(pdfBuffer);
 
     } catch (error) {
       logger.error('Error generating PDF from template', { 

@@ -2,7 +2,8 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
-    "lib": ["ES2020", "DOM"],  // ← AGREGAR "DOM" aquí    "outDir": "./dist",
+    "lib": ["ES2020", "DOM"],
+    "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
@@ -15,6 +16,7 @@
     "emitDecoratorMetadata": true,
     "typeRoots": ["./node_modules/@types"],
     "baseUrl": "./src",
+    "noEmit": false,
     "paths": {
       "@/*": ["*"],
       "@controllers/*": ["controllers/*"],
@@ -25,11 +27,12 @@
       "@utils/*": ["utils/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*.ts"],
   "exclude": [
     "node_modules",
     "dist",
     "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "**/*.js"
   ]
 }

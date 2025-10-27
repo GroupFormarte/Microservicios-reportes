@@ -1015,26 +1015,17 @@ exports.processSimulationData = (0, errorHandler_1.asyncHandler)(async (req, res
     //   message: 'Tu archivo está listo para descargar',
     // });
     logger_1.logger.info('Completion websocket notification sent', { sessionId });
+    // Contar total de preguntas si existen
+    const totalQuestions = simulationData.detailQuestion?.length || 0;
     res.json({
         success: true,
+        message: `Reporte ${simulationData.programName} generado exitosamente`,
         data: {
-            message: `Reporte ${simulationData.programName} generado exitosamente`,
-            sessionId: sessionId,
+            fileName: mergedFileName,
+            url: finalPdfUrl,
+            downloadUrl: `${finalPdfUrl}?download=true`,
             totalPages: allPages.length,
-            reportType: simulationData.programName,
-            metadata: {
-                institution: simulationData.campus,
-                course: simulationData.course,
-                generatedAt: new Date().toISOString()
-            },
-            pdf: {
-                fileName: mergedFileName,
-                url: finalPdfUrl,
-                downloadUrl: `${finalPdfUrl}?download=true`
-            },
-            rawData: {
-                portada: portadaPage
-            }
+            totalQuestions: totalQuestions
         }
     });
 });
