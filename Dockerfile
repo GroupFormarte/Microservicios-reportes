@@ -1,97 +1,77 @@
-# ===============================================
-# Multi-stage Docker build for Microservice Reports
-# ===============================================
+# ---- Build stage ----
+FROM node:20-bookworm-slim AS build
 
-# Build Stage
-FROM node:18-alpine AS builder
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Install build dependencies for Puppeteer
-RUN apk add --no-cache \
-    chromium \
-    nss \
-    freetype \
-    freetype-dev \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont \
-    python3 \
-    make \
-    g++
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  ca-certificates git \
+  && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
-COPY tsconfig.json ./
+RUN npm ci
 
-# Install dependencies
-RUN npm ci && npm cache clean --force
-
-# Copy source code
-COPY src/ ./src/
-COPY views/ ./views/
-COPY public/ ./public/
-
-# Build TypeScript
+COPY tsconfig*.json ./
+COPY src ./src
+COPY views ./views
+COPY public ./public
 RUN npm run build
 
-# ===============================================
-# Production Stage
-FROM node:18-alpine AS production
+RUN npm prune --omit=dev
 
-# Install runtime dependencies for Puppeteer
-RUN apk add --no-cache \
-    chromium \
-    nss \
-    freetype \
-    freetype-dev \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont \
-    ttf-dejavu \
-    ttf-droid \
-    ttf-liberation \
-    dumb-init \
-    && rm -rf /var/cache/apk/*
+# ---- Runtime stage ----
+FROM node:20-bookworm-slim AS runtime
 
-# Create app user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+ENV DEBIAN_FRONTEND=noninteractive \
+    NODE_ENV=production \
+    PORT=3350 \
+    PUPPETEER_DISABLE_HEADLESS_WARNING=true
 
-# Set working directory
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  fonts-liberation \
+  libasound2 \
+  libatk-bridge2.0-0 \
+  libatk1.0-0 \
+  libc6 \
+  libcairo2 \
+  libcups2 \
+  libdbus-1-3 \
+  libdrm2 \
+  libexpat1 \
+  libgbm1 \
+  libglib2.0-0 \
+  libgtk-3-0 \
+  libnss3 \
+  libpango-1.0-0 \
+  libx11-6 \
+  libx11-xcb1 \
+  libxcb1 \
+  libxcomposite1 \
+  libxdamage1 \
+  libxext6 \
+  libxfixes3 \
+  libxrandr2 \
+  libxshmfence1 \
+  wget \
+  && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-# Copy package files and install production dependencies
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/views ./views
+COPY --from=build /app/public ./public
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
 
-# Copy built application from builder stage
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/views ./views
-COPY --from=builder /app/public ./public
+RUN mkdir -p /app/public/pdfs
 
-# Create necessary directories with proper permissions
-RUN mkdir -p public/pdfs logs && \
-    chown -R nodejs:nodejs /app
+RUN useradd -m -u 10001 nodeuser
+USER nodeuser
 
-# Set Puppeteer to use installed Chromium
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
-    NODE_ENV=production
+EXPOSE 3350
 
-# Switch to non-root user
-USER nodejs
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3350/health', r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
 
-# Expose port
-EXPOSE 3001
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
-
-# Use dumb-init to handle signals properly
-ENTRYPOINT ["dumb-init", "--"]
-
-# Start application
 CMD ["node", "dist/app.js"]
