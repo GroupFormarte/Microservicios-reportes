@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   reports:
     build:
@@ -15,8 +13,11 @@ services:
       NODE_ENV: production
       PORT: 3350
       HOST: 0.0.0.0
+    # Aumenta /dev/shm para Chromium (Puppeteer) y define volúmenes persistentes
+    shm_size: "1gb"
     volumes:
       - pdfs:/app/public/pdfs
+      - excels:/app/public/excels
     restart: unless-stopped
     networks:
       - app_net
@@ -27,3 +28,4 @@ networks:
 
 volumes:
   pdfs:
+  excels:
