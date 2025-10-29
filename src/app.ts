@@ -74,15 +74,6 @@ app.use('/static/assets', express.static(path.join(__dirname, '../../Recursos/as
 app.use('/static/pdfs', express.static(path.join(__dirname, '../public/pdfs')));
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
-// PDF files access without authentication (specific route before general /api/reports)
-app.use('/api/reports/pdfs', express.static(path.join(__dirname, '../public/pdfs')));
-
-// Excel files access without authentication (specific route before general /api/reports)
-app.use('/api/reports/excels', express.static(path.join(__dirname, '../public/excels')));
-
-// CSS files access without authentication (specific route before general /api/reports)
-app.use('/api/reports/css', express.static(path.join(__dirname, '../public/css')));
-
 // View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../views'));
@@ -93,10 +84,19 @@ app.use('/health', healthRoutes);
 // Authentication routes (no auth required for login)
 app.use('/api/auth', authRoutes);
 
+// PDF files access without authentication (MUST be before authenticated routes)
+app.use('/api/reports/pdfs', express.static(path.join(__dirname, '../public/pdfs')));
+
+// Excel files access without authentication (MUST be before authenticated routes)
+app.use('/api/reports/excels', express.static(path.join(__dirname, '../public/excels')));
+
+// CSS files access without authentication (MUST be before authenticated routes)
+app.use('/api/reports/css', express.static(path.join(__dirname, '../public/css')));
+
 // API routes with authentication (now supports both JWT and API Key)
 app.use('/api/reports', hybridAuth, reportsRoutes);
 app.use('/api/reports/questions', questionsRouter);
-app.use('/api/pdf', hybridAuth, pdfRoutes);
+app.use('/api/pdf', pdfRoutes);
 
 // Root endpoint - serve preview page
 app.get('/', (req, res) => {
