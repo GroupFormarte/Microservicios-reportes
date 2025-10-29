@@ -12,7 +12,7 @@ export class QuestionsPdfService {
     this.pdfService = new PdfService();
   }
 
-  async generatePdf(options: QuestionGenerationOptions): Promise<{ fileName: string; url: string; downloadUrl: string }> {
+  async generatePdf(options: QuestionGenerationOptions, baseUrl?: string): Promise<{ fileName: string; url: string; downloadUrl: string }> {
     const { questions, title, options: pdfOptions, sessionId } = options;
     
     try {
@@ -45,12 +45,13 @@ export class QuestionsPdfService {
       const pdfPath = path.join(process.cwd(), 'public', 'pdfs', fileName);
       await fs.writeFile(pdfPath, pdfBuffer);
 
-      const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
-      
+      // Use provided baseUrl or fallback to environment variable
+      const url = baseUrl || process.env.BASE_URL || 'http://localhost:3001';
+
       return {
         fileName,
-        url: `${baseUrl}/api/reports/pdfs/${fileName}`,
-        downloadUrl: `${baseUrl}/api/reports/pdfs/${fileName}?download=true`
+        url: `${url}/api/reports/pdfs/${fileName}`,
+        downloadUrl: `${url}/api/reports/pdfs/${fileName}?download=true`
       };
 
     } catch (error) {

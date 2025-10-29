@@ -60,8 +60,11 @@ export class PdfController {
         studentsCount: listado.length
       });
 
+      // Get dynamic base URL from request
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+
       // Process PDF generation asynchronously
-      this.processPdfGeneration(listado);
+      this.processPdfGeneration(listado, baseUrl);
 
     } catch (error) {
       logger.error('Error in PDF generation:', error);
@@ -72,13 +75,13 @@ export class PdfController {
     }
   }
 
-  private async processPdfGeneration(listado: StudentData[]): Promise<void> {
+  private async processPdfGeneration(listado: StudentData[], baseUrl?: string): Promise<void> {
     let browser: Browser | null = null;
-    
+
     try {
       const fileName = `reporte_estudiantes_${uuidv4()}.pdf`;
       const filePath = path.join(this.uploadsDir, fileName);
-      
+
       // Launch Puppeteer
       browser = await puppeteer.launch({
         headless: true,
@@ -96,14 +99,14 @@ export class PdfController {
       });
 
       const mergedPdf = await PDFDocument.create();
-      
+
       for (let i = 0; i < listado.length; i++) {
         const student = listado[i];
         logger.info(`Processing student ${i + 1}/${listado.length}: ${student.name}`);
 
         // Generate individual PDF
         const pdfBuffer = await this.generateStudentPdf(browser, student);
-        
+
         // Load and merge into main PDF
         const studentPdf = await PDFDocument.load(pdfBuffer);
         const pages = await mergedPdf.copyPages(studentPdf, studentPdf.getPageIndices());
@@ -114,8 +117,9 @@ export class PdfController {
       const pdfBytes = await mergedPdf.save();
       fs.writeFileSync(filePath, pdfBytes);
 
-      const baseUrl = process.env.BASE_URL || 'http://localhost:3001';
-      const fileUrl = `${baseUrl}/uploads/${fileName}`;
+      // Use provided baseUrl or fallback to environment variable
+      const url = baseUrl || process.env.BASE_URL || 'http://localhost:3001';
+      const fileUrl = `${url}/uploads/${fileName}`;
 
       logger.info(`PDF generated successfully: ${fileName}`);
 

@@ -66,13 +66,14 @@ console.log(`Questions data saved to: ${filepath}`);
         timestamp: new Date()
       });
 
-      // Generate PDF
+      // Generate PDF with dynamic base URL
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
       const result = await this.questionsPdfService.generatePdf({
         questions,
         title,
         options,
         sessionId
-      });
+      }, baseUrl);
 
       websocketService.emitProgress({
         sessionId,
