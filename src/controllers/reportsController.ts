@@ -1359,11 +1359,17 @@ export const regenerateReport = asyncHandler(async (req: Request, res: Response,
 
   try {
     // 1. Construir filtro de consulta
-    // Soportar examDate como String o Date en MongoDB
+    // Normalizar fechas para buscar por días completos (00:00:00 a 23:59:59)
+    const startDate = new Date(fecha_inicio);
+    startDate.setUTCHours(0, 0, 0, 0);
+
+    const endDate = new Date(fecha_finalizacion);
+    endDate.setUTCHours(23, 59, 59, 999);
+
     const filter: any = {
       examDate: {
-         $gte: fecha_inicio.replace('Z', ''),           // "2025-01-01T00:00:00.000"
-    $lte: fecha_finalizacion.replace('Z', '') 
+        $gte: startDate,
+        $lte: endDate
       },
       idInstitute,
       tipe_inform
@@ -1381,17 +1387,11 @@ export const regenerateReport = asyncHandler(async (req: Request, res: Response,
     logger.info(`Found ${reportDocuments.length} documents`);
 
     if (reportDocuments.length === 0) {
-      // Debug: intentar consulta sin filtro de fecha
-      const totalDocs = await ReportData.countDocuments({ idInstitute, tipe_inform });
-      logger.info(`Total documents with idInstitute=${idInstitute} and tipe_inform=${tipe_inform}: ${totalDocs}`);
+      logger.warn('No reports found with the specified filters', { filter });
 
       return res.status(404).json({
         success: false,
-        error: 'No reports found with the specified filters',
-        debug: {
-          totalDocsWithoutDateFilter: totalDocs,
-          filterUsed: filter
-        }
+        error: 'No reports found with the specified filters'
       });
     }
 

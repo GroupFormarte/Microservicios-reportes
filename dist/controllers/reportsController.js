@@ -1122,22 +1122,28 @@ exports.regenerateReport = (0, errorHandler_1.asyncHandler)(async (req, res, nex
     });
     try {
         // 1. Construir filtro de consulta
+        // Normalizar fechas para buscar por días completos (00:00:00 a 23:59:59)
+        const startDate = new Date(fecha_inicio);
+        startDate.setUTCHours(0, 0, 0, 0);
+        const endDate = new Date(fecha_finalizacion);
+        endDate.setUTCHours(23, 59, 59, 999);
         const filter = {
             examDate: {
-                $gte: new Date(fecha_inicio),
-                $lte: new Date(fecha_finalizacion)
+                $gte: startDate,
+                $lte: endDate
             },
-            idInstitute: idInstitute,
-            tipe_inform: tipe_inform
+            idInstitute,
+            tipe_inform
         };
-        // Agregar simulationId si viene
         if (simulationId) {
             filter.simulationId = simulationId;
         }
-        logger_1.logger.info('Querying report_data with filter', filter);
+        logger_1.logger.info('Querying report_data with filter', JSON.stringify(filter, null, 2));
         // 2. Consultar report_data
         const reportDocuments = await ReportData_1.ReportData.find(filter).lean();
+        logger_1.logger.info(`Found ${reportDocuments.length} documents`);
         if (reportDocuments.length === 0) {
+            logger_1.logger.warn('No reports found with the specified filters', { filter });
             return res.status(404).json({
                 success: false,
                 error: 'No reports found with the specified filters'

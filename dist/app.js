@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -21,6 +54,8 @@ const questions_1 = require("./routes/questions");
 const pdf_1 = __importDefault(require("./routes/pdf"));
 const health_1 = __importDefault(require("./routes/health"));
 const auth_2 = __importDefault(require("./routes/auth"));
+const ReportData_1 = require("./models/ReportData");
+const mongoose_1 = __importStar(require("mongoose"));
 const app = (0, express_1.default)();
 // Security middleware
 app.use((0, helmet_1.default)({
@@ -34,9 +69,9 @@ app.use((0, helmet_1.default)({
         },
     },
 }));
-// CORS configuration
+// CORS configuration - Allow all origins
 app.use((0, cors_1.default)({
-    origin: config_1.isDevelopment ? true : config_1.config.corsOrigin,
+    origin: true,
     credentials: config_1.config.corsCredentials,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
@@ -105,6 +140,23 @@ const startServer = async () => {
         // Connect to MongoDB
         await (0, database_1.connectDatabase)();
         logger_1.logger.info('MongoDB connection established');
+        // 1. Modelo auxiliar de migraciones
+        const Migration = mongoose_1.default.model('Migration', new mongoose_1.Schema({
+            name: { type: String, unique: true }
+        }));
+        // 2. Al iniciar el servidor, ejecutas esto:
+        const migrationName = "fix-examDate-to-Date-v2";
+        const alreadyRan = await Migration.findOne({ name: migrationName });
+        if (!alreadyRan) {
+            console.log("⏳ Ejecutando migración: convertir examDate a Date...");
+            const result = await ReportData_1.ReportData.updateMany({ examDate: { $type: "string" } }, [{ $set: { examDate: { $toDate: "$examDate" } } }]);
+            console.log(`✅ Migración completada: ${result.modifiedCount} documentos actualizados`);
+            await Migration.create({ name: migrationName });
+            console.log("✅ Migración registrada.");
+        }
+        else {
+            console.log("✔️ Migración ya estaba aplicada, se ignora.");
+        }
         // Initialize WebSocket service with the Express app
         websocketService_1.websocketService.initialize(app, config_1.config.port);
         logger_1.logger.info(`Server with WebSocket running on http://${config_1.config.host}:${config_1.config.port}`);

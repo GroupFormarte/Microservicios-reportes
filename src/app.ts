@@ -129,19 +129,22 @@ const startServer = async () => {
     }));
 
     // 2. Al iniciar el servidor, ejecutas esto:
-    const alreadyRan = await Migration.findOne({ name: "fix-examDate-to-Date" });
+    const migrationName = "fix-examDate-to-Date-v2";
+    const alreadyRan = await Migration.findOne({ name: migrationName });
 
     if (!alreadyRan) {
       console.log("⏳ Ejecutando migración: convertir examDate a Date...");
 
-      await ReportData.updateMany(
+      const result = await ReportData.updateMany(
         { examDate: { $type: "string" } },
         [{ $set: { examDate: { $toDate: "$examDate" } } }]
       );
 
-      await Migration.create({ name: "fix-examDate-to-Date" });
+      console.log(`✅ Migración completada: ${result.modifiedCount} documentos actualizados`);
 
-      console.log("✅ Migración completada y registrada.");
+      await Migration.create({ name: migrationName });
+
+      console.log("✅ Migración registrada.");
     } else {
       console.log("✔️ Migración ya estaba aplicada, se ignora.");
     }
