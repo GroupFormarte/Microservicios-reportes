@@ -26,7 +26,7 @@ export interface RefreshResponse {
 }
 
 export class AuthService {
-  private readonly podiumApiUrl = 'https://stage-api.plataformapodium.com/api/user/';
+  private readonly podiumApiUrl = 'https://stage-api.plataformapodium.com/api/user';
   private readonly jwtSecret: string;
 private readonly jwtExpiresIn: number = 24 * 60 * 60; // 24 horas en segundos
 
