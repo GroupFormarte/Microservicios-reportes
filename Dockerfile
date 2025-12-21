@@ -14,6 +14,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
+# 🔽 Instala Chrome compatible con Puppeteer
+RUN npx puppeteer browsers install chrome
+
 # Compila TypeScript
 COPY tsconfig*.json ./
 COPY src ./src
@@ -32,7 +35,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     NODE_ENV=production \
     PORT=3350 \
     HOST=0.0.0.0 \
-    PUPPETEER_DISABLE_HEADLESS_WARNING=true
+    PUPPETEER_DISABLE_HEADLESS_WARNING=true \
+    PUPPETEER_CACHE_DIR=/home/nodeuser/.cache/puppeteer
 
 # Dependencias que Chromium necesita en runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -72,10 +76,12 @@ COPY --from=build /app/views ./views
 COPY --from=build /app/public ./public
 COPY package*.json ./
 
+# 🔽 Copia también el navegador de Puppeteer
+COPY --from=build /root/.cache/puppeteer /home/nodeuser/.cache/puppeteer
+
 # Prepara directorios de escritura y asigna propiedad a UID 10001
-# (Cuando se creen por primera vez los named volumes, copiarán esta propiedad)
 RUN mkdir -p /app/public/pdfs /app/public/excels /app/public/images /app/public/tmp \
-    && chown -R 10001:10001 /app
+    && chown -R 10001:10001 /app /home/nodeuser
 
 # Usuario no root
 RUN useradd -m -u 10001 nodeuser

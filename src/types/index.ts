@@ -179,6 +179,8 @@ export interface EnvConfig {
   jwtSecret?: string;
   logLevel: string;
   logFormat: string;
+  mailApiUrl: string;
+  mailApiTimeout: number;
 }
 
 // Service Response Types

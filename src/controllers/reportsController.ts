@@ -6,6 +6,7 @@ import { RenderService } from '../services/renderService';
 import { pdfService } from '../services/pdfService';
 import { websocketService } from '../services/websocketService';
 import { excelService } from '../services/excelService';
+import { emailService } from '../services/emailService';
 import { asyncHandler } from '../middleware/errorHandler';
 import { logger } from '../utils/logger';
 import { ReportData } from '../models/ReportData';
@@ -484,7 +485,7 @@ export const getDefaultHeaderImages = () => {
 
 
 
-// New endpoint: Process simulation data
+// New endpoint: Process simulation data (ASYNC VERSION)
 export const processSimulationData = asyncHandler(async (req: Request, res: Response) => {
   const simulationData = req.body;
   const sessionId = req.headers['x-session-id'] as string || `session_${Date.now()}`;
@@ -503,747 +504,808 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
     timestamp: new Date()
   });
 
-  const images = getDefaultHeaderImages();
-  const baseHeaderInfo = generarBaseHeaderInfo(simulationData, images);
-
-  websocketService.emitProgress({
-    sessionId,
-    stage: 'generating_cover',
-    progress: 10,
-    message: 'Generando página de portada',
-    timestamp: new Date()
-  });
-
-  const portadaPage = generarPaginaPortada(simulationData, images);
-
-  let allPages: any[] = [];
-  if (simulationData.tipe_inform.trim().includes("udea")) {
-
-    /* 
-    - la pagina principal es la de portada.
-    - diagrama comparativo de puntajes tiene diagrama de barra horizontal ( no se ha creado)
-    - distribución de estudiantes por competencias usa el diagrama por barra vertical "bar_chart_with_title" 
-      este se saca con el cálculo de porcentaje por competencia, las reglas en los labels son:
-      I: 0-35%, II: 36-75%, III: 76-100%
-
-    - la siguiente pagina es por desempeño de área y se hace con el diagrama "score_distribution" en horizontal se 
-      hace el cálculo por cada área: Insuficiente(0-35%), Mínimo(36-50%), Satisfactorio(51-65%), Avanzado(66-100%)
-    - En este se mostrará el índice de respuesta por prueba y se usará la tabla "tabla_dificultad_analisis" de cada pregunta
-
-    - La siguiente pagina se hara el calculo de las preguntas por competencias y se analizara  o se pintara la pregunta correcta 
-      en su respectiva casilla el la columna id se pintara de verde naranja o rojo dependiendo del resultado estos son los valores de 
-      indice de dificultad:
-
-      • Bajo (verde) entre: 0.0 y 30.9
-      • Medio (naranjado) entre: 31.0 y 60.9
-      • Alto (rojo) entre: 61.1 y 100
-    
-      y en la columna donde se ubica cada letra del abecedario se pintara de un coloror verda la pregunta correcta 
-      como seve en la imagen  usa "tabla-dificultad-analisis" 
-      para saber cuantas columnas crear para el abecedario se puede consultar en la variable simulationData.detailQuestion
-      este trae la información necesaria para construir la tabla. y viene un listado  de {
-        "id": "685175ed6adaaca08941b64b",
-        "cod": "ASI-T-1",
-        "componente": "Semántico",
-        "competencia": "Literal",
-        "periodo": "N/A",
-        "id_recurso": "685175646adaaca08941b63a",
-        "nameUser": "Myriam",
-        "eje_tematico": "Connotación ",
-        "grado": "Preuniversitario UdeA",
-        "programa": "Preuniversitario UdeA",
-        "area": "Competencia Lectora",
-        "status": false,
-        "id_material_refuerzo": "685175e86adaaca08941b649",
-        "asignatura": "Competencia lectora",
-        "tipo": null,
-        "tipo_platform": "Examen",
-        "created": "2025-06-17 09:04:29.858",
-        "cant_respuesta": "4",
-        "pregunta": "685175786adaaca08941b63d",
-        "pregunta_correcta": "685175866adaaca08941b63f",
-        "question_depend_others": "",
-        "respuestas": [
-          "685175866adaaca08941b63f",
-          "685175ad6adaaca08941b647",
-          "685175986adaaca08941b643",
-          "685175a16adaaca08941b645"
-        ]
-      }
-
-    */
-
-    /*
-      PÁGINA 3: Distribución de estudiantes por competencias
-      Clasificación basada en PORCENTAJE de aciertos por competencia:
-      
-      Cálculo: (respuestas_correctas_competencia / total_preguntas_competencia) * 100
-      
-      Clasificación por porcentaje:
-      - I: 0-35% de aciertos
-      - II: 36-75% de aciertos  
-      - III: 76-100% de aciertos
-      
-      Cada competencia (Literal, Inferencial, etc.) se evalúa independientemente
-    */
-
-    const competenciasData = procesarDistribucionCompetencias(simulationData);
-
-    // Configuración dinámica para competencias
-    const competenciasRanges = [
-      { min: 0, max: 35, label: 'I' },
-      { min: 36, max: 75, label: 'II' },
-      { min: 76, max: 100, label: 'III' }
-    ];
-    const competenciasLabels = ['I', 'II', 'III'];
-    const competenciasColors = ['#c55c5c', '#d88008', '#58a55c'];
-
-    const { barChartData, barChartDataGroupedByArea } = calcularEstadisticasCompetenciasDynamic(
-      competenciasData,
-      competenciasRanges,
-      competenciasLabels,
-      competenciasColors
-    );
-
-    // console.log('UDEA - Página 3 - Distribución por Competencias:');
-    // console.log(JSON.stringify(barChartData, null, 2));
-
-    // return res.json({ barChartDataGroupedByArea });
-
-
-    const areaData = procesarDesempenoPorArea(simulationData);
-    // const { areaStats, scoreDistributionData } = calcularEstadisticasArea(areaData);
-
-    // console.log('UDEA - Página 4 - Desempeño por Área:');
-    // console.log(JSON.stringify(scoreDistributionData, null, 2));
-
-
-
-
-    // Configuración dinámica para áreas
-    const areasRanges = [
-      { min: 0, max: 35, label: 'Insuficiente' },
-      { min: 36, max: 50, label: 'Mínimo' },
-      { min: 51, max: 65, label: 'Satisfactorio' },
-      { min: 66, max: 100, label: 'Avanzado' }
-    ];
-    const areasColors = ['#c55c5c', '#d88008', '#58a55c', '#4c8631'];
-
-    const { scoreDistributionData } =
-      calcularEstadisticasAreaDynamic(areaData, areasRanges, areasColors);
-
-
-
-
-    const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData);
-
-    let indiceDificultadPorCompetencia: any[] = [];
-    for (const inD of tablaEstudiantesDataArray) {
-      indiceDificultadPorCompetencia.push(inD)
-    }
-
-    const tablaDificultadData = procesarTablaDificultadAnalisis(simulationData);
-
-    const tablaAnalisisData = generarDatosTablaDificultad(
-      tablaDificultadData,
-      undefined,
-      indiceDificultadPorCompetencia
-    );
-
-
-    // Debug: Check the difficulty index calculation
-    // console.log('DEBUG - Difficulty indices per competency:', tablaEstudiantesData.data.indiceDificultadPorCompetencia);
-    // console.log('DEBUG - Table analysis data for each area:');
-    // tablaAnalisisData.forEach((tabla, index) => {
-    //   console.log(`Area ${index + 1} (${tabla.data.subject}):`, tabla.data.indiceDificultadArea);
-    // });
-
-
-    // return res.json({tablaAnalisisData});
-
-    // console.log('UDEA - Página 5 - Tabla Análisis de Dificultad:');
-    // console.log(JSON.stringify(tablaDificultadData, null, 2));
-    // console.log(JSON.stringify(tablaAnalisisData, null, 2));
-
-    /*
-     La siguiente pagina se va a encargar de mostrar el listado de estudiantes donde se mostraran todas las competencias
-     en sus respectivas columnas.
-
-     PROCESO DE GENERACIÓN DE DATOS:
-
-     1. EXTRACCIÓN DE COMPETENCIAS:
-        - Se recorren todos los estudiantes y sus materias
-        - Se extraen todas las competencias únicas de simulationData.students[].examenes_asignados[].materias[].competencies[]
-        - Se ordena alfabéticamente para consistencia
-
-     2. PROCESAMIENTO POR ESTUDIANTE:
-        - Puntaje: se obtiene de examenes_asignados[].score
-        - Posición: se obtiene de examenes_asignados[].position  
-        - Grupo: se obtiene de student.course_id
-        - Competencias: porcentaje de cada competencia desde materias[].competencies[].skills[0].porcentaje
-
-     3. CATEGORIZACIÓN:
-        - Se clasifica cada estudiante según su puntaje total:
-        - Insuficiente (I): 0-35%
-        - Mínimo (M): 36-50% 
-        - Satisfactorio (S): 51-65%
-        - Avanzado (A): 66-100%
-
-     4. CÁLCULOS ESTADÍSTICOS:
-        - Promedio General: (suma de todos los puntajes) / (número de estudiantes)
-        - Desviación Estándar: √(Σ(xi - μ)² / N)
-          donde xi = puntaje individual, μ = promedio, N = número de estudiantes
-        
-        Proceso:
-        a) Se suman todos los puntajes para calcular el promedio
-        b) Se calcula la varianza: suma de (puntaje - promedio)² dividido por N
-        c) La desviación estándar es la raíz cuadrada de la varianza
-
-     5. ORDENAMIENTO Y POSICIONES:
-        - Los estudiantes se ordenan por puntaje de mayor a menor
-        - Se actualizan las posiciones después del ordenamiento
-        - puestoGrado y puestoGrupo se asignan basado en esta clasificación
-
-     Se usara tabla_con_puntaje.ejs
-    */
-
-    // console.log('UDEA - Página 6 - Tabla de Estudiantes:');
-    // console.log(JSON.stringify(tablaEstudiantesData, null, 2));
-
-    // Página 3: Distribución por competencias (horizontal - múltiples gráficos en una página)
-    let competenciasPage: PageRequest[] = []
-
-    for (const chars of barChartDataGroupedByArea) {
-      const competenciaPage: PageRequest = {
-        layout: "horizontal",
-        chartTitle: "Distribución de estudiantes por competencias consolidadas por prueba",
-        subTitle: chars.charts[0].area,
-        headerInfo: baseHeaderInfo,
-        components: chars.charts
-      };
-
-      competenciasPage.push(competenciaPage);
-    }
-
-
-
-    // Página 4: Desempeño por área (horizontal)
-    const areasPages: PageRequest[] = []
-    for (const chart of scoreDistributionData.data.subjects) {
-      const areasPage: PageRequest = {
-        layout: "horizontal",
-        chartTitle: "Desempeño por Área",
-        headerInfo: baseHeaderInfo,
-        components: [{
-          type: "score_distribution_horizontal", data: {
-            "subjects": [chart],
-            "needGuide": true
-          }
-        }]
-      };
-      areasPages.push(areasPage);
-    }
-    // Página 5: Tabla de análisis de dificultad (vertical)
-    let analisisPages: PageRequest[] = []
-    for (const tabla of tablaAnalisisData) {
-      const analisisPage: PageRequest = {
-        layout: "vertical",
-        chartTitle: "Análisis de Dificultad",
-        headerInfo: baseHeaderInfo,
-        components: [tabla]
-      };
-      analisisPages.push(analisisPage);
-    }
-
-    // Página 6: Tabla de estudiantes (horizontal) - Puede ser múltiples páginas
-    const estudiantesPages: PageRequest[] = tablaEstudiantesDataArray.map((tablaData, index) => ({
-      layout: "horizontal",
-      chartTitle: tablaEstudiantesDataArray.length > 1
-        ? `Tabla de Estudiantes (Página ${index + 1} de ${tablaEstudiantesDataArray.length})`
-        : "Tabla de Estudiantes",
-      headerInfo: baseHeaderInfo,
-      components: [tablaData]
-    }));
-
-    // Generar PDFs individuales
-    allPages = [
-      portadaPage,
-      ...competenciasPage,
-      ...areasPages,
-      ...analisisPages,
-      ...estudiantesPages
-    ];
-
-
-  } else if (simulationData.tipe_inform.trim().includes("unal")) {
-
-
-    // ===== PÁGINA 2: Competencias Chart UNAL (usando función genérica) =====
-    const competenciasPageUnal = generarPaginaCompetenciasChart(
-      simulationData,
-      baseHeaderInfo,
-      {
-        chartId: "unal_competencias",
-        chartTitle: "Análisis de Competencias UNAL",
-        processorFunction: procesarCompetenciasUNAL
-      }
-    );
-
-    // Procesar datos para response metadata (opcional)
-    const competenciasUnal = procesarCompetenciasUNAL(simulationData);
-
-    // graficos por area
-
-    const areaData = procesarDesempenoPorArea(simulationData);
-    // Configuración dinámica para áreas
-
-    /* 
-      • 1 [>100 a 350]
-      • 2 [> 350 a 500]
-      • 3 [>500 a 700]
-      • 4 [>700 a 1000]
-    */
-
-    const areasRanges = [
-      { min: 0, max: 350, label: '1' },
-      { min: 351, max: 500, label: '2' },
-      { min: 501, max: 700, label: '3' },
-      { min: 701, max: 1000, label: '4' }
-    ];
-    const areasColors = ['#c55c5c', '#d88008', '#58a55c', '#4c8631'];
-
-
-    const { scoreDistributionData } =
-      calcularEstadisticasAreaDynamic(areaData, areasRanges, areasColors);
-
-
-    const areasPages: PageRequest[] = []
-    for (const chart of scoreDistributionData.data.subjects) {
-      const areasPage: PageRequest = {
-        layout: "horizontal",
-        chartTitle: "Desempeño por Área",
-        headerInfo: baseHeaderInfo,
-        components: [{
-          type: "score_distribution_horizontal",
-          data: {
-            "subjects": [chart],
-            "needGuide": false
-
-          }
-        }]
-      };
-      areasPages.push(areasPage);
-    }
-
-    const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData);
-    const tablaDificultadData = procesarTablaDificultadAnalisis(simulationData);
-    let indiceDificultadPorCompetencia: any[] = [];
-    for (const inD of tablaEstudiantesDataArray) {
-      indiceDificultadPorCompetencia.push(inD)
-    }
-    const tablaAnalisisData = generarDatosTablaDificultad(
-      tablaDificultadData,
-      undefined,
-      indiceDificultadPorCompetencia
-    );
-    // Página 5: Tabla de análisis de dificultad (vertical)
-    let analisisPages: PageRequest[] = []
-    for (const tabla of tablaAnalisisData) {
-      const analisisPage: PageRequest = {
-        layout: "vertical",
-        chartTitle: "Análisis de Dificultad",
-        headerInfo: baseHeaderInfo,
-        components: [tabla]
-      };
-      analisisPages.push(analisisPage);
-    }
-
-    // Página 6: Tabla de estudiantes (horizontal) - Puede ser múltiples páginas
-    const estudiantesPages: PageRequest[] = tablaEstudiantesDataArray.map((tablaData, index) => ({
-      layout: "horizontal",
-      chartTitle: tablaEstudiantesDataArray.length > 1
-        ? `Tabla de Estudiantes (Página ${index + 1} de ${tablaEstudiantesDataArray.length})`
-        : "Tabla de Estudiantes",
-      headerInfo: baseHeaderInfo,
-      components: [tablaData]
-    }));
-
-    // Generar PDFs individuales para UNAL
-    allPages = [
-      portadaPage,
-      competenciasPageUnal,
-      ...areasPages,
-      ...analisisPages,
-      ...estudiantesPages
-    ];
-  } else {
-
-
-    const comparativoData = procesarCompetenciasComparativo(simulationData);
-    const competenciasUnal = procesarCompetenciasUNAL(simulationData);
-
-
-    // return res.json({ comparativoData,competenciasUnal });
-    const comparativePage: PageRequest = {
-      layout: "horizontal",
-      chartTitle: "Comparativo de Puntajes por Materia",
-      headerInfo: baseHeaderInfo,
-      components: [{
-        type: "comparativo_puntaje",
-        data: comparativoData
-      }]
-    };
-
-    const competenciasData = procesarDistribucionCompetencias(simulationData);
-
-    // Configuración dinámica para competencias
-    const competenciasRanges = [
-      { min: 0, max: 35, label: '1' },
-      { min: 36, max: 50, label: '2' },
-      { min: 51, max: 65, label: '3' },
-      { min: 66, max: 100, label: '4' },
-    ];
-
-    const competenciasLabels = ['1', '2', '3', '4'];
-
-    const competenciasColors = ['#c55c5c', '#d88008', '#f4d03f', '#58a55c'];
-
-    const { barChartData, barChartDataGroupedByArea } = calcularEstadisticasCompetenciasDynamic(
-      competenciasData,
-      competenciasRanges,
-      competenciasLabels,
-      competenciasColors
-    );
-
-    let competenciasPage: PageRequest[] = []
-
-    // return res.json({ barChartDataGroupedByArea });
-    for (const chars of barChartDataGroupedByArea) {
-      const competenciaPage: PageRequest = {
-        layout: "horizontal",
-        chartTitle: "Distribución de estudiantes por competencias consolidadas por prueba",
-        subTitle: chars.area,
-        headerInfo: baseHeaderInfo,
-        components: chars.charts
-      };
-
-      competenciasPage.push(competenciaPage);
-    }
-
-    //-------------------------------
-    const areaData = procesarDesempenoPorArea(simulationData);
-
-    // Configuración dinámica para áreas
-    const areasRanges = [
-      { min: 0, max: 35, label: '1' },
-      { min: 36, max: 50, label: '2' },
-      { min: 51, max: 65, label: '3' },
-      { min: 66, max: 100, label: '4' }
-    ];
-
-    const areasColors = competenciasColors;
-
-    const { scoreDistributionData } =
-      calcularEstadisticasAreaDynamic(areaData, areasRanges, areasColors, "score_distribution",);
-
-    scoreDistributionData.type = "score_distribution";
-    // Página 4: Desempeño por área (horizontal)
-
-    const areasPages: PageRequest[] = [];
-    const subjects = scoreDistributionData.data.subjects;
-    const CHARTS_PER_PAGE = 4;
-
-    // Dividir subjects en grupos de máximo 4
-    for (let i = 0; i < subjects.length; i += CHARTS_PER_PAGE) {
-      const subjectsChunk = subjects.slice(i, i + CHARTS_PER_PAGE);
-      const pageNumber = Math.floor(i / CHARTS_PER_PAGE) + 1;
-      const totalPages = Math.ceil(subjects.length / CHARTS_PER_PAGE);
-
-      // Generar título con información de paginación si hay múltiples páginas
-      const chartTitle = subjects.length > CHARTS_PER_PAGE
-        ? `Desempeño por Área (Página ${pageNumber} de ${totalPages})`
-        : "Desempeño por Área";
-
-      const areasPage: PageRequest = {
-        layout: "vertical",
-        chartTitle: chartTitle,
-        headerInfo: baseHeaderInfo,
-        components: [{
-          type: "score_distribution",
-          data: {
-            "subjects": subjectsChunk,
-
-          }
-        }]
-      };
-      areasPages.push(areasPage);
-    }
-
-    const nivel = [
-      {
-        label: "BAJO",
-        color: "#4c8631",
-        min: 0,
-        max: 35.9
-      },
-      {
-        label: "MEDIO",
-        color: "#d88008",
-        min: 36.0,
-        max: 70.9
-      },
-      {
-        label: "ALTO",
-        color: "#bd5785",
-        min: 71.0,
-        max: 100
-      }
-    ];
-
-    const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData);
-    let indiceDificultadPorCompetencia: any[] = [];
-    for (const inD of tablaEstudiantesDataArray) {
-      indiceDificultadPorCompetencia.push(inD)
-    }
-
-
-    const tablaDificultadData = procesarTablaDificultadAnalisis(simulationData);
-
-    const tablaAnalisisData = generarDatosTablaDificultad(
-      tablaDificultadData,
-      nivel,
-      indiceDificultadPorCompetencia
-    );
-
-    // Página 5: Tabla de análisis de dificultad (vertical)
-    let analisisPages: PageRequest[] = []
-    for (const tabla of tablaAnalisisData) {
-      const analisisPage: PageRequest = {
-        layout: "vertical",
-        chartTitle: "Análisis de Dificultad",
-        headerInfo: baseHeaderInfo,
-        components: [tabla]
-      };
-      analisisPages.push(analisisPage);
-    }
-
-    // ===== DISTRIBUCIÓN POR ASIGNATURA =====
-    const asignaturasRanges = [
-      { min: 0, max: 35, label: '1' },
-      { min: 36, max: 50, label: '2' },
-      { min: 51, max: 65, label: '3' },
-      { min: 66, max: 100, label: '4' }
-    ];
-
-    const asignaturasChartsData = procesarPromediosDynamic(simulationData, asignaturasRanges);
-    const asignatures = asignaturasChartsData.map(item => item.data);
-
-    const asignaturasPages: PageRequest[] = [];
-
-
-    // Dividir asignaturas en grupos de máximo 4
-    for (let i = 0; i < asignatures.length; i += CHARTS_PER_PAGE) {
-      const asignaturasChunk = asignatures.slice(i, i + CHARTS_PER_PAGE);
-      const pageNumber = Math.floor(i / CHARTS_PER_PAGE) + 1;
-      const totalPages = Math.ceil(asignatures.length / CHARTS_PER_PAGE);
-
-      // Generar título con información de paginación si hay múltiples páginas
-      const chartTitle = asignatures.length > CHARTS_PER_PAGE
-        ? `Distribución de Estudiantes por Asignatura (Página ${pageNumber} de ${totalPages})`
-        : "Distribución de Estudiantes por Asignatura";
-
-      const component: ComponentRequest = {
-        type: "bar_chart_with_title",
-        data: {
-          subjects: asignaturasChunk,
-        }
-      }
-
-      const asignaturasPage: PageRequest = {
-        layout: "vertical",
-        chartTitle: chartTitle,
-        headerInfo: baseHeaderInfo,
-        components: [component]
-      };
-      asignaturasPages.push(asignaturasPage);
-    }
-
-    const ejeTematicoChartsData = procesarPromediosDynamic(simulationData, asignaturasRanges, "eje_tematico");
-    const ejeTematicos = ejeTematicoChartsData.map(item => item.data);
-
-    const ejeTematicosPages: PageRequest[] = [];
-
-
-    // Dividir asignaturas en grupos de máximo 4
-    for (let i = 0; i < ejeTematicos.length; i += CHARTS_PER_PAGE) {
-      const ejeTematicosChunk = ejeTematicos.slice(i, i + CHARTS_PER_PAGE);
-      const pageNumber = Math.floor(i / CHARTS_PER_PAGE) + 1;
-      const totalPages = Math.ceil(ejeTematicos.length / CHARTS_PER_PAGE);
-
-      // Generar título con información de paginación si hay múltiples páginas
-      const chartTitle = ejeTematicos.length > CHARTS_PER_PAGE
-        ? `Distribución de estudiantes por temas ó ejes tematicos por prueba (Página ${pageNumber} de ${totalPages})`
-        : "Distribución de estudiantes por temas ó ejes tematicos por prueba";
-
-      const component: ComponentRequest = {
-        type: "bar_chart_with_title",
-        data: {
-          subjects: ejeTematicosChunk,
-        }
-      }
-
-      const ejeTematicosPage: PageRequest = {
-        layout: "vertical",
-        chartTitle: chartTitle,
-        headerInfo: baseHeaderInfo,
-        components: [component]
-      };
-      ejeTematicosPages.push(ejeTematicosPage);
-    }
-
-    // Página 6: Tabla de estudiantes por competencias (horizontal) - Puede ser múltiples páginas
-    const listadoEstudiantesCompetenciasPages: PageRequest[] = tablaEstudiantesDataArray.map((tablaData, index) => ({
-      layout: "horizontal",
-      chartTitle: tablaEstudiantesDataArray.length > 1
-        ? `Listado general por competencias (Página ${index + 1} de ${tablaEstudiantesDataArray.length})`
-        : "Listado general por competencias",
-      headerInfo: baseHeaderInfo,
-      components: [tablaData]
-    }));
-
-    // Página 7: Tabla de estudiantes por áreas (horizontal) - Puede ser múltiples páginas
-    const tablaEstudiantesAreasDataArray = procesarTablaEstudiantesPorArea(simulationData);
-    const listadoEstudiantesAreasPages: PageRequest[] = tablaEstudiantesAreasDataArray.map((tablaData, index) => ({
-      layout: "horizontal",
-      chartTitle: tablaEstudiantesAreasDataArray.length > 1
-        ? `Listado general por pruebas (Página ${index + 1} de ${tablaEstudiantesAreasDataArray.length})`
-        : "Listado general por pruebas",
-      headerInfo: baseHeaderInfo,
-      components: [tablaData]
-    }));
-
-    allPages = [
-      portadaPage,
-      comparativePage,
-      ...competenciasPage,
-      ...areasPages,
-      ...asignaturasPages,
-      ...analisisPages,
-      ...listadoEstudiantesCompetenciasPages,
-      ...listadoEstudiantesAreasPages,
-      ...ejeTematicosPages
-    ];
-  }
-
-
-
-
-
-
-  websocketService.emitProgress({
-    sessionId,
-    stage: 'generating_pdfs',
-    progress: 70,
-    message: `Generando PDFs individuales (${allPages.length} páginas)`,
-    timestamp: new Date()
-  });
-
-  const individualPdfFiles = [];
-  for (let index = 0; index < allPages.length; index++) {
-    const pageData = allPages[index];
-
-    try {
-      // Determinar orientación basada en el layout de la página
-      const orientation = pageData.layout === "horizontal" ? "landscape" : "portrait";
-      const fileName = await pdfService.savePdf(pageData, {
-        format: "A4",
-        orientation: orientation,
-        printBackground: true,
-        scale: 0.75
-      });
-      individualPdfFiles.push(fileName);
-    } catch (error) {
-      websocketService.emitError(sessionId, `Error generando PDF página ${index + 1}`, {
-        error: error instanceof Error ? error.message : String(error),
-        pageIndex: index
-      });
-      logger.error(`Error generating PDF for page ${index + 1}`, { error: error instanceof Error ? error.message : String(error) });
-      throw error;
-    }
-  }
-
-  websocketService.emitProgress({
-    sessionId,
-    stage: 'merging_pdfs',
-    progress: 90,
-    message: 'Combinando páginas en PDF final',
-    timestamp: new Date()
-  });
-
-  const mergedFileName = `reporte_completo_${simulationData.campus.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
-  await pdfService.mergePdfs(individualPdfFiles, mergedFileName);
-
-
-  await pdfService.deletePdfs(individualPdfFiles);
-
-  const finalPdfUrl = `${req.protocol}://${req.get('host')}/api/reports/pdfs/${mergedFileName}`;
-
-  // Clear cache and cleanup resources after successful report generation
-  try {
-    renderService.clearCache();
-    logger.info('Cache cleared after report completion', {
-      reportType: simulationData.tipe_inform,
-      institution: simulationData.campus,
-      totalPages: allPages.length
-    });
-  } catch (cacheError) {
-    // Don't fail the entire process if cache clearing fails
-    logger.warn('Cache clearing failed, but report generation was successful', {
-      error: (cacheError as Error).message
-    });
-  }
-
-  // Emit completion
-  logger.info('About to emit completion websocket notification', {
-    sessionId,
-    fileName: mergedFileName,
-    url: finalPdfUrl
-  });
-
-  websocketService.emitProgress({
-    sessionId,
-    stage: 'completed',
-    progress: 100,
-    message: 'Reporte generado exitosamente',
-    timestamp: new Date(),
-    data: { fileName: mergedFileName, url: finalPdfUrl }
-  });
-
-  // Enviar el evento SSE
-  // pushToWSClients({
-  //   status: 'pdf-ready',
-  //   // userId,
-  //   url: fileUrl,
-  //   message: 'Tu archivo está listo para descargar',
-  // });
-
-  logger.info('Completion websocket notification sent', { sessionId });
-
-  // Contar total de preguntas si existen
-  const totalQuestions = simulationData.detailQuestion?.length || 0;
-
-  res.json({
+  // CAMBIO PRINCIPAL: Retornar respuesta inmediata (202 Accepted)
+  res.status(202).json({
     success: true,
-    message: `Reporte ${simulationData.programName} generado exitosamente`,
-    data: {
-      fileName: mergedFileName,
-      url: finalPdfUrl,
-      downloadUrl: `${finalPdfUrl}?download=true`,
-      totalPages: allPages.length,
-      totalQuestions: totalQuestions
-    }
+    message: 'Reporte en procesamiento. Recibirás notificaciones vía WebSocket cuando esté listo.',
+    sessionId: sessionId,
+    status: 'processing',
+    websocketChannel: 'report-progress'
   });
 
+  // Procesar reporte en background usando setImmediate
+  setImmediate(async () => {
+    try {
+      logger.info('Starting background report generation', { sessionId, tipe_inform: simulationData.tipe_inform });
+
+      const images = getDefaultHeaderImages();
+      const baseHeaderInfo = generarBaseHeaderInfo(simulationData, images);
+
+      websocketService.emitProgress({
+        sessionId,
+        stage: 'generating_cover',
+        progress: 10,
+        message: 'Generando página de portada',
+        timestamp: new Date()
+      });
+
+      const portadaPage = generarPaginaPortada(simulationData, images);
+
+      let allPages: any[] = [];
+      if (simulationData.tipe_inform.trim().includes("udea")) {
+
+        /* 
+        - la pagina principal es la de portada.
+        - diagrama comparativo de puntajes tiene diagrama de barra horizontal ( no se ha creado)
+        - distribución de estudiantes por competencias usa el diagrama por barra vertical "bar_chart_with_title" 
+          este se saca con el cálculo de porcentaje por competencia, las reglas en los labels son:
+          I: 0-35%, II: 36-75%, III: 76-100%
+    
+        - la siguiente pagina es por desempeño de área y se hace con el diagrama "score_distribution" en horizontal se 
+          hace el cálculo por cada área: Insuficiente(0-35%), Mínimo(36-50%), Satisfactorio(51-65%), Avanzado(66-100%)
+        - En este se mostrará el índice de respuesta por prueba y se usará la tabla "tabla_dificultad_analisis" de cada pregunta
+    
+        - La siguiente pagina se hara el calculo de las preguntas por competencias y se analizara  o se pintara la pregunta correcta 
+          en su respectiva casilla el la columna id se pintara de verde naranja o rojo dependiendo del resultado estos son los valores de 
+          indice de dificultad:
+    
+          • Bajo (verde) entre: 0.0 y 30.9
+          • Medio (naranjado) entre: 31.0 y 60.9
+          • Alto (rojo) entre: 61.1 y 100
+        
+          y en la columna donde se ubica cada letra del abecedario se pintara de un coloror verda la pregunta correcta 
+          como seve en la imagen  usa "tabla-dificultad-analisis" 
+          para saber cuantas columnas crear para el abecedario se puede consultar en la variable simulationData.detailQuestion
+          este trae la información necesaria para construir la tabla. y viene un listado  de {
+            "id": "685175ed6adaaca08941b64b",
+            "cod": "ASI-T-1",
+            "componente": "Semántico",
+            "competencia": "Literal",
+            "periodo": "N/A",
+            "id_recurso": "685175646adaaca08941b63a",
+            "nameUser": "Myriam",
+            "eje_tematico": "Connotación ",
+            "grado": "Preuniversitario UdeA",
+            "programa": "Preuniversitario UdeA",
+            "area": "Competencia Lectora",
+            "status": false,
+            "id_material_refuerzo": "685175e86adaaca08941b649",
+            "asignatura": "Competencia lectora",
+            "tipo": null,
+            "tipo_platform": "Examen",
+            "created": "2025-06-17 09:04:29.858",
+            "cant_respuesta": "4",
+            "pregunta": "685175786adaaca08941b63d",
+            "pregunta_correcta": "685175866adaaca08941b63f",
+            "question_depend_others": "",
+            "respuestas": [
+              "685175866adaaca08941b63f",
+              "685175ad6adaaca08941b647",
+              "685175986adaaca08941b643",
+              "685175a16adaaca08941b645"
+            ]
+          }
+    
+        */
+
+        /*
+          PÁGINA 3: Distribución de estudiantes por competencias
+          Clasificación basada en PORCENTAJE de aciertos por competencia:
+          
+          Cálculo: (respuestas_correctas_competencia / total_preguntas_competencia) * 100
+          
+          Clasificación por porcentaje:
+          - I: 0-35% de aciertos
+          - II: 36-75% de aciertos  
+          - III: 76-100% de aciertos
+          
+          Cada competencia (Literal, Inferencial, etc.) se evalúa independientemente
+        */
+
+        const competenciasData = procesarDistribucionCompetencias(simulationData);
+
+        // Configuración dinámica para competencias
+        const competenciasRanges = [
+          { min: 0, max: 35, label: 'I' },
+          { min: 36, max: 75, label: 'II' },
+          { min: 76, max: 100, label: 'III' }
+        ];
+        const competenciasLabels = ['I', 'II', 'III'];
+        const competenciasColors = ['#c55c5c', '#d88008', '#58a55c'];
+
+        const { barChartData, barChartDataGroupedByArea } = calcularEstadisticasCompetenciasDynamic(
+          competenciasData,
+          competenciasRanges,
+          competenciasLabels,
+          competenciasColors
+        );
+
+        // console.log('UDEA - Página 3 - Distribución por Competencias:');
+        // console.log(JSON.stringify(barChartData, null, 2));
+
+        // return res.json({ barChartDataGroupedByArea });
+
+
+        const areaData = procesarDesempenoPorArea(simulationData);
+        // const { areaStats, scoreDistributionData } = calcularEstadisticasArea(areaData);
+
+        // console.log('UDEA - Página 4 - Desempeño por Área:');
+        // console.log(JSON.stringify(scoreDistributionData, null, 2));
+
+
+
+
+        // Configuración dinámica para áreas
+        const areasRanges = [
+          { min: 0, max: 35, label: 'Insuficiente' },
+          { min: 36, max: 50, label: 'Mínimo' },
+          { min: 51, max: 65, label: 'Satisfactorio' },
+          { min: 66, max: 100, label: 'Avanzado' }
+        ];
+        const areasColors = ['#c55c5c', '#d88008', '#58a55c', '#4c8631'];
+
+        const { scoreDistributionData } =
+          calcularEstadisticasAreaDynamic(areaData, areasRanges, areasColors);
+
+
+
+
+        const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData);
+
+        let indiceDificultadPorCompetencia: any[] = [];
+        for (const inD of tablaEstudiantesDataArray) {
+          indiceDificultadPorCompetencia.push(inD)
+        }
+
+        const tablaDificultadData = procesarTablaDificultadAnalisis(simulationData);
+
+        const tablaAnalisisData = generarDatosTablaDificultad(
+          tablaDificultadData,
+          undefined,
+          indiceDificultadPorCompetencia
+        );
+
+
+        // Debug: Check the difficulty index calculation
+        // console.log('DEBUG - Difficulty indices per competency:', tablaEstudiantesData.data.indiceDificultadPorCompetencia);
+        // console.log('DEBUG - Table analysis data for each area:');
+        // tablaAnalisisData.forEach((tabla, index) => {
+        //   console.log(`Area ${index + 1} (${tabla.data.subject}):`, tabla.data.indiceDificultadArea);
+        // });
+
+
+        // return res.json({tablaAnalisisData});
+
+        // console.log('UDEA - Página 5 - Tabla Análisis de Dificultad:');
+        // console.log(JSON.stringify(tablaDificultadData, null, 2));
+        // console.log(JSON.stringify(tablaAnalisisData, null, 2));
+
+        /*
+         La siguiente pagina se va a encargar de mostrar el listado de estudiantes donde se mostraran todas las competencias
+         en sus respectivas columnas.
+    
+         PROCESO DE GENERACIÓN DE DATOS:
+    
+         1. EXTRACCIÓN DE COMPETENCIAS:
+            - Se recorren todos los estudiantes y sus materias
+            - Se extraen todas las competencias únicas de simulationData.students[].examenes_asignados[].materias[].competencies[]
+            - Se ordena alfabéticamente para consistencia
+    
+         2. PROCESAMIENTO POR ESTUDIANTE:
+            - Puntaje: se obtiene de examenes_asignados[].score
+            - Posición: se obtiene de examenes_asignados[].position  
+            - Grupo: se obtiene de student.course_id
+            - Competencias: porcentaje de cada competencia desde materias[].competencies[].skills[0].porcentaje
+    
+         3. CATEGORIZACIÓN:
+            - Se clasifica cada estudiante según su puntaje total:
+            - Insuficiente (I): 0-35%
+            - Mínimo (M): 36-50% 
+            - Satisfactorio (S): 51-65%
+            - Avanzado (A): 66-100%
+    
+         4. CÁLCULOS ESTADÍSTICOS:
+            - Promedio General: (suma de todos los puntajes) / (número de estudiantes)
+            - Desviación Estándar: √(Σ(xi - μ)² / N)
+              donde xi = puntaje individual, μ = promedio, N = número de estudiantes
+            
+            Proceso:
+            a) Se suman todos los puntajes para calcular el promedio
+            b) Se calcula la varianza: suma de (puntaje - promedio)² dividido por N
+            c) La desviación estándar es la raíz cuadrada de la varianza
+    
+         5. ORDENAMIENTO Y POSICIONES:
+            - Los estudiantes se ordenan por puntaje de mayor a menor
+            - Se actualizan las posiciones después del ordenamiento
+            - puestoGrado y puestoGrupo se asignan basado en esta clasificación
+    
+         Se usara tabla_con_puntaje.ejs
+        */
+
+        // console.log('UDEA - Página 6 - Tabla de Estudiantes:');
+        // console.log(JSON.stringify(tablaEstudiantesData, null, 2));
+
+        // Página 3: Distribución por competencias (horizontal - múltiples gráficos en una página)
+        let competenciasPage: PageRequest[] = []
+
+        for (const chars of barChartDataGroupedByArea) {
+          const competenciaPage: PageRequest = {
+            layout: "horizontal",
+            chartTitle: "Distribución de estudiantes por competencias consolidadas por prueba",
+            subTitle: chars.charts[0].area,
+            headerInfo: baseHeaderInfo,
+            components: chars.charts
+          };
+
+          competenciasPage.push(competenciaPage);
+        }
+
+
+
+        // Página 4: Desempeño por área (horizontal)
+        const areasPages: PageRequest[] = []
+        for (const chart of scoreDistributionData.data.subjects) {
+          const areasPage: PageRequest = {
+            layout: "horizontal",
+            chartTitle: "Desempeño por Área",
+            headerInfo: baseHeaderInfo,
+            components: [{
+              type: "score_distribution_horizontal", data: {
+                "subjects": [chart],
+                "needGuide": true
+              }
+            }]
+          };
+          areasPages.push(areasPage);
+        }
+        // Página 5: Tabla de análisis de dificultad (vertical)
+        let analisisPages: PageRequest[] = []
+        for (const tabla of tablaAnalisisData) {
+          const analisisPage: PageRequest = {
+            layout: "vertical",
+            chartTitle: "Análisis de Dificultad",
+            headerInfo: baseHeaderInfo,
+            components: [tabla]
+          };
+          analisisPages.push(analisisPage);
+        }
+
+        // Página 6: Tabla de estudiantes (horizontal) - Puede ser múltiples páginas
+        const estudiantesPages: PageRequest[] = tablaEstudiantesDataArray.map((tablaData, index) => ({
+          layout: "horizontal",
+          chartTitle: tablaEstudiantesDataArray.length > 1
+            ? `Tabla de Estudiantes (Página ${index + 1} de ${tablaEstudiantesDataArray.length})`
+            : "Tabla de Estudiantes",
+          headerInfo: baseHeaderInfo,
+          components: [tablaData]
+        }));
+
+        // Generar PDFs individuales
+        allPages = [
+          portadaPage,
+          ...competenciasPage,
+          ...areasPages,
+          ...analisisPages,
+          ...estudiantesPages
+        ];
+
+
+      } else if (simulationData.tipe_inform.trim().includes("unal")) {
+
+
+        // ===== PÁGINA 2: Competencias Chart UNAL (usando función genérica) =====
+        const competenciasPageUnal = generarPaginaCompetenciasChart(
+          simulationData,
+          baseHeaderInfo,
+          {
+            chartId: "unal_competencias",
+            chartTitle: "Análisis de Competencias UNAL",
+            processorFunction: procesarCompetenciasUNAL
+          }
+        );
+
+        // Procesar datos para response metadata (opcional)
+        const competenciasUnal = procesarCompetenciasUNAL(simulationData);
+
+        // graficos por area
+
+        const areaData = procesarDesempenoPorArea(simulationData);
+        // Configuración dinámica para áreas
+
+        /* 
+          • 1 [>100 a 350]
+          • 2 [> 350 a 500]
+          • 3 [>500 a 700]
+          • 4 [>700 a 1000]
+        */
+
+        const areasRanges = [
+          { min: 0, max: 350, label: '1' },
+          { min: 351, max: 500, label: '2' },
+          { min: 501, max: 700, label: '3' },
+          { min: 701, max: 1000, label: '4' }
+        ];
+        const areasColors = ['#c55c5c', '#d88008', '#58a55c', '#4c8631'];
+
+
+        const { scoreDistributionData } =
+          calcularEstadisticasAreaDynamic(areaData, areasRanges, areasColors);
+
+
+        const areasPages: PageRequest[] = []
+        for (const chart of scoreDistributionData.data.subjects) {
+          const areasPage: PageRequest = {
+            layout: "horizontal",
+            chartTitle: "Desempeño por Área",
+            headerInfo: baseHeaderInfo,
+            components: [{
+              type: "score_distribution_horizontal",
+              data: {
+                "subjects": [chart],
+                "needGuide": false
+
+              }
+            }]
+          };
+          areasPages.push(areasPage);
+        }
+
+        const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData);
+        const tablaDificultadData = procesarTablaDificultadAnalisis(simulationData);
+        let indiceDificultadPorCompetencia: any[] = [];
+        for (const inD of tablaEstudiantesDataArray) {
+          indiceDificultadPorCompetencia.push(inD)
+        }
+        const tablaAnalisisData = generarDatosTablaDificultad(
+          tablaDificultadData,
+          undefined,
+          indiceDificultadPorCompetencia
+        );
+        // Página 5: Tabla de análisis de dificultad (vertical)
+        let analisisPages: PageRequest[] = []
+        for (const tabla of tablaAnalisisData) {
+          const analisisPage: PageRequest = {
+            layout: "vertical",
+            chartTitle: "Análisis de Dificultad",
+            headerInfo: baseHeaderInfo,
+            components: [tabla]
+          };
+          analisisPages.push(analisisPage);
+        }
+
+        // Página 6: Tabla de estudiantes (horizontal) - Puede ser múltiples páginas
+        const estudiantesPages: PageRequest[] = tablaEstudiantesDataArray.map((tablaData, index) => ({
+          layout: "horizontal",
+          chartTitle: tablaEstudiantesDataArray.length > 1
+            ? `Tabla de Estudiantes (Página ${index + 1} de ${tablaEstudiantesDataArray.length})`
+            : "Tabla de Estudiantes",
+          headerInfo: baseHeaderInfo,
+          components: [tablaData]
+        }));
+
+        // Generar PDFs individuales para UNAL
+        allPages = [
+          portadaPage,
+          competenciasPageUnal,
+          ...areasPages,
+          ...analisisPages,
+          ...estudiantesPages
+        ];
+      } else {
+
+
+        const comparativoData = procesarCompetenciasComparativo(simulationData);
+        const competenciasUnal = procesarCompetenciasUNAL(simulationData);
+
+
+        // return res.json({ comparativoData,competenciasUnal });
+        const comparativePage: PageRequest = {
+          layout: "horizontal",
+          chartTitle: "Comparativo de Puntajes por Materia",
+          headerInfo: baseHeaderInfo,
+          components: [{
+            type: "comparativo_puntaje",
+            data: comparativoData
+          }]
+        };
+
+        const competenciasData = procesarDistribucionCompetencias(simulationData);
+
+        // Configuración dinámica para competencias
+        const competenciasRanges = [
+          { min: 0, max: 35, label: '1' },
+          { min: 36, max: 50, label: '2' },
+          { min: 51, max: 65, label: '3' },
+          { min: 66, max: 100, label: '4' },
+        ];
+
+        const competenciasLabels = ['1', '2', '3', '4'];
+
+        const competenciasColors = ['#c55c5c', '#d88008', '#f4d03f', '#58a55c'];
+
+        const { barChartData, barChartDataGroupedByArea } = calcularEstadisticasCompetenciasDynamic(
+          competenciasData,
+          competenciasRanges,
+          competenciasLabels,
+          competenciasColors
+        );
+
+        let competenciasPage: PageRequest[] = []
+
+        // return res.json({ barChartDataGroupedByArea });
+        for (const chars of barChartDataGroupedByArea) {
+          const competenciaPage: PageRequest = {
+            layout: "horizontal",
+            chartTitle: "Distribución de estudiantes por competencias consolidadas por prueba",
+            subTitle: chars.area,
+            headerInfo: baseHeaderInfo,
+            components: chars.charts
+          };
+
+          competenciasPage.push(competenciaPage);
+        }
+
+        //-------------------------------
+        const areaData = procesarDesempenoPorArea(simulationData);
+
+        // Configuración dinámica para áreas
+        const areasRanges = [
+          { min: 0, max: 35, label: '1' },
+          { min: 36, max: 50, label: '2' },
+          { min: 51, max: 65, label: '3' },
+          { min: 66, max: 100, label: '4' }
+        ];
+
+        const areasColors = competenciasColors;
+
+        const { scoreDistributionData } =
+          calcularEstadisticasAreaDynamic(areaData, areasRanges, areasColors, "score_distribution",);
+
+        scoreDistributionData.type = "score_distribution";
+        // Página 4: Desempeño por área (horizontal)
+
+        const areasPages: PageRequest[] = [];
+        const subjects = scoreDistributionData.data.subjects;
+        const CHARTS_PER_PAGE = 4;
+
+        // Dividir subjects en grupos de máximo 4
+        for (let i = 0; i < subjects.length; i += CHARTS_PER_PAGE) {
+          const subjectsChunk = subjects.slice(i, i + CHARTS_PER_PAGE);
+          const pageNumber = Math.floor(i / CHARTS_PER_PAGE) + 1;
+          const totalPages = Math.ceil(subjects.length / CHARTS_PER_PAGE);
+
+          // Generar título con información de paginación si hay múltiples páginas
+          const chartTitle = subjects.length > CHARTS_PER_PAGE
+            ? `Desempeño por Área (Página ${pageNumber} de ${totalPages})`
+            : "Desempeño por Área";
+
+          const areasPage: PageRequest = {
+            layout: "vertical",
+            chartTitle: chartTitle,
+            headerInfo: baseHeaderInfo,
+            components: [{
+              type: "score_distribution",
+              data: {
+                "subjects": subjectsChunk,
+
+              }
+            }]
+          };
+          areasPages.push(areasPage);
+        }
+
+        const nivel = [
+          {
+            label: "BAJO",
+            color: "#4c8631",
+            min: 0,
+            max: 35.9
+          },
+          {
+            label: "MEDIO",
+            color: "#d88008",
+            min: 36.0,
+            max: 70.9
+          },
+          {
+            label: "ALTO",
+            color: "#bd5785",
+            min: 71.0,
+            max: 100
+          }
+        ];
+
+        const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData);
+        let indiceDificultadPorCompetencia: any[] = [];
+        for (const inD of tablaEstudiantesDataArray) {
+          indiceDificultadPorCompetencia.push(inD)
+        }
+
+
+        const tablaDificultadData = procesarTablaDificultadAnalisis(simulationData);
+
+        const tablaAnalisisData = generarDatosTablaDificultad(
+          tablaDificultadData,
+          nivel,
+          indiceDificultadPorCompetencia
+        );
+
+        // Página 5: Tabla de análisis de dificultad (vertical)
+        let analisisPages: PageRequest[] = []
+        for (const tabla of tablaAnalisisData) {
+          const analisisPage: PageRequest = {
+            layout: "vertical",
+            chartTitle: "Análisis de Dificultad",
+            headerInfo: baseHeaderInfo,
+            components: [tabla]
+          };
+          analisisPages.push(analisisPage);
+        }
+
+        // ===== DISTRIBUCIÓN POR ASIGNATURA =====
+        const asignaturasRanges = [
+          { min: 0, max: 35, label: '1' },
+          { min: 36, max: 50, label: '2' },
+          { min: 51, max: 65, label: '3' },
+          { min: 66, max: 100, label: '4' }
+        ];
+
+        const asignaturasChartsData = procesarPromediosDynamic(simulationData, asignaturasRanges);
+        const asignatures = asignaturasChartsData.map(item => item.data);
+
+        const asignaturasPages: PageRequest[] = [];
+
+
+        // Dividir asignaturas en grupos de máximo 4
+        for (let i = 0; i < asignatures.length; i += CHARTS_PER_PAGE) {
+          const asignaturasChunk = asignatures.slice(i, i + CHARTS_PER_PAGE);
+          const pageNumber = Math.floor(i / CHARTS_PER_PAGE) + 1;
+          const totalPages = Math.ceil(asignatures.length / CHARTS_PER_PAGE);
+
+          // Generar título con información de paginación si hay múltiples páginas
+          const chartTitle = asignatures.length > CHARTS_PER_PAGE
+            ? `Distribución de Estudiantes por Asignatura (Página ${pageNumber} de ${totalPages})`
+            : "Distribución de Estudiantes por Asignatura";
+
+          const component: ComponentRequest = {
+            type: "bar_chart_with_title",
+            data: {
+              subjects: asignaturasChunk,
+            }
+          }
+
+          const asignaturasPage: PageRequest = {
+            layout: "vertical",
+            chartTitle: chartTitle,
+            headerInfo: baseHeaderInfo,
+            components: [component]
+          };
+          asignaturasPages.push(asignaturasPage);
+        }
+
+        const ejeTematicoChartsData = procesarPromediosDynamic(simulationData, asignaturasRanges, "eje_tematico");
+        const ejeTematicos = ejeTematicoChartsData.map(item => item.data);
+
+        const ejeTematicosPages: PageRequest[] = [];
+
+
+        // Dividir asignaturas en grupos de máximo 4
+        for (let i = 0; i < ejeTematicos.length; i += CHARTS_PER_PAGE) {
+          const ejeTematicosChunk = ejeTematicos.slice(i, i + CHARTS_PER_PAGE);
+          const pageNumber = Math.floor(i / CHARTS_PER_PAGE) + 1;
+          const totalPages = Math.ceil(ejeTematicos.length / CHARTS_PER_PAGE);
+
+          // Generar título con información de paginación si hay múltiples páginas
+          const chartTitle = ejeTematicos.length > CHARTS_PER_PAGE
+            ? `Distribución de estudiantes por temas ó ejes tematicos por prueba (Página ${pageNumber} de ${totalPages})`
+            : "Distribución de estudiantes por temas ó ejes tematicos por prueba";
+
+          const component: ComponentRequest = {
+            type: "bar_chart_with_title",
+            data: {
+              subjects: ejeTematicosChunk,
+            }
+          }
+
+          const ejeTematicosPage: PageRequest = {
+            layout: "vertical",
+            chartTitle: chartTitle,
+            headerInfo: baseHeaderInfo,
+            components: [component]
+          };
+          ejeTematicosPages.push(ejeTematicosPage);
+        }
+
+        // Página 6: Tabla de estudiantes por competencias (horizontal) - Puede ser múltiples páginas
+        const listadoEstudiantesCompetenciasPages: PageRequest[] = tablaEstudiantesDataArray.map((tablaData, index) => ({
+          layout: "horizontal",
+          chartTitle: tablaEstudiantesDataArray.length > 1
+            ? `Listado general por competencias (Página ${index + 1} de ${tablaEstudiantesDataArray.length})`
+            : "Listado general por competencias",
+          headerInfo: baseHeaderInfo,
+          components: [tablaData]
+        }));
+
+        // Página 7: Tabla de estudiantes por áreas (horizontal) - Puede ser múltiples páginas
+        const tablaEstudiantesAreasDataArray = procesarTablaEstudiantesPorArea(simulationData);
+        const listadoEstudiantesAreasPages: PageRequest[] = tablaEstudiantesAreasDataArray.map((tablaData, index) => ({
+          layout: "horizontal",
+          chartTitle: tablaEstudiantesAreasDataArray.length > 1
+            ? `Listado general por pruebas (Página ${index + 1} de ${tablaEstudiantesAreasDataArray.length})`
+            : "Listado general por pruebas",
+          headerInfo: baseHeaderInfo,
+          components: [tablaData]
+        }));
+
+        allPages = [
+          portadaPage,
+          comparativePage,
+          ...competenciasPage,
+          ...areasPages,
+          ...asignaturasPages,
+          ...analisisPages,
+          ...listadoEstudiantesCompetenciasPages,
+          ...listadoEstudiantesAreasPages,
+          ...ejeTematicosPages
+        ];
+      }
+
+
+      websocketService.emitProgress({
+        sessionId,
+        stage: 'generating_pdfs',
+        progress: 70,
+        message: `Generando PDFs individuales (${allPages.length} páginas)`,
+        timestamp: new Date()
+      });
+
+      const individualPdfFiles = [];
+      for (let index = 0; index < allPages.length; index++) {
+        const pageData = allPages[index];
+
+        try {
+          // Determinar orientación basada en el layout de la página
+          const orientation = pageData.layout === "horizontal" ? "landscape" : "portrait";
+          const fileName = await pdfService.savePdf(pageData, {
+            format: "A4",
+            orientation: orientation,
+            printBackground: true,
+            scale: 0.75
+          });
+          individualPdfFiles.push(fileName);
+        } catch (error) {
+          websocketService.emitError(sessionId, `Error generando PDF página ${index + 1}`, {
+            error: error instanceof Error ? error.message : String(error),
+            pageIndex: index
+          });
+          logger.error(`Error generating PDF for page ${index + 1}`, { error: error instanceof Error ? error.message : String(error) });
+          throw error;
+        }
+      }
+
+      websocketService.emitProgress({
+        sessionId,
+        stage: 'merging_pdfs',
+        progress: 90,
+        message: 'Combinando páginas en PDF final',
+        timestamp: new Date()
+      });
+
+      const mergedFileName = `reporte_completo_${simulationData.campus.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
+      await pdfService.mergePdfs(individualPdfFiles, mergedFileName);
+
+
+      await pdfService.deletePdfs(individualPdfFiles);
+
+      const finalPdfUrl = `${req.protocol}://${req.get('host')}/api/reports/pdfs/${mergedFileName}`;
+
+      // Clear cache and cleanup resources after successful report generation
+      try {
+        renderService.clearCache();
+        logger.info('Cache cleared after report completion', {
+          reportType: simulationData.tipe_inform,
+          institution: simulationData.campus,
+          totalPages: allPages.length
+        });
+      } catch (cacheError) {
+        // Don't fail the entire process if cache clearing fails
+        logger.warn('Cache clearing failed, but report generation was successful', {
+          error: (cacheError as Error).message
+        });
+      }
+
+      // Emit completion
+      logger.info('About to emit completion websocket notification', {
+        sessionId,
+        fileName: mergedFileName,
+        url: finalPdfUrl
+      });
+
+      websocketService.emitProgress({
+        sessionId,
+        stage: 'completed',
+        progress: 100,
+        message: 'Reporte generado exitosamente',
+        timestamp: new Date(),
+        data: { fileName: mergedFileName, url: finalPdfUrl }
+      });
+
+      logger.info('Completion websocket notification sent', { sessionId });
+
+      // Enviar email con el reporte (si se proporcionó un destinatario)
+      if (simulationData.to) {
+        logger.info('Sending report via email', {
+          to: simulationData.to,
+          sessionId
+        });
+
+        websocketService.emitProgress({
+          sessionId,
+          stage: 'sending_email',
+          progress: 100,
+          message: 'Enviando reporte por correo electrónico',
+          timestamp: new Date()
+        });
+
+        const emailSubject = emailService.generateEmailSubject(
+          simulationData.campus || 'Institución',
+          simulationData.tipe_inform || 'reporte',
+          simulationData.programName
+        );
+
+        const emailSent = await emailService.sendReportEmail({
+          to: simulationData.to,
+          subject: emailSubject,
+          link: finalPdfUrl
+        });
+
+        if (emailSent) {
+          logger.info('Report email sent successfully', {
+            to: simulationData.to,
+            sessionId
+          });
+
+          websocketService.emitProgress({
+            sessionId,
+            stage: 'email_sent',
+            progress: 100,
+            message: `Reporte enviado exitosamente a ${simulationData.to}`,
+            timestamp: new Date(),
+            data: { emailSent: true, recipient: simulationData.to }
+          });
+        } else {
+          logger.warn('Failed to send report email', {
+            to: simulationData.to,
+            sessionId
+          });
+
+          websocketService.emitProgress({
+            sessionId,
+            stage: 'email_failed',
+            progress: 100,
+            message: 'El reporte se generó pero no se pudo enviar el email',
+            timestamp: new Date(),
+            data: { emailSent: false, pdfUrl: finalPdfUrl }
+          });
+        }
+      } else {
+        logger.info('No email recipient provided, skipping email sending', { sessionId });
+      }
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('Background report generation failed', {
+        sessionId,
+        error: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined
+      });
+
+      websocketService.emitError(sessionId, `Error generando reporte: ${errorMessage}`, {
+        stage: 'failed',
+        timestamp: new Date()
+      });
+    }
+  });
 });
 
 // Excel generation endpoint

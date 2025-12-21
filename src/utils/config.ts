@@ -14,7 +14,9 @@ export const config: EnvConfig = {
   apiKey: process.env.API_KEY,
   jwtSecret: process.env.JWT_SECRET,
   logLevel: process.env.LOG_LEVEL || 'info',
-  logFormat: process.env.LOG_FORMAT || 'combined'
+  logFormat: process.env.LOG_FORMAT || 'combined',
+  mailApiUrl: process.env.MAIL_API_URL || 'https://mail-api.plataformapodium.com/api/send-report',
+  mailApiTimeout: parseInt(process.env.MAIL_API_TIMEOUT || '30000', 10)
 };
 
 export const isDevelopment = config.nodeEnv === 'development';
