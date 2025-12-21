@@ -7,6 +7,7 @@ import { pdfService } from '../services/pdfService';
 import { websocketService } from '../services/websocketService';
 import { excelService } from '../services/excelService';
 import { emailService } from '../services/emailService';
+import { dataStorageService } from '../services/dataStorageService';
 import { asyncHandler } from '../middleware/errorHandler';
 import { logger } from '../utils/logger';
 import { ReportData } from '../models/ReportData';
@@ -484,7 +485,7 @@ export const getDefaultHeaderImages = () => {
 
 
 
-
+// DistribucióndeEstudiantesporAsignatura
 // New endpoint: Process simulation data (ASYNC VERSION)
 export const processSimulationData = asyncHandler(async (req: Request, res: Response) => {
   const simulationData = req.body;
@@ -517,6 +518,12 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
   setImmediate(async () => {
     try {
       logger.info('Starting background report generation', { sessionId, tipe_inform: simulationData.tipe_inform });
+
+      // Guardar simulationData en JSON para auditoría/debugging
+      // const savedFileName = await dataStorageService.saveSimulationData(simulationData, sessionId);
+      // if (savedFileName) {
+      //   logger.info('Simulation data saved to JSON', { fileName: savedFileName, sessionId });
+      // }
 
       const images = getDefaultHeaderImages();
       const baseHeaderInfo = generarBaseHeaderInfo(simulationData, images);
@@ -1055,7 +1062,7 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
 
         const asignaturasPages: PageRequest[] = [];
 
-
+ 
         // Dividir asignaturas en grupos de máximo 4
         for (let i = 0; i < asignatures.length; i += CHARTS_PER_PAGE) {
           const asignaturasChunk = asignatures.slice(i, i + CHARTS_PER_PAGE);
@@ -1136,7 +1143,7 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
           headerInfo: baseHeaderInfo,
           components: [tablaData]
         }));
-
+console.dir({ asignaturasPages }, { depth: null });
         allPages = [
           portadaPage,
           comparativePage,
@@ -1520,6 +1527,91 @@ export const regenerateReport = asyncHandler(async (req: Request, res: Response,
     res.status(500).json({
       success: false,
       error: 'Error al regenerar el reporte',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+// ===== ENDPOINTS PARA GESTIÓN DE DATOS GUARDADOS =====
+
+/**
+ * GET /api/reports/data/list
+ * Lista todos los archivos JSON de simulationData guardados
+ */
+export const listSimulationDataFiles = asyncHandler(async (req: Request, res: Response) => {
+  logger.info('Listing simulation data files');
+
+  try {
+    const files = await dataStorageService.listSimulationDataFiles();
+
+    res.json({
+      success: true,
+      data: {
+        files,
+        count: files.length
+      }
+    });
+  } catch (error) {
+    logger.error('Error listing simulation data files:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al listar archivos de datos',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+/**
+ * GET /api/reports/data/:fileName
+ * Lee un archivo específico de simulationData
+ */
+export const getSimulationDataFile = asyncHandler(async (req: Request, res: Response) => {
+  const { fileName } = req.params;
+
+  logger.info('Reading simulation data file', { fileName });
+
+  try {
+    const data = await dataStorageService.readSimulationData(fileName);
+
+    res.json({
+      success: true,
+      data
+    });
+  } catch (error) {
+    logger.error('Error reading simulation data file:', error);
+    res.status(404).json({
+      success: false,
+      error: 'Archivo no encontrado',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+/**
+ * DELETE /api/reports/data/cleanup
+ * Limpia archivos antiguos de simulationData (por defecto >30 días)
+ */
+export const cleanupOldSimulationData = asyncHandler(async (req: Request, res: Response) => {
+  const daysOld = parseInt(req.query.days as string) || 30;
+
+  logger.info('Cleaning up old simulation data files', { daysOld });
+
+  try {
+    const deletedCount = await dataStorageService.cleanOldFiles(daysOld);
+
+    res.json({
+      success: true,
+      data: {
+        deletedCount,
+        daysOld,
+        message: `Se eliminaron ${deletedCount} archivos con más de ${daysOld} días`
+      }
+    });
+  } catch (error) {
+    logger.error('Error cleaning up old files:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al limpiar archivos antiguos',
       details: error instanceof Error ? error.message : 'Unknown error'
     });
   }

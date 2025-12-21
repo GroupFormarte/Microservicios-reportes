@@ -3,6 +3,7 @@
  */
 
 import { logger } from './logger';
+import { generateUniqueChartId, clearChartIdRegistry } from './chartIdGenerator';
 
 /**
  * Helper function to split students array into chunks of specified size
@@ -128,8 +129,12 @@ export function calcularEstadisticasCompetenciasDynamic(
   labels: string[] = ['I', 'II', 'III'],
   colors: string[] = ['#58a55c', '#d88008', '#c55c5c']
 ) {
+  // Limpiar el registro de IDs al inicio
+  clearChartIdRegistry();
+
   // Agrupar y calcular porcentajes por competencia
   const competenciasStats: any = {};
+  let chartCounter = 0; // Contador para IDs únicos
 
   // Extraer todas las competencias únicas por área
   competenciasData.forEach((item: any) => {
@@ -195,7 +200,7 @@ export function calcularEstadisticasCompetenciasDynamic(
         data: {
           title: compName,
           area: areaName,
-          chartId: `${areaName.toLowerCase().replace(/\s+/g, '_')}_${compName.toLowerCase().replace(/\s+/g, '_')}_competencias`,
+          chartId: generateUniqueChartId([areaName, compName, 'competencias'], chartCounter++),
           ranges: rangeData,
           chartData: {
             values: values
@@ -237,6 +242,8 @@ export function calcularEstadisticasCompetenciasDynamic(
 }
 
 export function calcularEstadisticasCompetencias(competenciasData: any[], labels: string[] = ['I', 'II', 'III'], colors: string[] = ['#58a55c', '#d88008', '#c55c5c']) {
+  let chartCounter = 0; // Contador para IDs únicos
+
   // Agrupar y calcular porcentajes por competencia
   const competenciasStats: any = {};
 
@@ -294,7 +301,7 @@ export function calcularEstadisticasCompetencias(competenciasData: any[], labels
         data: {
           title: compName,
           area: areaName,
-          chartId: `${areaName.toLowerCase().replace(/\s+/g, '_')}_${compName.toLowerCase().replace(/\s+/g, '_')}_competencias`,
+          chartId: generateUniqueChartId([areaName, compName, 'competencias'], chartCounter++),
           ranges: [
             { percentage: stats.I.percentage, count: stats.I.count },
             { percentage: stats.II.percentage, count: stats.II.count },
@@ -406,6 +413,8 @@ export function calcularEstadisticasAreaDynamic(
   colors: string[] = ['#c55c5c', '#d88008', '#58a55c', '#4c8631'],
   type: string = "score_distribution_horizontal",
 ) {
+  let chartCounter = 0; // Contador para IDs únicos
+
   // Agrupar por área
   const areaStats: any = {};
 
@@ -457,10 +466,10 @@ export function calcularEstadisticasAreaDynamic(
       area: areaName,
       data: {
         title: areaName,
-        chartId: `${areaName.toLowerCase().replace(/\s+/g, '_')}_distribution`,
+        chartId: generateUniqueChartId([areaName, 'distribution'], chartCounter++),
         subjects: [{
           name: areaName,
-          chartId: `${areaName.toLowerCase().replace(/\s+/g, '_')}_distribution`,
+          chartId: generateUniqueChartId([areaName, 'distribution'], chartCounter++),
           ranges: rangeData,
           legend: ranges.map((range, index) => ({
             color: `legend-color-${index + 1}`,
@@ -528,6 +537,8 @@ export function generarPaginasAreaIndividuales(scoreDistributionData: any): Arra
  * Calcula estadísticas para score_distribution por área
  */
 export function calcularEstadisticasArea(areaData: any[]) {
+  let chartCounter = 0; // Contador para IDs únicos
+
   // Agrupar por área
   const areaStats: any = {};
 
@@ -570,7 +581,7 @@ export function calcularEstadisticasArea(areaData: any[]) {
 
     return {
       name: areaName,
-      chartId: `${areaName.toLowerCase().replace(/\s+/g, '_')}_distribution`,
+      chartId: generateUniqueChartId([areaName, 'distribution'], chartCounter++),
       ranges: [
         {
           label: 'Insuficiente (0-35%)',
@@ -1625,6 +1636,8 @@ export function procesarPromediosDynamic(simulationData: any, ranges: Array<{ mi
   { min: 51, max: 65, label: '3' },
   { min: 66, max: 100, label: '4' }
 ], type: string = 'asignatura') {
+  let chartCounter = 0; // Contador para IDs únicos
+
   const asignaturasData: any = {};
 
   // Crear mapa de preguntas para acceso rápido por ID
@@ -1735,7 +1748,7 @@ export function procesarPromediosDynamic(simulationData: any, ranges: Array<{ mi
       type: "bar_chart_with_title",
       data: {
         title: asignatura,
-        chartId: `${asignatura.toLowerCase().replace(/\s+/g, '_')}_chart`,
+        chartId: generateUniqueChartId([asignatura, 'chart'], chartCounter++),
         ranges: rangeStats.map(range => ({
           percentage: range.percentage,
           count: range.count

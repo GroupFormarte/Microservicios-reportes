@@ -4,7 +4,10 @@ import {
   processSimulationData,
   generateExcelReport,
   generateExcelAnswers,
-  regenerateReport
+  regenerateReport,
+  listSimulationDataFiles,
+  getSimulationDataFile,
+  cleanupOldSimulationData
 } from '../controllers/reportsController';
 
 const router = Router();
@@ -20,6 +23,11 @@ router.post('/excel-puntajes', generateExcelReport);
 
 // 📝 EXCEL ANSWERS ENDPOINT - Generate Excel report with student answers
 router.post('/excel-respuestas', generateExcelAnswers);
+
+// 📁 DATA MANAGEMENT ENDPOINTS - Manage saved simulation data
+router.get('/data/list', listSimulationDataFiles);
+router.get('/data/:fileName', getSimulationDataFile);
+router.delete('/data/cleanup', cleanupOldSimulationData);
 
 // 🧪 TEST ENDPOINT - WebSocket test page
 router.get('/test-websocket', (req, res) => {
