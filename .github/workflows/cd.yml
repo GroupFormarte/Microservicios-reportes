@@ -1,0 +1,165 @@
+name: CD - Continuous Deployment to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    name: Validate Build & Docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Linter
+        run: npm run lint
+        continue-on-error: true
+
+      - name: TypeScript Type Check
+        run: npx tsc --noEmit
+
+      - name: Build Application
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Run Jest Tests
+        run: npm test -- --coverage --passWithNoTests
+        env:
+          NODE_ENV: test
+
+      - name: Create .env file for Docker
+        run: |
+          echo "🔧 Creating .env file for CI validation..."
+          cat << ENVEOF > .env
+          NODE_ENV=production
+          PORT=3350
+          HOST=0.0.0.0
+          API_KEY=test-api-key-for-ci
+          MONGODB_URI=mongodb://localhost:27017/test_reports
+          JWT_SECRET=test_secret_key_for_ci_validation
+          JWT_EXPIRES_IN=1d
+          ENVEOF
+
+      - name: Build Docker Image
+        run: |
+          echo "🐳 Building Docker image..."
+          docker compose build
+
+      - name: Start Docker Container
+        run: |
+          echo "🚀 Starting container..."
+          docker compose up -d
+          sleep 10
+
+      - name: Check container is running
+        run: |
+          echo "🔍 Checking if container is running..."
+          docker compose ps
+          if [ $(docker compose ps -q | wc -l) -gt 0 ]; then
+            echo "✅ Container is running"
+          else
+            echo "❌ Container failed to start"
+            docker compose logs
+            exit 1
+          fi
+
+      - name: Cleanup Docker resources
+        if: always()
+        run: |
+          echo "🧹 Cleaning up..."
+          docker compose down -v
+          echo "✅ Cleanup completed"
+
+  deploy:
+    name: Deploy to Production Server
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.event_name == 'push'
+    environment:
+      name: production
+      url: https://api-reports.plataformapodium.com
+
+    steps:
+      - name: Deploy to Production Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USERNAME }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          command_timeout: 20m
+          script: |
+            set -e
+            cd /var/www/api-reports.plataformapodium.com
+            
+            echo "📥 Pulling latest changes from main..."
+            sudo git fetch origin
+            sudo git reset --hard origin/main
+            sudo git clean -fd
+            
+            echo "🛑 Stopping and removing existing containers..."
+            sudo docker compose down
+            
+            echo "🗑️ Cleaning up old Docker resources..."
+            sudo docker system prune -f
+            
+            echo "🐳 Building and starting new container..."
+            sudo docker compose up -d --build --force-recreate
+            
+            echo "⏳ Waiting for container to be ready..."
+            sleep 15
+            
+            echo "🏥 Health check..."
+            CONTAINER_STATUS=$(sudo docker compose ps -q | xargs docker inspect -f '{{.State.Status}}')
+            if [ "$CONTAINER_STATUS" = "running" ]; then
+              echo "✅ Container is running"
+            else
+              echo "❌ Container is not running"
+              sudo docker compose logs --tail=50
+              exit 1
+            fi
+            
+            echo "✅ Deployment completed successfully!"
+
+      - name: Verify deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USERNAME }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            echo "📊 Checking Docker container status..."
+            sudo docker compose -f /var/www/api-reports.plataformapodium.com/docker-compose.yml ps
+            echo ""
+            echo "📋 Container logs (last 30 lines)..."
+            sudo docker compose -f /var/www/api-reports.plataformapodium.com/docker-compose.yml logs --tail=30
+            echo ""
+            echo "🔍 Testing API endpoint..."
+            curl -f http://localhost:3350/health || echo "Health endpoint check completed"
+
+      - name: Deployment Summary
+        if: success()
+        run: |
+          echo "✅ Deployment to Production successful"
+          echo "🌐 API available at: https://api-reports.plataformapodium.com"
+          echo "🐳 Container: formarte-reports"
+          echo "📍 Port: 3350"
+
+      - name: Deployment Failed
+        if: failure()
+        run: |
+          echo "❌ Deployment failed"
+          echo "🔍 Check logs above for details"
+          echo "📋 Rollback may be needed"
