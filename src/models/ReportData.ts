@@ -150,6 +150,26 @@ const ReportDataSchema = new Schema(
   }
 );
 
+// Hook para convertir examDate de String a Date automáticamente
+ReportDataSchema.pre('save', function(next) {
+  if (this.examDate && typeof this.examDate === 'string') {
+    this.examDate = new Date(this.examDate);
+  }
+  next();
+});
+
+// Hook para conversión en bulk operations (insertMany, updateMany, etc.)
+ReportDataSchema.pre('insertMany', function(next, docs: any[]) {
+  if (Array.isArray(docs)) {
+    docs.forEach(doc => {
+      if (doc.examDate && typeof doc.examDate === 'string') {
+        doc.examDate = new Date(doc.examDate);
+      }
+    });
+  }
+  next();
+});
+
 // Índice compuesto para consultas eficientes
 ReportDataSchema.index({ examDate: 1, idInstitute: 1, tipe_inform: 1 });
 ReportDataSchema.index({ examDate: 1, idInstitute: 1, tipe_inform: 1, simulationId: 1 });

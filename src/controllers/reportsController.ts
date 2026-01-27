@@ -492,7 +492,7 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
   const sessionId = req.headers['x-session-id'] as string || `session_${Date.now()}`;
 
   console.log('=== SIMULATION DATA RECEIVED ===');
-  console.log(simulationData.tipe_inform);
+  console.log(simulationData);
   console.log('=== END SIMULATION DATA ===');
   console.log('Session ID:', sessionId);
 
@@ -1398,8 +1398,10 @@ export const regenerateReport = asyncHandler(async (req: Request, res: Response,
     fecha_finalizacion,
     idInstitute,
     tipe_inform,
-    simulationId
+    simulationId,
+    to
   } = req.body;
+  console.log('Datos de consola', { body: req.body });
 
   // Validaciones
   if (!fecha_inicio || !fecha_finalizacion || !idInstitute || !tipe_inform) {
@@ -1423,7 +1425,8 @@ export const regenerateReport = asyncHandler(async (req: Request, res: Response,
     fecha_finalizacion,
     idInstitute,
     tipe_inform,
-    simulationId
+    simulationId,
+    to
   });
 
   try {
@@ -1435,28 +1438,55 @@ export const regenerateReport = asyncHandler(async (req: Request, res: Response,
     const endDate = new Date(fecha_finalizacion);
     endDate.setUTCHours(23, 59, 59, 999);
 
-    const filter: any = {
-      examDate: {
-        $gte: startDate,
-        $lte: endDate
-      },
+    // Base filter (sin examDate)
+    const baseFilter: any = {
       idInstitute,
       tipe_inform
     };
 
     if (simulationId) {
-      filter.simulationId = simulationId;
+      baseFilter.simulationId = simulationId;
     }
 
-    logger.info('Querying report_data with filter', JSON.stringify(filter, null, 2));
+    // 2. Intentar búsqueda por Date primero
+    const filterByDate = {
+      ...baseFilter,
+      examDate: {
+        $gte: startDate,
+        $lte: endDate
+      }
+    };
 
-    // 2. Consultar report_data
-    const reportDocuments = await ReportData.find(filter).lean();
+    logger.info('Querying report_data with Date filter', JSON.stringify(filterByDate, null, 2));
 
-    logger.info(`Found ${reportDocuments.length} documents`);
+    let reportDocuments = await ReportData.find(filterByDate).lean();
 
+    logger.info(`Found ${reportDocuments.length} documents with Date filter`);
+
+    // 3. Si no encuentra por Date, intentar por String (compatibilidad retroactiva)
     if (reportDocuments.length === 0) {
-      logger.warn('No reports found with the specified filters', { filter });
+      logger.info('No documents found with Date filter, trying String filter...');
+
+      const filterByString = {
+        ...baseFilter,
+        examDate: {
+          $gte: startDate.toISOString(),
+          $lte: endDate.toISOString()
+        }
+      };
+
+      logger.info('Querying report_data with String filter', JSON.stringify(filterByString, null, 2));
+
+      // Usar .collection.find() para evitar que Mongoose convierta los tipos
+      const cursor = ReportData.collection.find(filterByString);
+      reportDocuments = await cursor.toArray();
+
+      logger.info(`Found ${reportDocuments.length} documents with String filter`);
+    }
+
+    // 4. Si aún no encuentra nada, retornar error
+    if (reportDocuments.length === 0) {
+      logger.warn('No reports found with any filter', { baseFilter, startDate, endDate });
 
       return res.status(404).json({
         success: false,
@@ -1477,9 +1507,19 @@ export const regenerateReport = asyncHandler(async (req: Request, res: Response,
         Object.assign(resultsObj, doc.results);
       }
 
+      // Normalizar examDate: puede ser Date o String
+      let normalizedExamDate: string | undefined;
+      if (doc.examDate) {
+        if (typeof doc.examDate === 'string') {
+          normalizedExamDate = doc.examDate;
+        } else if (doc.examDate instanceof Date) {
+          normalizedExamDate = doc.examDate.toISOString();
+        }
+      }
+
       return {
         ...doc,
-        examDate: doc.examDate ? doc.examDate.toISOString() : undefined,
+        examDate: normalizedExamDate,
         results: Object.keys(resultsObj).length > 0 ? resultsObj : undefined
       };
     });
@@ -1513,9 +1553,15 @@ export const regenerateReport = asyncHandler(async (req: Request, res: Response,
       results
     );
 
+    // 6. Agregar el email si fue proporcionado
+    if (to) {
+      finalReport.to = to;
+      logger.info('Email address added to report', { to });
+    }
+
     logger.info('Final report generated, sending to processSimulationData');
 
-    // 6. Procesar el reporte directamente
+    // 7. Procesar el reporte directamente
     // Modificar el body del request actual con el reporte consolidado
     req.body = finalReport;
 
