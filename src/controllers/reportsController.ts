@@ -1479,7 +1479,7 @@ export const regenerateReport = asyncHandler(async (req: Request, res: Response,
 
       // Usar .collection.find() para evitar que Mongoose convierta los tipos
       const cursor = ReportData.collection.find(filterByString);
-      reportDocuments = await cursor.toArray();
+      reportDocuments = await cursor.toArray() as any;
 
       logger.info(`Found ${reportDocuments.length} documents with String filter`);
     }
