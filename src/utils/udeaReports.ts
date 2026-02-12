@@ -1006,10 +1006,39 @@ const clasificarCategoria = (porcentaje: number): string => {
 };
 
 /**
- * Procesa datos para la tabla de estudiantes con competencias
- * Página 6 del reporte UDEA 
+ * Interfaz para posiciones globales
  */
-export function procesarTablaEstudiantes(simulationData: any) {
+interface GlobalPositionData {
+  studentId: string;
+  puestoGrado: number;
+  puestoGrupo: number;
+  scoreGlobal: number;
+  totalEstudiantesGlobal: number;
+}
+
+interface GlobalPositionsMap {
+  [studentId: string]: GlobalPositionData;
+}
+
+/**
+ * Procesa datos para la tabla de estudiantes con competencias
+ * Página 6 del reporte UDEA
+ *
+ * @param simulationData - Datos de la simulación
+ * @param globalPositions - Mapa opcional de posiciones globales (puesto por grado)
+ *                          Si viene de regenerateReport, se extraen de results
+ *                          Si viene de processSimulationData, se calculan desde ReportData
+ */
+export function procesarTablaEstudiantes(simulationData: any, globalPositions?: GlobalPositionsMap) {
+  // LOG DEBUG: Ver si llegaron globalPositions
+  logger.info('========== procesarTablaEstudiantes DEBUG ==========');
+  logger.info(`globalPositions recibido: ${globalPositions ? 'SI' : 'NO'}`);
+  logger.info(`Cantidad de estudiantes en globalPositions: ${globalPositions ? Object.keys(globalPositions).length : 0}`);
+  if (globalPositions && Object.keys(globalPositions).length > 0) {
+    const firstKey = Object.keys(globalPositions)[0];
+    logger.info(`Ejemplo globalPositions[${firstKey}]: ${JSON.stringify(globalPositions[firstKey])}`);
+  }
+
   const estudiantes: any[] = [];
   let totalPuntajes = 0;
   let puntajesArray: number[] = [];
@@ -1044,8 +1073,15 @@ export function procesarTablaEstudiantes(simulationData: any) {
 
     // Obtener datos básicos del estudiante
     const puntaje = examen_asignado.score || 0;
-    const posicion = examen_asignado.position || 0;
+    const posicionGrupo = examen_asignado.position || 0;
     const categoria = clasificarCategoria(puntaje);
+
+    // Obtener posición global si está disponible
+    const globalPos = globalPositions?.[student.id];
+    const posicionGrado = globalPos?.puestoGrado || 0; // Se calculará después si no hay globalPositions
+
+    // LOG DEBUG: Ver posiciones de cada estudiante
+    logger.info(`[procesarTablaEstudiantes] Student ${student.id}: examen_asignado.position=${examen_asignado.position}, globalPos?.puestoGrado=${globalPos?.puestoGrado}, posicionGrupo=${posicionGrupo}, posicionGrado=${posicionGrado}`);
 
     // Calcular porcentajes por competencia
     const competenciasData: any = {};
@@ -1066,13 +1102,14 @@ export function procesarTablaEstudiantes(simulationData: any) {
     });
 
     const estudianteData = {
-      puestoGrado: posicion,
-      puestoGrupo: posicion, // Asumir que es el mismo por ahora
+      puestoGrado: posicionGrado, // Posición global (de globalPositions o se calcula después)
+      puestoGrupo: posicionGrupo, // Posición dentro del grupo (de examen_asignado.position)
       grupo: student.course_id || 'N/A',
-      nombre: student.name || `Estudiante ${index + 1}`, // Placeholder - no hay nombre en el JSON
-      puntaje: Math.round(puntaje * 10) / 10, // Un decimal
+      nombre: student.name || `Estudiante ${index + 1}`,
+      puntaje: Math.round(puntaje * 10) / 10,
       categoria: categoria,
-      competencias: competenciasList.map(comp => competenciasData[comp] + '%')
+      competencias: competenciasList.map(comp => competenciasData[comp] + '%'),
+      _studentId: student.id // Para poder buscar en globalPositions después
     };
 
     estudiantes.push(estudianteData);
@@ -1081,7 +1118,8 @@ export function procesarTablaEstudiantes(simulationData: any) {
 
     logger.info('Processed student for table', {
       studentId: student.id,
-      position: posicion,
+      posicionGrupo: posicionGrupo,
+      posicionGrado: posicionGrado,
       score: puntaje,
       category: categoria,
       competencies: Object.keys(competenciasData).length
@@ -1101,10 +1139,22 @@ export function procesarTablaEstudiantes(simulationData: any) {
   estudiantes.sort((a, b) => parseFloat(b.puntaje) - parseFloat(a.puntaje));
 
   // Actualizar posiciones después del ordenamiento
-  estudiantes.forEach((estudiante, index) => {
-    estudiante.puestoGrado = index + 1;
-    estudiante.puestoGrupo = index + 1;
-  });
+  // Solo recalcular puestoGrado si NO hay globalPositions (viene de processSimulationData directo)
+  // puestoGrupo NUNCA se recalcula, siempre viene del examen_asignado.position original
+  if (!globalPositions || Object.keys(globalPositions).length === 0) {
+    // Sin globalPositions: recalcular puestoGrado basado en ordenamiento local
+    estudiantes.forEach((estudiante, index) => {
+      estudiante.puestoGrado = index + 1;
+      // puestoGrupo ya tiene el valor correcto de examen_asignado.position
+    });
+
+    logger.info('Recalculated puestoGrado locally (no globalPositions provided)');
+  } else {
+    // Con globalPositions: las posiciones ya están correctas
+    logger.info('Using globalPositions for puestoGrado', {
+      studentsWithGlobalPos: Object.keys(globalPositions).length
+    });
+  }
 
   // Calcular índice de dificultad promedio por competencia
   const indiceDificultadPorCompetencia: any = {};
@@ -1226,8 +1276,20 @@ export function procesarTablaEstudiantes(simulationData: any) {
 /**
  * Procesa datos para la tabla de estudiantes con áreas en lugar de competencias
  * Similar a procesarTablaEstudiantes pero basado en áreas/materias
+ *
+ * @param simulationData - Datos de la simulación
+ * @param globalPositions - Mapa opcional de posiciones globales (puesto por grado)
  */
-export function procesarTablaEstudiantesPorArea(simulationData: any) {
+export function procesarTablaEstudiantesPorArea(simulationData: any, globalPositions?: GlobalPositionsMap) {
+  // LOG DEBUG: Ver si llegaron globalPositions
+  logger.info('========== procesarTablaEstudiantesPorArea DEBUG ==========');
+  logger.info(`globalPositions recibido: ${globalPositions ? 'SI' : 'NO'}`);
+  logger.info(`Cantidad de estudiantes en globalPositions: ${globalPositions ? Object.keys(globalPositions).length : 0}`);
+  if (globalPositions && Object.keys(globalPositions).length > 0) {
+    const firstKey = Object.keys(globalPositions)[0];
+    logger.info(`Ejemplo globalPositions[${firstKey}]: ${JSON.stringify(globalPositions[firstKey])}`);
+  }
+
   const estudiantes: any[] = [];
   let totalPuntajes = 0;
   let puntajesArray: number[] = [];
@@ -1260,8 +1322,15 @@ export function procesarTablaEstudiantesPorArea(simulationData: any) {
 
     // Obtener datos básicos del estudiante
     const puntaje = examen_asignado.score || 0;
-    const posicion = examen_asignado.position || 0;
+    const posicionGrupo = examen_asignado.position || 0;
     const categoria = clasificarCategoria(puntaje);
+
+    // Obtener posición global si está disponible
+    const globalPos = globalPositions?.[student.id];
+    const posicionGrado = globalPos?.puestoGrado || 0; // Se calculará después si no hay globalPositions
+
+    // LOG DEBUG: Ver posiciones de cada estudiante
+    logger.info(`[procesarTablaEstudiantesPorArea] Student ${student.id}: examen_asignado.position=${examen_asignado.position}, globalPos?.puestoGrado=${globalPos?.puestoGrado}, posicionGrupo=${posicionGrupo}, posicionGrado=${posicionGrado}`);
 
     // Calcular porcentajes por área
     const areasData: any = {};
@@ -1280,14 +1349,15 @@ export function procesarTablaEstudiantesPorArea(simulationData: any) {
     const valoresPorcentajes = areasList.map(area => areasData[area] + '%');
 
     const estudianteData = {
-      puestoGrado: posicion,
-      puestoGrupo: posicion, // Asumir que es el mismo por ahora
+      puestoGrado: posicionGrado, // Posición global (de globalPositions o se calcula después)
+      puestoGrupo: posicionGrupo, // Posición dentro del grupo (de examen_asignado.position)
       grupo: student.course_id || 'N/A',
       nombre: student.name || `Estudiante ${index + 1}`,
-      puntaje: Math.round(puntaje * 10) / 10, // Un decimal
+      puntaje: Math.round(puntaje * 10) / 10,
       categoria: categoria,
       areas: valoresPorcentajes,
-      competencias: valoresPorcentajes // Para compatibilidad con el template
+      competencias: valoresPorcentajes, // Para compatibilidad con el template
+      _studentId: student.id // Para poder buscar en globalPositions después
     };
 
     estudiantes.push(estudianteData);
@@ -1296,7 +1366,8 @@ export function procesarTablaEstudiantesPorArea(simulationData: any) {
 
     logger.info('Processed student for areas table', {
       studentId: student.id,
-      position: posicion,
+      posicionGrupo: posicionGrupo,
+      posicionGrado: posicionGrado,
       score: puntaje,
       category: categoria,
       areas: Object.keys(areasData).length
@@ -1316,10 +1387,22 @@ export function procesarTablaEstudiantesPorArea(simulationData: any) {
   estudiantes.sort((a, b) => parseFloat(b.puntaje) - parseFloat(a.puntaje));
 
   // Actualizar posiciones después del ordenamiento
-  estudiantes.forEach((estudiante, index) => {
-    estudiante.puestoGrado = index + 1;
-    estudiante.puestoGrupo = index + 1;
-  });
+  // Solo recalcular puestoGrado si NO hay globalPositions (viene de processSimulationData directo)
+  // puestoGrupo NUNCA se recalcula, siempre viene del examen_asignado.position original
+  if (!globalPositions || Object.keys(globalPositions).length === 0) {
+    // Sin globalPositions: recalcular puestoGrado basado en ordenamiento local
+    estudiantes.forEach((estudiante, index) => {
+      estudiante.puestoGrado = index + 1;
+      // puestoGrupo ya tiene el valor correcto de examen_asignado.position
+    });
+
+    logger.info('Recalculated puestoGrado locally for areas table (no globalPositions provided)');
+  } else {
+    // Con globalPositions: las posiciones ya están correctas
+    logger.info('Using globalPositions for puestoGrado in areas table', {
+      studentsWithGlobalPos: Object.keys(globalPositions).length
+    });
+  }
 
   // Calcular índice de dificultad promedio por área
   const indiceDificultadPorArea: any = {};

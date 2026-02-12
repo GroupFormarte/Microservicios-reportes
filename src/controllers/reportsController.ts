@@ -12,6 +12,7 @@ import { asyncHandler } from '../middleware/errorHandler';
 import { logger } from '../utils/logger';
 import { ReportData } from '../models/ReportData';
 import { ReportConsolidationService } from '../services/reportConsolidation';
+import { GlobalPositionService } from '../services/globalPositionService';
 import {
   ApiResponse,
   PageRequest,
@@ -538,6 +539,61 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
 
       const portadaPage = generarPaginaPortada(simulationData, images);
 
+      // ===== CALCULAR POSICIONES GLOBALES =====
+      // Si viene de regenerateReport, ya tiene results con posiciones globales
+      // Si viene directo, necesita calcular consultando ReportData
+      let globalPositions: any = {};
+
+      logger.info('========== GLOBAL POSITIONS FLOW DEBUG ==========');
+      logger.info(`simulationData.results exists: ${!!simulationData.results}`);
+      logger.info(`simulationData.results length: ${simulationData.results ? Object.keys(simulationData.results).length : 0}`);
+      logger.info(`simulationData.idInstitute: ${simulationData.idInstitute}`);
+      logger.info(`simulationData.simulationId: ${simulationData.simulationId}`);
+      logger.info(`simulationData.tipe_inform: ${simulationData.tipe_inform}`);
+      logger.info(`simulationData.students count: ${simulationData.students?.length || 0}`);
+
+      if (simulationData.results && Object.keys(simulationData.results).length > 0) {
+        // Viene de regenerateReport: extraer posiciones de results
+        globalPositions = GlobalPositionService.extractGlobalPositionsFromResults(
+          simulationData.results,
+          simulationData.students,
+          simulationData.simulationId
+        );
+        logger.info('Global positions extracted from results (regenerateReport)', {
+          studentsWithPositions: Object.keys(globalPositions).length
+        });
+      } else if (simulationData.idInstitute && simulationData.simulationId) {
+        // Viene de processSimulationData directo: calcular desde ReportData
+        try {
+          globalPositions = await GlobalPositionService.calculateGlobalPositions(
+            simulationData.idInstitute,
+            simulationData.tipe_inform,
+            simulationData.simulationId,
+            simulationData.students
+          );
+          logger.info('Global positions calculated from ReportData', {
+            studentsWithPositions: Object.keys(globalPositions).length
+          });
+        } catch (error) {
+          logger.warn('Could not calculate global positions, using local calculation', {
+            error: error instanceof Error ? error.message : String(error)
+          });
+        }
+      }
+
+      // LOG DEBUG: Ver resultado final de globalPositions
+      logger.info(`========== GLOBAL POSITIONS FINAL RESULT ==========`);
+      logger.info(`Total globalPositions: ${Object.keys(globalPositions).length}`);
+      if (Object.keys(globalPositions).length > 0) {
+        // Mostrar los primeros 5 estudiantes
+        const sampleStudents = Object.entries(globalPositions).slice(0, 5);
+        for (const [studentId, pos] of sampleStudents) {
+          const posData = pos as any;
+          logger.info(`  ${studentId}: puestoGrado=${posData.puestoGrado}, puestoGrupo=${posData.puestoGrupo}, score=${posData.scoreGlobal}`);
+        }
+      }
+      logger.info('========== END GLOBAL POSITIONS FLOW ==========');
+
       let allPages: any[] = [];
       if (simulationData.tipe_inform.trim().includes("udea")) {
 
@@ -657,7 +713,7 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
 
 
 
-        const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData);
+        const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData, globalPositions);
 
         let indiceDificultadPorCompetencia: any[] = [];
         for (const inD of tablaEstudiantesDataArray) {
@@ -857,7 +913,7 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
           areasPages.push(areasPage);
         }
 
-        const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData);
+        const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData, globalPositions);
         const tablaDificultadData = procesarTablaDificultadAnalisis(simulationData);
         let indiceDificultadPorCompetencia: any[] = [];
         for (const inD of tablaEstudiantesDataArray) {
@@ -1022,7 +1078,7 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
           }
         ];
 
-        const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData);
+        const tablaEstudiantesDataArray = procesarTablaEstudiantes(simulationData, globalPositions);
         let indiceDificultadPorCompetencia: any[] = [];
         for (const inD of tablaEstudiantesDataArray) {
           indiceDificultadPorCompetencia.push(inD)
@@ -1134,7 +1190,7 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
         }));
 
         // Página 7: Tabla de estudiantes por áreas (horizontal) - Puede ser múltiples páginas
-        const tablaEstudiantesAreasDataArray = procesarTablaEstudiantesPorArea(simulationData);
+        const tablaEstudiantesAreasDataArray = procesarTablaEstudiantesPorArea(simulationData, globalPositions);
         const listadoEstudiantesAreasPages: PageRequest[] = tablaEstudiantesAreasDataArray.map((tablaData, index) => ({
           layout: "horizontal",
           chartTitle: tablaEstudiantesAreasDataArray.length > 1
