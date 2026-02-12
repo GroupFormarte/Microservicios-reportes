@@ -527,7 +527,7 @@ export const processSimulationData = asyncHandler(async (req: Request, res: Resp
 
       const images = getDefaultHeaderImages();
       const baseHeaderInfo = generarBaseHeaderInfo(simulationData, images);
-
+ 
       websocketService.emitProgress({
         sessionId,
         stage: 'generating_cover',

@@ -3,6 +3,7 @@
  * Consolida múltiples reportes de report_data en una estructura unificada
  */
 
+import { platform } from 'os';
 import { RaschCalculator, RaschResult } from './raschCalculator';
 import { UdeaGradingSystem, UdeaResult } from './udeaGrading';
 
@@ -232,7 +233,8 @@ export class ReportConsolidationService {
           const raschResult: RaschResult = RaschCalculator.calculateRasch(
             students,
             student,
-            simulationId
+            simulationId,
+            { platformType: tipeInform }
           );
 
           results[student.id] = {

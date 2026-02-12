@@ -69,9 +69,15 @@ export interface RaschResult {
 
 const NON_RESPONSE_THETA = -9999.0;
 
+export type PlatformType = 'unal' | 'saber';
+
 export class RaschCalculator {
   /**
    * Calcula el modelo de Rasch para un conjunto de estudiantes
+   *
+   * Tipos de plataforma soportados:
+   * - 'unal': Escala 0-1000 con media 500 y SD 100
+   * - 'saber': Escala 0-500 (estilo ICFES)
    */
   static calculateRasch(
     students: Student[],
@@ -80,9 +86,10 @@ export class RaschCalculator {
     options: {
       maxIterations?: number;
       tolerance?: number;
+      platformType?: PlatformType;
     } = {}
   ): RaschResult {
-    const { maxIterations = 20, tolerance = 1e-6 } = options;
+    const { maxIterations = 20, tolerance = 1e-6, platformType = 'unal' } = options;
 
     // 1) Crear índices para estudiantes y preguntas
     const studentIndex = this.createStudentIndex(students);
@@ -195,12 +202,37 @@ export class RaschCalculator {
     const position = targetIndex >= 0 ? targetIndex + 1 : -1;
     const rawTheta = targetIndex >= 0 ? scored[targetIndex].ability : 0.0;
 
-    // Normalizar a escala 500 ± 100
-    const meanTheta = this.mean(thetas);
-    const sdTheta = this.std(thetas, meanTheta);
-    let finalScore = 500.0;
-    if (sdTheta > 0) {
-      finalScore = 500 + (100 * (rawTheta - meanTheta)) / sdTheta;
+    // CORRECCIÓN: Excluir estudiantes sin respuestas (theta = -9999) del cálculo estadístico
+    const validThetas = thetas.filter((t) => t !== NON_RESPONSE_THETA);
+
+    let finalScore = 0.0; // Por defecto 0 si no respondió
+
+    // Solo calcular puntaje normalizado si el estudiante respondió preguntas
+    if (rawTheta !== NON_RESPONSE_THETA && validThetas.length > 0) {
+      const meanTheta = this.mean(validThetas);
+      const sdTheta = this.std(validThetas, meanTheta);
+
+      if (platformType === 'saber') {
+        // SABER: Escala 0-500 (ICFES)
+        // Normalizar theta a un rango 0-1 y luego escalar a 0-500
+        const minTheta = Math.min(...validThetas);
+        const maxTheta = Math.max(...validThetas);
+        const range = maxTheta - minTheta;
+        if (range > 0) {
+          const normalized = (rawTheta - minTheta) / range; // 0-1
+          finalScore = normalized * 500; // 0-500
+        } else {
+          finalScore = 250.0; // Media si todos tienen el mismo theta
+        }
+      } else {
+        // UNAL: Escala con media 500 y SD 100 (rango aprox 200-800)
+        finalScore = 500.0;
+        if (sdTheta > 0) {
+          finalScore = 500 + (100 * (rawTheta - meanTheta)) / sdTheta;
+        }
+        // Limitar al rango 0-1000
+        finalScore = Math.max(0.0, Math.min(1000.0, finalScore));
+      }
     }
 
     // Contar respuestas del estudiante objetivo
@@ -323,8 +355,14 @@ export class RaschCalculator {
 
               const qIndex = questionIndex[qId];
               if (qIndex !== undefined) {
-                const isCorrect = ans.isCorrect ?? ans.es_correcta ?? false;
-                matrix[sIndex][qIndex] = isCorrect ? 1 : 0;
+                // Solo marcar como respondida si tiene answerId
+                const answerId = ans.answerId || ans.id_respuesta;
+                if (!answerId || answerId === '') {
+                  matrix[sIndex][qIndex] = -1; // Sin respuesta
+                } else {
+                  const isCorrect = ans.isCorrect ?? ans.es_correcta ?? false;
+                  matrix[sIndex][qIndex] = isCorrect ? 1 : 0;
+                }
               }
             }
           }
