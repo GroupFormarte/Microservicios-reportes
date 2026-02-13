@@ -1071,17 +1071,20 @@ export function procesarTablaEstudiantes(simulationData: any, globalPositions?: 
 
     if (!examen_asignado) return;
 
+    // Obtener posición global si está disponible
+    const globalPos = globalPositions?.[student.id];
+
     // Obtener datos básicos del estudiante
-    const puntaje = examen_asignado.score || 0;
+    // Usar scoreGlobal de globalPositions si está disponible (viene del recálculo con RaschCalculator)
+    // De lo contrario, usar el score del examen asignado
+    const puntaje = globalPos?.scoreGlobal ?? examen_asignado.score ?? 0;
     const posicionGrupo = examen_asignado.position || 0;
     const categoria = clasificarCategoria(puntaje);
 
-    // Obtener posición global si está disponible
-    const globalPos = globalPositions?.[student.id];
     const posicionGrado = globalPos?.puestoGrado || 0; // Se calculará después si no hay globalPositions
 
     // LOG DEBUG: Ver posiciones de cada estudiante
-    logger.info(`[procesarTablaEstudiantes] Student ${student.id}: examen_asignado.position=${examen_asignado.position}, globalPos?.puestoGrado=${globalPos?.puestoGrado}, posicionGrupo=${posicionGrupo}, posicionGrado=${posicionGrado}`);
+    logger.info(`[procesarTablaEstudiantes] Student ${student.id}: examen_asignado.position=${examen_asignado.position}, globalPos?.puestoGrado=${globalPos?.puestoGrado}, globalPos?.scoreGlobal=${globalPos?.scoreGlobal}, posicionGrupo=${posicionGrupo}, posicionGrado=${posicionGrado}`);
 
     // Calcular porcentajes por competencia
     const competenciasData: any = {};
@@ -1320,17 +1323,20 @@ export function procesarTablaEstudiantesPorArea(simulationData: any, globalPosit
 
     if (!examen_asignado) return;
 
+    // Obtener posición global si está disponible
+    const globalPos = globalPositions?.[student.id];
+
     // Obtener datos básicos del estudiante
-    const puntaje = examen_asignado.score || 0;
+    // Usar scoreGlobal de globalPositions si está disponible (viene del recálculo con RaschCalculator)
+    // De lo contrario, usar el score del examen asignado
+    const puntaje = globalPos?.scoreGlobal ?? examen_asignado.score ?? 0;
     const posicionGrupo = examen_asignado.position || 0;
     const categoria = clasificarCategoria(puntaje);
 
-    // Obtener posición global si está disponible
-    const globalPos = globalPositions?.[student.id];
     const posicionGrado = globalPos?.puestoGrado || 0; // Se calculará después si no hay globalPositions
 
     // LOG DEBUG: Ver posiciones de cada estudiante
-    logger.info(`[procesarTablaEstudiantesPorArea] Student ${student.id}: examen_asignado.position=${examen_asignado.position}, globalPos?.puestoGrado=${globalPos?.puestoGrado}, posicionGrupo=${posicionGrupo}, posicionGrado=${posicionGrado}`);
+    logger.info(`[procesarTablaEstudiantesPorArea] Student ${student.id}: examen_asignado.position=${examen_asignado.position}, globalPos?.puestoGrado=${globalPos?.puestoGrado}, globalPos?.scoreGlobal=${globalPos?.scoreGlobal}, posicionGrupo=${posicionGrupo}, posicionGrado=${posicionGrado}`);
 
     // Calcular porcentajes por área
     const areasData: any = {};
