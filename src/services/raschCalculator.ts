@@ -120,13 +120,10 @@ export class RaschCalculator {
       return 1.0 / (1.0 + Math.exp(-exponent));
     };
 
-    // 5) Contar respuestas por estudiante
-    const answeredCount = new Array(nStudents).fill(0);
+    // 5) Contar respuestas REALES por estudiante (con answerId) para detectar quienes no respondieron
+    const realAnsweredCount = this.countRealAnswers(students, idSimulacro);
     for (let i = 0; i < nStudents; i++) {
-      for (let j = 0; j < nItems; j++) {
-        if (responseMatrix[i][j] !== -1) answeredCount[i]++;
-      }
-      if (answeredCount[i] === 0) {
+      if (realAnsweredCount[i] === 0) {
         thetas[i] = NON_RESPONSE_THETA;
       }
     }
@@ -137,7 +134,7 @@ export class RaschCalculator {
 
       // Actualizar thetas (habilidades de estudiantes)
       for (let i = 0; i < nStudents; i++) {
-        if (answeredCount[i] === 0) continue;
+        if (realAnsweredCount[i] === 0) continue;
 
         let grad = 0.0;
         let hess = 0.0;
@@ -163,7 +160,7 @@ export class RaschCalculator {
         let hess = 0.0;
 
         for (let i = 0; i < nStudents; i++) {
-          if (answeredCount[i] === 0 || responseMatrix[i][j] === -1) continue;
+          if (realAnsweredCount[i] === 0 || responseMatrix[i][j] === -1) continue;
           const p = pij(i, j);
           grad += -(responseMatrix[i][j] - p);
           hess -= p * (1 - p);
@@ -213,17 +210,13 @@ export class RaschCalculator {
       const sdTheta = this.std(validThetas, meanTheta);
 
       if (platformType === 'saber') {
-        // SABER: Escala 0-500 (ICFES)
-        // Normalizar theta a un rango 0-1 y luego escalar a 0-500
-        const minTheta = Math.min(...validThetas);
-        const maxTheta = Math.max(...validThetas);
-        const range = maxTheta - minTheta;
-        if (range > 0) {
-          const normalized = (rawTheta - minTheta) / range; // 0-1
-          finalScore = normalized * 500; // 0-500
-        } else {
-          finalScore = 250.0; // Media si todos tienen el mismo theta
+        // SABER: Escala 0-500 (ICFES) con media 250 y SD 50
+        finalScore = 250.0;
+        if (sdTheta > 0) {
+          finalScore = 250 + (50 * (rawTheta - meanTheta)) / sdTheta;
         }
+        // Limitar al rango 0-500
+        finalScore = Math.max(0.0, Math.min(500.0, finalScore));
       } else {
         // UNAL: Escala con media 500 y SD 100 (rango aprox 200-800)
         finalScore = 500.0;
@@ -235,23 +228,32 @@ export class RaschCalculator {
       }
     }
 
-    // Contar respuestas del estudiante objetivo
+    // Contar respuestas reales del estudiante objetivo (desde los datos originales, no la matrix)
     let correctAnswers = 0;
     let incorrectAnswers = 0;
     let totalAnswered = 0;
 
-    if (targetIndex >= 0) {
-      const targetStudentIndex = studentIndex[targetStudent.id!];
-      for (let j = 0; j < nItems; j++) {
-        const response = responseMatrix[targetStudentIndex][j];
-        if (response !== -1) {
-          totalAnswered++;
-          if (response === 1) {
-            correctAnswers++;
-          } else {
-            incorrectAnswers++;
+    const targetExams = targetStudent.assignedExams || targetStudent.examenes_asignados || [];
+    for (const exam of targetExams) {
+      const examId = exam.idSimulacro || exam.id_simulacro;
+      if (examId === idSimulacro) {
+        const sessions = exam.sessionResponses || exam.respuesta_sesion || [];
+        for (const sr of sessions) {
+          const answers = sr.answers || sr.respuestas || [];
+          for (const ans of answers) {
+            const answerId = ans.answerId || ans.id_respuesta;
+            if (answerId && answerId !== '') {
+              totalAnswered++;
+              const isCorrect = ans.isCorrect ?? ans.es_correcta ?? false;
+              if (isCorrect) {
+                correctAnswers++;
+              } else {
+                incorrectAnswers++;
+              }
+            }
           }
         }
+        break;
       }
     }
 
@@ -355,10 +357,10 @@ export class RaschCalculator {
 
               const qIndex = questionIndex[qId];
               if (qIndex !== undefined) {
-                // Solo marcar como respondida si tiene answerId
+                // Si la pregunta existe en el examen pero no fue respondida, cuenta como incorrecta (0)
                 const answerId = ans.answerId || ans.id_respuesta;
                 if (!answerId || answerId === '') {
-                  matrix[sIndex][qIndex] = -1; // Sin respuesta
+                  matrix[sIndex][qIndex] = 0; // No respondida = incorrecta
                 } else {
                   const isCorrect = ans.isCorrect ?? ans.es_correcta ?? false;
                   matrix[sIndex][qIndex] = isCorrect ? 1 : 0;
@@ -372,6 +374,38 @@ export class RaschCalculator {
     }
 
     return matrix;
+  }
+
+  /**
+   * Cuenta las respuestas reales (con answerId) por estudiante
+   */
+  private static countRealAnswers(students: Student[], idSimulacro: string): number[] {
+    const counts = new Array(students.length).fill(0);
+
+    for (let i = 0; i < students.length; i++) {
+      const exams = students[i].assignedExams || students[i].examenes_asignados || [];
+
+      for (const exam of exams) {
+        const examId = exam.idSimulacro || exam.id_simulacro;
+        if (examId === idSimulacro) {
+          const sessions = exam.sessionResponses || exam.respuesta_sesion || [];
+
+          for (const sr of sessions) {
+            const answers = sr.answers || sr.respuestas || [];
+
+            for (const ans of answers) {
+              const answerId = ans.answerId || ans.id_respuesta;
+              if (answerId && answerId !== '') {
+                counts[i]++;
+              }
+            }
+          }
+          break;
+        }
+      }
+    }
+
+    return counts;
   }
 
   /**
