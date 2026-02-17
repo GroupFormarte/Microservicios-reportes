@@ -8,6 +8,7 @@ import { websocketService } from '../services/websocketService';
 import { excelService } from '../services/excelService';
 import { emailService } from '../services/emailService';
 import { dataStorageService } from '../services/dataStorageService';
+import { fileCleanupService } from '../services/fileCleanupService';
 import { asyncHandler } from '../middleware/errorHandler';
 import { logger } from '../utils/logger';
 import { ReportData } from '../models/ReportData';
@@ -1262,6 +1263,14 @@ console.dir({ asignaturasPages }, { depth: null });
 
       const finalPdfUrl = `${req.protocol}://${req.get('host')}/api/reports/pdfs/${mergedFileName}`;
 
+      // Programar eliminación automática del PDF después de 20 minutos
+      const expirationMinutes = fileCleanupService.getFileLifetimeMinutes();
+      fileCleanupService.schedulePdfDeletion(mergedFileName);
+      logger.info('PDF scheduled for automatic deletion', {
+        fileName: mergedFileName,
+        expirationMinutes
+      });
+
       // Clear cache and cleanup resources after successful report generation
       try {
         renderService.clearCache();
@@ -1319,7 +1328,8 @@ console.dir({ asignaturasPages }, { depth: null });
         const emailSent = await emailService.sendReportEmail({
           to: simulationData.to,
           subject: emailSubject,
-          link: finalPdfUrl
+          link: finalPdfUrl,
+          expirationMinutes: expirationMinutes
         });
 
         if (emailSent) {
@@ -1384,6 +1394,14 @@ export const generateExcelReport = asyncHandler(async (req: Request, res: Respon
   try {
     const fileName = await excelService.generateExcelReport(simulationData);
 
+    // Programar eliminación automática del Excel después de 20 minutos
+    const expirationMinutes = fileCleanupService.getFileLifetimeMinutes();
+    fileCleanupService.scheduleExcelDeletion(fileName);
+    logger.info('Excel scheduled for automatic deletion', {
+      fileName,
+      expirationMinutes
+    });
+
     // Generate download URL
     const excelUrl = `${req.protocol}://${req.get('host')}/api/reports/excels/${fileName}`;
 
@@ -1393,7 +1411,9 @@ export const generateExcelReport = asyncHandler(async (req: Request, res: Respon
         fileName,
         url: excelUrl,
         downloadUrl: `${excelUrl}?download=true`,
-        message: 'Excel generado exitosamente'
+        message: 'Excel generado exitosamente',
+        expirationMinutes,
+        expirationMessage: `Este archivo estará disponible por ${expirationMinutes} minutos.`
       }
     });
 
@@ -1420,6 +1440,14 @@ export const generateExcelAnswers = asyncHandler(async (req: Request, res: Respo
   try {
     const fileName = await excelService.generateExcelAnswers(simulationData);
 
+    // Programar eliminación automática del Excel después de 20 minutos
+    const expirationMinutes = fileCleanupService.getFileLifetimeMinutes();
+    fileCleanupService.scheduleExcelDeletion(fileName);
+    logger.info('Excel answers scheduled for automatic deletion', {
+      fileName,
+      expirationMinutes
+    });
+
     // Generate download URL
     const excelUrl = `${req.protocol}://${req.get('host')}/api/reports/excels/${fileName}`;
 
@@ -1429,7 +1457,9 @@ export const generateExcelAnswers = asyncHandler(async (req: Request, res: Respo
         fileName,
         url: excelUrl,
         downloadUrl: `${excelUrl}?download=true`,
-        message: 'Excel de respuestas generado exitosamente'
+        message: 'Excel de respuestas generado exitosamente',
+        expirationMinutes,
+        expirationMessage: `Este archivo estará disponible por ${expirationMinutes} minutos.`
       }
     });
 

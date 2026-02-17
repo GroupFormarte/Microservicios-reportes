@@ -11,6 +11,7 @@ export interface SendReportEmailParams {
   to: string;
   subject: string;
   link: string;
+  expirationMinutes?: number; // Tiempo en minutos hasta que expire el archivo
 }
 
 export class EmailService {
@@ -26,11 +27,14 @@ export class EmailService {
    * Envía un email con el link del reporte generado
    */
   async sendReportEmail(params: SendReportEmailParams): Promise<boolean> {
+    const expirationMinutes = params.expirationMinutes ?? 20;
+
     try {
       logger.info('Sending report email', {
         to: params.to,
         subject: params.subject,
-        apiUrl: this.mailApiUrl
+        apiUrl: this.mailApiUrl,
+        expirationMinutes
       });
 
       const response = await axios.post(
@@ -38,7 +42,9 @@ export class EmailService {
         {
           to: params.to,
           subject: params.subject,
-          link: params.link
+          link: params.link,
+          expirationMinutes: expirationMinutes,
+          expirationMessage: `Este enlace estará disponible por ${expirationMinutes} minutos.`
         },
         {
           timeout: this.mailApiTimeout,

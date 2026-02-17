@@ -12,6 +12,7 @@ import { errorHandler } from './middleware/errorHandler';
 import { hybridAuth } from './middleware/auth';
 import { websocketService } from './services/websocketService';
 import { connectDatabase, disconnectDatabase } from './config/database';
+import { fileCleanupService } from './services/fileCleanupService';
 import reportsRoutes from './routes/reports';
 import { questionsRouter } from './routes/questions';
 import pdfRoutes from './routes/pdf';
@@ -121,6 +122,12 @@ const startServer = async () => {
     // Connect to MongoDB
     await connectDatabase();
     logger.info('MongoDB connection established');
+
+    // Limpiar archivos antiguos (PDFs y Excels) al iniciar
+    const deletedFiles = await fileCleanupService.cleanupOldFiles();
+    if (deletedFiles > 0) {
+      logger.info('Cleaned up old report files on startup', { deletedCount: deletedFiles });
+    }
 
 
     // 1. Modelo auxiliar de migraciones
