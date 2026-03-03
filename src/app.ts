@@ -10,6 +10,7 @@ import { config, isDevelopment } from './utils/config';
 import { logger } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { hybridAuth } from './middleware/auth';
+import { pdfNotFoundMiddleware, excelNotFoundMiddleware } from './middleware/fileNotFound';
 import { websocketService } from './services/websocketService';
 import { connectDatabase, disconnectDatabase } from './config/database';
 import { fileCleanupService } from './services/fileCleanupService';
@@ -72,14 +73,18 @@ app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 app.use('/public', express.static(path.join(__dirname, '../public')));
 app.use('/static/css', express.static(path.join(__dirname, '../public/css')));
 app.use('/static/assets', express.static(path.join(__dirname, '../../Recursos/assets')));
-app.use('/static/pdfs', express.static(path.join(__dirname, '../public/pdfs')));
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
-// PDF files access without authentication (specific route before general /api/reports)
-app.use('/api/reports/pdfs', express.static(path.join(__dirname, '../public/pdfs')));
+// Directorios de archivos generados
+const pdfsDirectory = path.join(__dirname, '../public/pdfs');
+const excelsDirectory = path.join(__dirname, '../public/excels');
 
-// Excel files access without authentication (specific route before general /api/reports)
-app.use('/api/reports/excels', express.static(path.join(__dirname, '../public/excels')));
+// PDF files access with "file not available" page for expired/deleted files
+app.use('/static/pdfs', pdfNotFoundMiddleware(pdfsDirectory), express.static(pdfsDirectory));
+app.use('/api/reports/pdfs', pdfNotFoundMiddleware(pdfsDirectory), express.static(pdfsDirectory));
+
+// Excel files access with "file not available" page for expired/deleted files
+app.use('/api/reports/excels', excelNotFoundMiddleware(excelsDirectory), express.static(excelsDirectory));
 
 // CSS files access without authentication (specific route before general /api/reports)
 app.use('/api/reports/css', express.static(path.join(__dirname, '../public/css')));

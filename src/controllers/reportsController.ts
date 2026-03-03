@@ -1263,7 +1263,7 @@ console.dir({ asignaturasPages }, { depth: null });
 
       const finalPdfUrl = `${req.protocol}://${req.get('host')}/api/reports/pdfs/${mergedFileName}`;
 
-      // Programar eliminación automática del PDF después de 20 minutos
+      // Programar eliminación automática del PDF después del tiempo configurado (30 minutos)
       const expirationMinutes = fileCleanupService.getFileLifetimeMinutes();
       fileCleanupService.schedulePdfDeletion(mergedFileName);
       logger.info('PDF scheduled for automatic deletion', {

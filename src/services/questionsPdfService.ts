@@ -2,6 +2,7 @@ import { QuestionGenerationOptions, QuestionForPdf, ProcessedQuestion, DeltaOper
 // import { renderService } from './renderService';
 import { PdfService } from './pdfService';
 import { websocketService } from './websocketService';
+import { fileCleanupService } from './fileCleanupService';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -44,6 +45,9 @@ export class QuestionsPdfService {
       // Save PDF file
       const pdfPath = path.join(process.cwd(), 'public', 'pdfs', fileName);
       await fs.writeFile(pdfPath, pdfBuffer);
+
+      // Programar eliminación automática después del tiempo configurado (30 minutos)
+      fileCleanupService.schedulePdfDeletion(fileName);
 
       // Use provided baseUrl or fallback to environment variable
       const url = baseUrl || process.env.BASE_URL || 'http://localhost:3001';

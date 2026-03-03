@@ -8,7 +8,7 @@ import path from 'path';
 import { logger } from '../utils/logger';
 
 // Tiempo de vida de los archivos en minutos
-const DEFAULT_FILE_LIFETIME_MINUTES = 20;
+const DEFAULT_FILE_LIFETIME_MINUTES = 30;
 
 interface ScheduledDeletion {
   filePath: string;
@@ -209,8 +209,8 @@ class FileCleanupService {
   }
 }
 
-// Singleton instance con 20 minutos por defecto
-export const fileCleanupService = new FileCleanupService(20);
+// Singleton instance con 30 minutos por defecto
+export const fileCleanupService = new FileCleanupService(30);
 
 // Exportar la clase para testing o instancias personalizadas
 export { FileCleanupService };
